@@ -98,6 +98,9 @@ COMMAND_RESULT="Unknown command"
 if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
  debug "_${NAMESPACE} has commands"
  COMMAND=$2
+ if [ "$COMMAND" == "" ] ; then
+   _help
+ fi 
  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
   debug "${NAMESPACE}_${COMMAND} is a valid command"
   shift 2
