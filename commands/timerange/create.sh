@@ -1,7 +1,11 @@
 #!/bin/bash
 
 function timerange_create {
-  while getopts "s:e:" opt "$@";
+  local START_TIME=-1
+  local END_TIME=-1
+  local DURATION_IN_MINUTES=0
+  local TYPE=BETWEEN_TIMES
+  while getopts "s:e:b:" opt "$@";
   do
     case "${opt}" in
       s)
@@ -10,12 +14,16 @@ function timerange_create {
       e)
         END_TIME=${OPTARG}
       ;;
+      b)
+        DURATION_IN_MINUTES=${OPTARG}
+        TYPE="BEFORE_NOW"
+      ;;
     esac   
   done;
   shiftOptInd
   shift $SHIFTS
   TIMERANGE_NAME=$@
-  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"BETWEEN_TIMES\",\"durationInMinutes\":0,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
+  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
 
 register timerange_create Create a custom time range 

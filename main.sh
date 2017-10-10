@@ -37,6 +37,8 @@ source ./commands/controller/call.sh
 source ./commands/dbmon/create.sh
 
 source ./commands/timerange/create.sh
+source ./commands/timerange/list.sh
+source ./commands/timerange/delete.sh
 
 source ./commands/dashboard/list.sh
 source ./commands/dashboard/export.sh

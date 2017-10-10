@@ -185,7 +185,11 @@ function dbmon_create {
 }
 register dbmon_create Create a new database collector
 function timerange_create {
-  while getopts "s:e:" opt "$@";
+  local START_TIME=-1
+  local END_TIME=-1
+  local DURATION_IN_MINUTES=0
+  local TYPE=BETWEEN_TIMES
+  while getopts "s:e:b:" opt "$@";
   do
     case "${opt}" in
       s)
@@ -194,14 +198,32 @@ function timerange_create {
       e)
         END_TIME=${OPTARG}
       ;;
+      b)
+        DURATION_IN_MINUTES=${OPTARG}
+        TYPE="BEFORE_NOW"
+      ;;
     esac   
   done;
   shiftOptInd
   shift $SHIFTS
   TIMERANGE_NAME=$@
-  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"BETWEEN_TIMES\",\"durationInMinutes\":0,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
+  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
 register timerange_create Create a custom time range 
+function timerange_list {
+  controller_call -X GET /controller/restui/user/getAllCustomTimeRanges
+}
+register timerange_list List all custom timeranges available on the controller
+function timerange_delete {
+  local TIMERANGE_ID=$@
+  if [[ $TIMERANGE_ID =~ ^[0-9]+$ ]]; then
+    controller_call -X POST -d "$TIMERANGE_ID" /controller/restui/user/deleteCustomRange
+  else
+    COMMAND_RESULT=""
+    error "This is not a number: '$TIMERANGE_ID'"
+  fi
+}
+register timerange_delete Delete a specific time range by id
 function dashboard_list {
   controller_call -X GET /controller/restui/dashboards/getAllDashboardsByType/false
 }
