@@ -4,7 +4,8 @@ function _help {
   COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
   COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"dbmon list\" to list all database collectors.\nFinally the following commands in the global namespace can be called directly:\n"
   local NAMESPACE=""
-  local SORTED=`echo -en "$GLOBAL_HELP" | sort`
+  local SORTED
+  SORTED=`echo -en "$GLOBAL_HELP" | sort`
   OLD_IFS=$IFS
   IFS=$'\n'
   for LINE in $SORTED; do
@@ -20,4 +21,4 @@ function _help {
   IFS=$OLD_IFS
 }
 
-register _help Display the global usage information 
+register _help Display the global usage information

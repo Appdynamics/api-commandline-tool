@@ -16,7 +16,7 @@ SCRIPTNAME=$0
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
-  GLOBAL_HELP="$GLOBAL_HELP\n$@"
+  GLOBAL_HELP="$GLOBAL_HELP\n$*"
 }
 COLOR_WARNING="\033[0;33m"
 COLOR_INFO="\033[0;32m"
@@ -25,27 +25,27 @@ COLOR_DEBUG="\033[0;35m"
 COLOR_RESET="\033[0m"
 function debug {
   if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
-    echo -e "${COLOR_DEBUG}DEBUG: $@${COLOR_RESET}"
+    echo -e "${COLOR_DEBUG}DEBUG: $*${COLOR_RESET}"
   fi
 }
 function error {
   if [ "${CONFIG_OUTPUT_VERBOSITY/error}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
-    echo -e "${COLOR_ERROR}ERROR: $@${COLOR_RESET}"
+    echo -e "${COLOR_ERROR}ERROR: $*${COLOR_RESET}"
   fi
 }
 function warning {
   if [ "${CONFIG_OUTPUT_VERBOSITY/warning}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
-    echo -e "${COLOR_WARNING}WARNING: $@${COLOR_RESET}"
+    echo -e "${COLOR_WARNING}WARNING: $*${COLOR_RESET}"
   fi
 }
 function info {
   if [ "${CONFIG_OUTPUT_VERBOSITY/info}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
-    echo -e "${COLOR_INFO}INFO: $@${COLOR_RESET}"
+    echo -e "${COLOR_INFO}INFO: $*${COLOR_RESET}"
   fi
 }
 function output {
   if [ "${CONFIG_OUTPUT_VERBOSITY}" != "" ]; then
-    echo -e "$@"
+    echo -e "$*"
   fi
 }
 function httpClient {
@@ -113,7 +113,8 @@ function _help {
   COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
   COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"dbmon list\" to list all database collectors.\nFinally the following commands in the global namespace can be called directly:\n"
   local NAMESPACE=""
-  local SORTED=`echo -en "$GLOBAL_HELP" | sort`
+  local SORTED
+  SORTED=`echo -en "$GLOBAL_HELP" | sort`
   OLD_IFS=$IFS
   IFS=$'\n'
   for LINE in $SORTED; do
@@ -128,7 +129,7 @@ function _help {
   done
   IFS=$OLD_IFS
 }
-register _help Display the global usage information 
+register _help Display the global usage information
 CONTROLLER_LOGIN_STATUS=0
 function controller_login {
   debug "Login at $CONFIG_CONTROLLER_HOST with $CONFIG_CONTROLLER_CREDENTIALS"
@@ -159,11 +160,9 @@ function controller_call {
       ;;
     esac
   done
- 
   shiftOptInd
   shift $SHIFTS
-  ENDPOINT=$@
-  
+  ENDPOINT=$*
   controller_login
   # Debug the COMMAND_RESULT from controller_login
   debug $COMMAND_RESULT
@@ -179,7 +178,7 @@ function controller_call {
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
    fi
 }
-register controller_call Send a custom HTTP call to a controller 
+register controller_call Send a custom HTTP call to a controller
 function dbmon_create {
   echo "Stub"
 }
@@ -202,20 +201,20 @@ function timerange_create {
         DURATION_IN_MINUTES=${OPTARG}
         TYPE="BEFORE_NOW"
       ;;
-    esac   
+    esac
   done;
   shiftOptInd
   shift $SHIFTS
-  TIMERANGE_NAME=$@
+  TIMERANGE_NAME=$*
   controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
-register timerange_create Create a custom time range 
+register timerange_create Create a custom time range
 function timerange_list {
   controller_call -X GET /controller/restui/user/getAllCustomTimeRanges
 }
 register timerange_list List all custom timeranges available on the controller
 function timerange_delete {
-  local TIMERANGE_ID=$@
+  local TIMERANGE_ID=$*
   if [[ $TIMERANGE_ID =~ ^[0-9]+$ ]]; then
     controller_call -X POST -d "$TIMERANGE_ID" /controller/restui/user/deleteCustomRange
   else
@@ -279,7 +278,7 @@ do
      D)
 	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
         debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
-  esac 
+  esac
 done
 shiftOptInd
 shift $SHIFTS
@@ -295,17 +294,17 @@ if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
  COMMAND=$2
  if [ "$COMMAND" == "" ] ; then
    _help
- fi 
+ fi
  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
   debug "${NAMESPACE}_${COMMAND} is a valid command"
   shift 2
-  ${NAMESPACE}_${COMMAND} $@
+  ${NAMESPACE}_${COMMAND} "$@"
  fi
 # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then
  debug "_${NAMESPACE} found as global command"
- shift 1 
- _${NAMESPACE} $@
+ shift 1
+ _${NAMESPACE} "$@"
 fi
 if [ "$COMMAND_RESULT" != "" ]; then
  output $COMMAND_RESULT

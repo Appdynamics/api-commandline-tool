@@ -18,12 +18,12 @@ function timerange_create {
         DURATION_IN_MINUTES=${OPTARG}
         TYPE="BEFORE_NOW"
       ;;
-    esac   
+    esac
   done;
   shiftOptInd
   shift $SHIFTS
-  TIMERANGE_NAME=$@
+  TIMERANGE_NAME=$*
   controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
 
-register timerange_create Create a custom time range 
+register timerange_create Create a custom time range

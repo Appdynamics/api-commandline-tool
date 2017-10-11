@@ -21,7 +21,7 @@ SCRIPTNAME=$0
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
-  GLOBAL_HELP="$GLOBAL_HELP\n$@"
+  GLOBAL_HELP="$GLOBAL_HELP\n$*"
 }
 
 source ./helpers/output.sh
@@ -81,7 +81,7 @@ do
      D)
 	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
         debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
-  esac 
+  esac
 done
 
 shiftOptInd
@@ -102,17 +102,17 @@ if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
  COMMAND=$2
  if [ "$COMMAND" == "" ] ; then
    _help
- fi 
+ fi
  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
   debug "${NAMESPACE}_${COMMAND} is a valid command"
   shift 2
-  ${NAMESPACE}_${COMMAND} $@
+  ${NAMESPACE}_${COMMAND} "$@"
  fi
 # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then
  debug "_${NAMESPACE} found as global command"
- shift 1 
- _${NAMESPACE} $@
+ shift 1
+ _${NAMESPACE} "$@"
 fi
 
 if [ "$COMMAND_RESULT" != "" ]; then

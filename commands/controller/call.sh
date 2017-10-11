@@ -14,12 +14,12 @@ function controller_call {
       ;;
     esac
   done
- 
+
   shiftOptInd
   shift $SHIFTS
 
-  ENDPOINT=$@
-  
+  ENDPOINT=$*
+
   controller_login
   # Debug the COMMAND_RESULT from controller_login
   debug $COMMAND_RESULT
@@ -36,4 +36,4 @@ function controller_call {
    fi
 }
 
-register controller_call Send a custom HTTP call to a controller 
+register controller_call Send a custom HTTP call to a controller
