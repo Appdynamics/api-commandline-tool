@@ -1,9 +1,9 @@
 #!/bin/bash
 
 function dashboard_export {
-  local DASHBOARD_ID=$@
+  local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X GET /controller/CustomDashboardImportExportServlet?dashboardId=$@
+    controller_call -X GET /controller/CustomDashboardImportExportServlet?dashboardId=$DASHBOARD_ID
   else
     COMMAND_RESULT=""
     error "This is not a number: '$DASHBOARD_ID'"

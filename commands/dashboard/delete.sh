@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function dashboard_delete {
-  local DASHBOARD_ID=$@
+  local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
     controller_call -X POST -d "[$DASHBOARD_ID]" /controller/restui/dashboards/deleteDashboards
   else

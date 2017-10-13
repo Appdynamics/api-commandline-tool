@@ -27,6 +27,7 @@ function register {
 source ./helpers/output.sh
 source ./helpers/httpClient.sh
 source ./helpers/shiftOptInd.sh
+source ./helpers/urlencode.sh
 
 source ./commands/self-setup.sh
 source ./commands/help.sh
@@ -35,6 +36,8 @@ source ./commands/controller/login.sh
 source ./commands/controller/call.sh
 
 source ./commands/dbmon/create.sh
+
+source ./commands/event/create.sh
 
 source ./commands/timerange/create.sh
 source ./commands/timerange/list.sh
@@ -81,6 +84,10 @@ do
      D)
 	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
         debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+     ;;
+     A)
+  CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OTPARG}
+  debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
   esac
 done
 

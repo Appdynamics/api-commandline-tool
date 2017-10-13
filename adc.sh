@@ -59,6 +59,21 @@ function shiftOptInd {
   OPTIND=0
   return $SHIFTS
 }
+# from https://gist.github.com/cdown/1163649
+function urlencode {
+    # urlencode <string>
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+    LC_COLLATE=$old_lc_collate
+}
 function _self-setup {
   local FORCE=0
   local GLOBAL=0
@@ -183,6 +198,46 @@ function dbmon_create {
   echo "Stub"
 }
 register dbmon_create Create a new database collector
+function event_create {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local NODE
+  local TIER
+  local SEVERITY
+  local EVENTTYPE
+  local BT
+  local COMMENT
+  while getopts "n:e:s:t:c:a:" opt "$@";
+  do
+    case "${opt}" in
+      n)
+        NODE=${OPTARG}
+      ;;
+      t)
+        TIER=${OPTARG}
+      ;;
+      s)
+        SEVERITY=${OPTARG}
+      ;;
+      e)
+        EVENTTYPE=${OPTARG}
+      ;;
+      b)
+        BT=${OPTARG}
+      ;;
+      c)
+        COMMENT=`urlencode "$OPTARG"`
+      ;;
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  SUMMARY=$*
+  controller_call -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
+}
+register event_create Create a custom event for a given application
 function timerange_create {
   local START_TIME=-1
   local END_TIME=-1
@@ -228,9 +283,9 @@ function dashboard_list {
 }
 register dashboard_list List all dashboards available on the controller
 function dashboard_export {
-  local DASHBOARD_ID=$@
+  local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X GET /controller/CustomDashboardImportExportServlet?dashboardId=$@
+    controller_call -X GET /controller/CustomDashboardImportExportServlet?dashboardId=$DASHBOARD_ID
   else
     COMMAND_RESULT=""
     error "This is not a number: '$DASHBOARD_ID'"
@@ -238,7 +293,7 @@ function dashboard_export {
 }
 register dashboard_export Export a specific dashboard
 function dashboard_delete {
-  local DASHBOARD_ID=$@
+  local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
     controller_call -X POST -d "[$DASHBOARD_ID]" /controller/restui/dashboards/deleteDashboards
   else
@@ -278,6 +333,10 @@ do
      D)
 	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
         debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+     ;;
+     A)
+  CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OTPARG}
+  debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
   esac
 done
 shiftOptInd
