@@ -29,6 +29,8 @@ Usage: ./adc.sh <namespace> <command>
 
 To execute a action, provide a namespace and a command, e.g. "dbmon list" to list all database collectors.
 Finally the following commands in the global namespace can be called directly:
+	help		Display the global usage information
+	self-setup		Initialize the adc configuration file
 
 controller
 	call		Send a custom HTTP call to a controller
@@ -42,9 +44,11 @@ dashboard
 dbmon
 	create		Create a new database collector
 
+event
+	create		Create a custom event for a given application
 
-	help		Display the global usage information
-	self-setup		Initialize the adc configuration file
+hello
+	world		Simple Hello World Example
 
 timerange
 	create		Create a custom time range
@@ -58,6 +62,12 @@ A simple work flow example is listing, exporting and deleting a dashboard:
 adc dashboard list
 adc dashboard export 13
 adc dashboard delete 13
+```
+
+Also, you can use `adc.sh` to easily create custom events, like code deployments:
+
+```
+./adc.sh event create -s INFO -c "This release fixes some minor issues with the mini cart functionality" -e APPLICATION_DEPLOYMENT -a 145 "Version 3.5.1 released"
 ```
 
 If a certain API call is not yet wrapped into a command, you can use `controller call` as general interface:

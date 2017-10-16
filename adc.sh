@@ -248,7 +248,8 @@ function event_create {
   done;
   shiftOptInd
   shift $SHIFTS
-  SUMMARY=$*
+  SUMMARY=`urlencode "$*"`
+  debug -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
   controller_call -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
 }
 register event_create Create a custom event for a given application
