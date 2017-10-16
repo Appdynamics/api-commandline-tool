@@ -36,6 +36,7 @@ source ./commands/help.sh
 source ./commands/controller/login.sh
 source ./commands/controller/call.sh
 source ./commands/controller/ping.sh
+source ./commands/controller/status.sh
 
 source ./commands/dbmon/create.sh
 
