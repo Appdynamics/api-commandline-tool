@@ -1,6 +1,6 @@
 # AppDynamics Commandline Tool (ADC)
 
-The AppDynamics Commandline Tool (ADC) is a shell script wrapper around [API](https://docs.appdynamics.com/display/PRO43/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller. 
+The AppDynamics Commandline Tool (ADC) is a shell script wrapper around [API](https://docs.appdynamics.com/display/PRO43/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
 
 ## Installation
 
@@ -63,9 +63,23 @@ adc dashboard delete 13
 If a certain API call is not yet wrapped into a command, you can use `controller call` as general interface:
 
 ```
-adc.sh controller call /controller/rest/applications?output=JSON 
+adc.sh controller call /controller/rest/applications?output=JSON
 ```
+
+## Plugins
+
+If you want to use custom plugins with `adc.sh` you can place shell scripts into a plugin folder (default: `~/.appdynamics/adc/plugins`) and they will be sourced automatically. A command plugin requires the following structure:
+
+```
+#!/bin/bash
+function namespace_command {
+...
+}
+register namespace_command help text
+```
+
+Please note, that your plugins will not be validated, so you can change global behavior or break the script.
 
 ## Build
 
-You can build your own version of `adc.sh` and integrate custom commands by cloning this git repository and working with `build.sh` to merge all scripts into one. 
+To make working on `adc.sh` easier this git repository includes a very simple build system: The file `main.sh` is merged with all scripts in the sub directories, that are `source`d. So, if you want to build a custom version of `adc.sh` clone this directory, edit `main.sh` or any of the other files in this repository and run `build.sh` to update the script. Any changes you made directly to `adc.sh` will be overwritten.

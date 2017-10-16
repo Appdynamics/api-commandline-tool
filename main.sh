@@ -28,6 +28,7 @@ source ./helpers/output.sh
 source ./helpers/httpClient.sh
 source ./helpers/shiftOptInd.sh
 source ./helpers/urlencode.sh
+source ./helpers/recursiveSource.sh
 
 source ./commands/self-setup.sh
 source ./commands/help.sh
@@ -62,32 +63,34 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 
-
-
-
 # Parse global options
-while getopts "H:C:D:" opt;
+while getopts "H:C:D:P:" opt;
 do
   case "${opt}" in
-     H)
-	CONFIG_CONTROLLER_HOST=${OPTARG}
-	debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
-     ;;
-     C)
-        CONFIG_CONTROLLER_CREDENTIALS=${OPTARG}
-        debug "Set CONFIG_CONTROLLER_CREDENTIALS=${CONFIG_CONTROLLER_CREDENTIALS}"
-     ;;
-     J)
-	CONFIG_CONTROLLER_COOKIE_LOCATION=${OPTARG}
-        debug "Set CONFIG_CONTROLLER_COOKIE_LOCATION=${CONFIG_CONTROLLER_COOKIE_LOCATION}"
-     ;;
-     D)
-	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
-        debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
-     ;;
-     A)
-  CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OTPARG}
-  debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
+    H)
+      CONFIG_CONTROLLER_HOST=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
+    ;;
+    C)
+      CONFIG_CONTROLLER_CREDENTIALS=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_CREDENTIALS=${CONFIG_CONTROLLER_CREDENTIALS}"
+    ;;
+    J)
+      CONFIG_CONTROLLER_COOKIE_LOCATION=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_COOKIE_LOCATION=${CONFIG_CONTROLLER_COOKIE_LOCATION}"
+    ;;
+    D)
+      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
+      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+    ;;
+    A)
+      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
+      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+    ;;
+    P)
+      CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
+      debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
   esac
 done
 
@@ -98,32 +101,37 @@ debug "CONFIG_CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST"
 debug "CONFIG_CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS"
 debug "CONFIG_CONTROLLER_COOKIE_LOCATION=$CONFIG_CONTROLLER_COOKIE_LOCATION"
 debug "CONFIG_OUTPUT_VERBOSITY=$CONFIG_OUTPUT_VERBOSITY"
+debug "CONFIG_USER_PLUGIN_DIRECTORY=$CONFIG_USER_PLUGIN_DIRECTORY"
+
+recursiveSource "${CONFIG_USER_PLUGIN_DIRECTORY}"
 
 NAMESPACE=$1
 
-COMMAND_RESULT="Unknown command"
+COMMAND_RESULT=""
 
 # Check if the namespace is used
 if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
- debug "_${NAMESPACE} has commands"
- COMMAND=$2
- if [ "$COMMAND" == "" ] ; then
-   _help
- fi
- if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
-  debug "${NAMESPACE}_${COMMAND} is a valid command"
-  shift 2
-  ${NAMESPACE}_${COMMAND} "$@"
- fi
-# Check if this is a global command
+  debug "_${NAMESPACE} has commands"
+  COMMAND=$2
+  if [ "$COMMAND" == "" ] ; then
+    _help
+  fi
+  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
+    debug "${NAMESPACE}_${COMMAND} is a valid command"
+    shift 2
+    ${NAMESPACE}_${COMMAND} "$@"
+  else
+    _help
+  fi
+  # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then
- debug "_${NAMESPACE} found as global command"
- shift 1
- _${NAMESPACE} "$@"
+  debug "_${NAMESPACE} found as global command"
+  shift 1
+  _${NAMESPACE} "$@"
+else
+  COMMAND_RESULT="Unknown command: $*"
 fi
 
-if [ "$COMMAND_RESULT" != "" ]; then
- output $COMMAND_RESULT
-fi
+echo -e "$COMMAND_RESULT"
 
 debug END

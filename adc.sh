@@ -74,6 +74,19 @@ function urlencode {
     done
     LC_COLLATE=$old_lc_collate
 }
+function recursiveSource {
+  if [ -d "$*" ]; then
+    debug "Sourcing plugins from $*"
+    for file in $*/* ; do
+      if [ -f "$file" ] && [ "${file##*.}" == "sh" ] ; then
+        . "$file"
+      fi
+      if [ -d "$file" ] ; then
+        recursiveSource $file
+      fi
+    done
+  fi
+}
 function _self-setup {
   local FORCE=0
   local GLOBAL=0
@@ -93,11 +106,12 @@ function _self-setup {
   local CONTROLLER_HOST=""
   local CONTROLLER_CREDENTIALS=""
   local OUTPUT_DIRECTORY="${HOME}/.appdynamics/adc"
+  local USER_PLUGIN_DIRECTORY="{$HOME}/.appdynamics/adc/plugins"
   local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
   if [ $GLOBAL -eq 1 ] ; then
     OUTPUT_DIRECTORY="/etc/appdynamics/adc"
     CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-adc-cookie.txt"
-  fi 
+  fi
   if [ -z ${CONFIG_CONTROLLER_HOST} ] ; then
    echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
    read CONTROLLER_HOST
@@ -112,9 +126,9 @@ function _self-setup {
    info "Will use $CONFIG_CONTROLLER_CREDENTIALS as controller credentials"
    CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS
   fi
-  OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}"
+  OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
   if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
-  then  
+  then
     mkdir -p $OUTPUT_DIRECTORY
     echo -e "$OUTPUT" > "$OUTPUT_DIRECTORY/config.sh"
     COMMAND_RESULT="Created $OUTPUT_DIRECTORY/config.sh successfully"
@@ -315,28 +329,33 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:D:" opt;
+while getopts "H:C:D:P:" opt;
 do
   case "${opt}" in
-     H)
-	CONFIG_CONTROLLER_HOST=${OPTARG}
-	debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
-     ;;
-     C)
-        CONFIG_CONTROLLER_CREDENTIALS=${OPTARG}
-        debug "Set CONFIG_CONTROLLER_CREDENTIALS=${CONFIG_CONTROLLER_CREDENTIALS}"
-     ;;
-     J)
-	CONFIG_CONTROLLER_COOKIE_LOCATION=${OPTARG}
-        debug "Set CONFIG_CONTROLLER_COOKIE_LOCATION=${CONFIG_CONTROLLER_COOKIE_LOCATION}"
-     ;;
-     D)
-	CONFIG_OUTPUT_VERBOSITY=${OPTARG}
-        debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
-     ;;
-     A)
-  CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OTPARG}
-  debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
+    H)
+      CONFIG_CONTROLLER_HOST=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
+    ;;
+    C)
+      CONFIG_CONTROLLER_CREDENTIALS=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_CREDENTIALS=${CONFIG_CONTROLLER_CREDENTIALS}"
+    ;;
+    J)
+      CONFIG_CONTROLLER_COOKIE_LOCATION=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_COOKIE_LOCATION=${CONFIG_CONTROLLER_COOKIE_LOCATION}"
+    ;;
+    D)
+      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
+      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+    ;;
+    A)
+      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
+      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+    ;;
+    P)
+      CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
+      debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
   esac
 done
 shiftOptInd
@@ -345,27 +364,31 @@ debug "CONFIG_CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST"
 debug "CONFIG_CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS"
 debug "CONFIG_CONTROLLER_COOKIE_LOCATION=$CONFIG_CONTROLLER_COOKIE_LOCATION"
 debug "CONFIG_OUTPUT_VERBOSITY=$CONFIG_OUTPUT_VERBOSITY"
+debug "CONFIG_USER_PLUGIN_DIRECTORY=$CONFIG_USER_PLUGIN_DIRECTORY"
+recursiveSource "${CONFIG_USER_PLUGIN_DIRECTORY}"
 NAMESPACE=$1
-COMMAND_RESULT="Unknown command"
+COMMAND_RESULT=""
 # Check if the namespace is used
 if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
- debug "_${NAMESPACE} has commands"
- COMMAND=$2
- if [ "$COMMAND" == "" ] ; then
-   _help
- fi
- if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
-  debug "${NAMESPACE}_${COMMAND} is a valid command"
-  shift 2
-  ${NAMESPACE}_${COMMAND} "$@"
- fi
-# Check if this is a global command
+  debug "_${NAMESPACE} has commands"
+  COMMAND=$2
+  if [ "$COMMAND" == "" ] ; then
+    _help
+  fi
+  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
+    debug "${NAMESPACE}_${COMMAND} is a valid command"
+    shift 2
+    ${NAMESPACE}_${COMMAND} "$@"
+  else
+    _help
+  fi
+  # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then
- debug "_${NAMESPACE} found as global command"
- shift 1
- _${NAMESPACE} "$@"
+  debug "_${NAMESPACE} found as global command"
+  shift 1
+  _${NAMESPACE} "$@"
+else
+  COMMAND_RESULT="Unknown command: $*"
 fi
-if [ "$COMMAND_RESULT" != "" ]; then
- output $COMMAND_RESULT
-fi
+echo -e "$COMMAND_RESULT"
 debug END
