@@ -35,6 +35,7 @@ source ./commands/help.sh
 
 source ./commands/controller/login.sh
 source ./commands/controller/call.sh
+source ./commands/controller/ping.sh
 
 source ./commands/dbmon/create.sh
 
@@ -64,7 +65,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:D:P:" opt;
+while getopts "H:C:D:P:F:" opt;
 do
   case "${opt}" in
     H)
@@ -90,6 +91,16 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    F)
+      CONTROLLER_INFO_XML=${OPTARG}
+      debug "Reading CONFIG_CONTROLLER_HOST from $CONTROLLER_INFO_XML"
+      CONTROLLER_INFO_XML_HOST="$(sed -n -e "s/<controller-host>\(.*\)<\/controller-host>/\1/p" $CONTROLLER_INFO_XML)"
+      CONTROLLER_INFO_XML_PORT="$(sed -n -e "s/<controller-port>\(.*\)<\/controller-port>/\1/p" $CONTROLLER_INFO_XML)"
+      CONTROLLER_INFO_XML_SSL_ENABLED="$(sed -n -e "s/<controller-ssl-enabled>\(.*\)<\/controller-ssl-enabled>/\1/p" $CONTROLLER_INFO_XML)"
+      [[ ${CONTROLLER_INFO_XML_SSL_ENABLED// /} == "true" ]] && CONTROLLER_INFO_XML_SCHEMA=https || CONTROLLER_INFO_XML_SCHEMA=http
+      CONFIG_CONTROLLER_HOST=${CONTROLLER_INFO_XML_SCHEMA}://${CONTROLLER_INFO_XML_HOST// /}:${CONTROLLER_INFO_XML_PORT// /}
+      debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
     ;;
   esac
 done

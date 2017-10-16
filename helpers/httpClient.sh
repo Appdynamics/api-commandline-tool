@@ -1,5 +1,5 @@
 #!/bin/bash
 
 function httpClient {
- curl "$@"
+ curl -L --connect-timeout 10 "$@"
 }

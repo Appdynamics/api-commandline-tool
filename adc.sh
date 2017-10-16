@@ -49,7 +49,7 @@ function output {
   fi
 }
 function httpClient {
- curl "$@"
+ curl -L --connect-timeout 10 "$@"
 }
 SHIFTS=0
 declare -i SHIFTS
@@ -208,6 +208,19 @@ function controller_call {
    fi
 }
 register controller_call Send a custom HTTP call to a controller
+CONTROLLER_LOGIN_STATUS=0
+function controller_ping {
+  debug "Ping $CONFIG_CONTROLLER_HOST"
+  local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "TIME_TOTAL=%{time_total}")
+  debug "RESPONSE: ${PING_RESPONSE}"
+  if [[ "${PING_RESPONSE/200 OK}" != "$Ping_RESPONSE" ]]; then
+    local TIME=${PING_RESPONSE##*TIME_TOTAL=}
+    COMMAND_RESULT="Pong! Time: ${TIME}"
+  else
+    COMMAND_RESULT="Error"
+  fi
+}
+register controller_ping Check the availability of an appdynamics controller
 function dbmon_create {
   echo "Stub"
 }
@@ -330,7 +343,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:D:P:" opt;
+while getopts "H:C:D:P:F:" opt;
 do
   case "${opt}" in
     H)
@@ -356,6 +369,16 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    F)
+      CONTROLLER_INFO_XML=${OPTARG}
+      debug "Reading CONFIG_CONTROLLER_HOST from $CONTROLLER_INFO_XML"
+      CONTROLLER_INFO_XML_HOST="$(sed -n -e "s/<controller-host>\(.*\)<\/controller-host>/\1/p" $CONTROLLER_INFO_XML)"
+      CONTROLLER_INFO_XML_PORT="$(sed -n -e "s/<controller-port>\(.*\)<\/controller-port>/\1/p" $CONTROLLER_INFO_XML)"
+      CONTROLLER_INFO_XML_SSL_ENABLED="$(sed -n -e "s/<controller-ssl-enabled>\(.*\)<\/controller-ssl-enabled>/\1/p" $CONTROLLER_INFO_XML)"
+      [[ ${CONTROLLER_INFO_XML_SSL_ENABLED// /} == "true" ]] && CONTROLLER_INFO_XML_SCHEMA=https || CONTROLLER_INFO_XML_SCHEMA=http
+      CONFIG_CONTROLLER_HOST=${CONTROLLER_INFO_XML_SCHEMA}://${CONTROLLER_INFO_XML_HOST// /}:${CONTROLLER_INFO_XML_PORT// /}
+      debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
     ;;
   esac
 done
