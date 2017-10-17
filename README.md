@@ -32,9 +32,14 @@ Finally the following commands in the global namespace can be called directly:
 	help		Display the global usage information
 	self-setup		Initialize the adc configuration file
 
+application
+	list		List all applications available on the controller
+
 controller
 	call		Send a custom HTTP call to a controller
 	login		Login to your controller
+	ping		Check the availability of an appdynamics controller
+	status		Get server status from controller
 
 dashboard
 	delete		Delete a specific dashboard
@@ -47,8 +52,9 @@ dbmon
 event
 	create		Create a custom event for a given application
 
-hello
-	world		Simple Hello World Example
+metrics
+	get		List all metrics available for one application
+	list		List all metrics available for one application
 
 timerange
 	create		Create a custom time range

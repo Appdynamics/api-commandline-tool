@@ -38,6 +38,11 @@ source ./commands/controller/call.sh
 source ./commands/controller/ping.sh
 source ./commands/controller/status.sh
 
+source ./commands/application/list.sh
+
+source ./commands/metrics/list.sh
+source ./commands/metrics/get.sh
+
 source ./commands/dbmon/create.sh
 
 source ./commands/event/create.sh

@@ -4,7 +4,7 @@ function timerange_create {
   local START_TIME=-1
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
-  local TYPE=BETWEEN_TIMES
+  local TYPE="BETWEEN_TIMES"
   while getopts "s:e:b:" opt "$@";
   do
     case "${opt}" in
@@ -14,7 +14,7 @@ function timerange_create {
       e)
         END_TIME=${OPTARG}
       ;;
-      b)
+      d)
         DURATION_IN_MINUTES=${OPTARG}
         TYPE="BEFORE_NOW"
       ;;

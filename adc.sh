@@ -225,6 +225,47 @@ function controller_status {
   controller_call -X GET /controller/rest/serverstatus
 }
 register controller_status Get server status from controller
+function application_list {
+  controller_call /controller/rest/applications
+}
+register application_list List all applications available on the controller
+function metrics_list {
+  local APPLICATION=$*
+  controller_call /controller/rest/applications/${APPLICATION}/metrics
+}
+register metrics_list List all metrics available for one application
+function metrics_get {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local START_TIME=-1
+  local END_TIME=-1
+  local DURATION_IN_MINUTES=0
+  local TYPE="BEFORE_NOW"
+  while getopts "a:s:e:d:t:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+      s)
+        START_TIME=${OPTARG}
+      ;;
+      e)
+        END_TIME=${OPTARG}
+      ;;
+      d)
+        DURATION_IN_MINUTES=${OPTARG}
+      ;;
+      t)
+        TYPE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  local METRIC_PATH=`urlencode "$*"`
+  controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
+}
+register metrics_get List all metrics available for one application
 function dbmon_create {
   local DB_USER=""
   local DB_HOSTNAME=""
@@ -330,7 +371,7 @@ function timerange_create {
   local START_TIME=-1
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
-  local TYPE=BETWEEN_TIMES
+  local TYPE="BETWEEN_TIMES"
   while getopts "s:e:b:" opt "$@";
   do
     case "${opt}" in
@@ -340,7 +381,7 @@ function timerange_create {
       e)
         END_TIME=${OPTARG}
       ;;
-      b)
+      d)
         DURATION_IN_MINUTES=${OPTARG}
         TYPE="BEFORE_NOW"
       ;;
