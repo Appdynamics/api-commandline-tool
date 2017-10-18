@@ -2,6 +2,7 @@
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
+CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # Configure default output verbosity. May contain a combination of the following strings:
 # - debug
 # - error
@@ -225,6 +226,90 @@ function controller_status {
   controller_call -X GET /controller/rest/serverstatus
 }
 register controller_status Get server status from controller
+function controller_version {
+  controller_call -X GET /controller/rest/serverstatus
+  COMMAND_RESULT=`echo -e $COMMAND_RESULT | sed -n -e 's/.*Controller v\(.*\) Build.*/\1/p'`
+}
+register controller_version Get installed version from controller
+function portal_login {
+  debug "Login at 'https://login.appdynamics.com/sso/login/' with $CONFIG_PORTAL_CREDENTIALS"
+  httpClient -s -c ${CONFIG_PORTAL_COOKIE_LOCATION} -d "username=${CONFIG_PORTAL_CREDENTIALS%%:*}&password=${CONFIG_PORTAL_CREDENTIALS##*:}" -s 'https://login.appdynamics.com/sso/login/'
+  PORTAL_LOGIN_STATUS=0
+  grep -q sso-sessionid ${CONFIG_PORTAL_COOKIE_LOCATION} && PORTAL_LOGIN_STATUS=1
+  if [ $PORTAL_LOGIN_STATUS -eq 1 ]; then
+    COMMAND_RESULT="Portal Login Successful"
+  else
+    COMMAND_RESULT="Portal Login Error! Please check your credentials"
+  fi
+}
+register portal_login Login to portal.appdynamics.com
+function portal_download {
+  local VERSION=0
+  local OPERATING_SYSTEM=`uname -s`
+  local MACHINE_HARDWARE=`uname -m`
+  while getopts "v:s:m:" opt "$@";
+  do
+    case "${opt}" in
+      v)
+        VERSION=${OPTARG}
+      ;;
+      s)
+        OPERATING_SYSTEM=${OPTARG}
+      ;;
+      m)
+        MACHINE_HARDWARE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  local AGENT=$*
+  if [ $VERSION = "0" ] ; then
+    controller_version
+    VERSION=$COMMAND_RESULT
+  fi
+  local FILE=""
+  case "$AGENT" in
+    java*)
+      FILE="sun-jvm/$VERSION/AppServerAgent-$VERSION.zip"
+    ;;
+    universal*)
+      if [[ "${MACHINE_HARDWARE/64}" != "$MACHINE_HARDWARE" ]]; then
+        MACHINE_HARDWARE="x64"
+      else
+        MACHINE_HARDWARE="x32"
+      fi
+      FILE="universal-agent/$VERSION/universal-agent-x32-$OPERATING_SYSTEM-$VERSION.zip"
+    ;;
+    machine*)
+      if [[ "${MACHINE_HARDWARE/64}" != "$MACHINE_HARDWARE" ]]; then
+        MACHINE_HARDWARE="64bit"
+      else
+        MACHINE_HARDWARE="32bit"
+      fi
+      case "$OPERATING_SYSTEM" in
+        Darwin)
+          OPERATING_SYSTEM="osx"
+        ;;
+        Linux)
+          OPERATING_SYSTEM="linux"
+        ;;
+        SunOS)
+          OPERATING_SYSTEM="solaris-sparc"
+        ;;
+      esac
+      FILE="machine-bundle/$VERSION/machineagent-bundle-$MACHINE_HARDWARE-$OPERATING_SYSTEM-$VERSION.zip"
+    ;;
+    *)
+      COMMAND_RESULT="Unknown agent type: $AGENT"
+    ;;
+  esac
+  if [ "$FILE" != "" ]; then
+    #portal_login
+    echo -O -b $CONFIG_PORTAL_COOKIE_LOCATION https://download.appdynamics.com/download/prox/download-file/$FILE
+  fi
+}
+register portal_download Download an appdynamics agent
 function application_list {
   controller_call /controller/rest/applications
 }
@@ -444,7 +529,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:D:P:F:" opt;
+while getopts "H:C:D:P:S:F:" opt;
 do
   case "${opt}" in
     H)
@@ -470,6 +555,10 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    S)
+      CONFIG_PORTAL_CREDENTIALS=${OPTARG}
+      debug "Set CONFIG_PORTAL_CREDENTIALS=${CONFIG_PORTAL_CREDENTIALS}"
     ;;
     F)
       CONTROLLER_INFO_XML=${OPTARG}

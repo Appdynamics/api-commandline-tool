@@ -4,6 +4,7 @@ USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
+CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 
 # Configure default output verbosity. May contain a combination of the following strings:
 # - debug
@@ -37,6 +38,10 @@ source ./commands/controller/login.sh
 source ./commands/controller/call.sh
 source ./commands/controller/ping.sh
 source ./commands/controller/status.sh
+source ./commands/controller/version.sh
+
+source ./commands/portal/login.sh
+source ./commands/portal/download.sh
 
 source ./commands/application/list.sh
 
@@ -71,7 +76,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:D:P:F:" opt;
+while getopts "H:C:D:P:S:F:" opt;
 do
   case "${opt}" in
     H)
@@ -97,6 +102,10 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    S)
+      CONFIG_PORTAL_CREDENTIALS=${OPTARG}
+      debug "Set CONFIG_PORTAL_CREDENTIALS=${CONFIG_PORTAL_CREDENTIALS}"
     ;;
     F)
       CONTROLLER_INFO_XML=${OPTARG}
