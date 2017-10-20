@@ -113,20 +113,11 @@ function _self-setup {
     OUTPUT_DIRECTORY="/etc/appdynamics/adc"
     CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-adc-cookie.txt"
   fi
-  if [ -z ${CONFIG_CONTROLLER_HOST} ] ; then
-   echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
-   read CONTROLLER_HOST
-  else
-   info "Will use $CONFIG_CONTROLLER_HOST as controller host location"
-   CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST
-  fi
-  if [ -z ${CONFIG_CONTROLLER_CREDENTIALS} ] ; then
-   echo "Controller Credentials (e.g. user@tenant:password)"
-   read CONTROLLER_CREDENTIALS
-  else
-   info "Will use $CONFIG_CONTROLLER_CREDENTIALS as controller credentials"
-   CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS
-  fi
+  echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
+  read CONTROLLER_HOST
+  echo "Controller Credentials (e.g. user@tenant:password)"
+  read CONTROLLER_CREDENTIALS
+  
   OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
   if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
   then
