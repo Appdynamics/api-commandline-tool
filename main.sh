@@ -31,7 +31,7 @@ source ./helpers/shiftOptInd.sh
 source ./helpers/urlencode.sh
 source ./helpers/recursiveSource.sh
 
-source ./commands/self-setup.sh
+source ./commands/config.sh
 source ./commands/help.sh
 
 source ./commands/controller/login.sh

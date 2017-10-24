@@ -6,7 +6,7 @@ The AppDynamics Commandline Tool (ADC) is a shell script wrapper around [API](ht
 
 To use the latest release of ADC just download the raw version of [adc.sh](https://github.com/Appdynamics/adc/blob/master/adc.sh)
 
-Afterwards run `adc.sh self-setup` to provide your controller host and credentials. This will create a configuration file at `~/.appdynamics/adc/config.sh`, e.g.:
+Afterwards run `adc.sh config` to provide your controller host and credentials. This will create a configuration file at `~/.appdynamics/adc/config.sh`, e.g.:
 
 ```bash
 CONFIG_CONTROLLER_HOST=https://appdynamics.example.com:8090
@@ -17,7 +17,7 @@ CONFIG_CONTROLLER_COOKIE_LOCATION=/home/ubuntu/.appdynamics/adc/cookie.txt
 If you want to change your configuration, you can either edit this file or you can re-run the self setup:
 
 ```
-adc.sh self-setup -f
+adc.sh config -f
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ Usage: ./adc.sh <namespace> <command>
 To execute a action, provide a namespace and a command, e.g. "dbmon list" to list all database collectors.
 Finally the following commands in the global namespace can be called directly:
 	help		Display the global usage information
-	self-setup		Initialize the adc configuration file
+	config		Initialize the adc configuration file
 
 application
 	list		List all applications available on the controller

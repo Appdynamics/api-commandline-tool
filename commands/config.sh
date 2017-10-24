@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _self-setup {
+function _config {
   local FORCE=0
   local GLOBAL=0
   while getopts "gf" opt "$@";
@@ -33,7 +33,7 @@ function _self-setup {
 
   echo "Controller Credentials (e.g. user@tenant:password)"
   read CONTROLLER_CREDENTIALS
-  
+
   OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
   if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
   then
@@ -46,4 +46,4 @@ function _self-setup {
   fi
 }
 
-register _self-setup Initialize the adc configuration file
+register _config Initialize the adc configuration file

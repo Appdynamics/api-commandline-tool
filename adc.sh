@@ -88,7 +88,7 @@ function recursiveSource {
     done
   fi
 }
-function _self-setup {
+function _config {
   local FORCE=0
   local GLOBAL=0
   while getopts "gf" opt "$@";
@@ -117,7 +117,6 @@ function _self-setup {
   read CONTROLLER_HOST
   echo "Controller Credentials (e.g. user@tenant:password)"
   read CONTROLLER_CREDENTIALS
-  
   OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
   if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
   then
@@ -129,7 +128,7 @@ function _self-setup {
     COMMAND_RESULT=""
   fi
 }
-register _self-setup Initialize the adc configuration file
+register _config Initialize the adc configuration file
 function _help {
   COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
   COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"dbmon list\" to list all database collectors.\nFinally the following commands in the global namespace can be called directly:\n"
