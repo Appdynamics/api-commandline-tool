@@ -13,11 +13,18 @@ CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 CONFIG_OUTPUT_VERBOSITY="error,output"
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
+GLOBAL_LONG_HELP_COUNTER=0
+declare -a GLOBAL_LONG_HELP_STRINGS
+declare -a GLOBAL_LONG_HELP_COMMANDS
 SCRIPTNAME=$0
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
   GLOBAL_HELP="$GLOBAL_HELP\n$*"
+}
+function describe {
+  GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
+  GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]=$(cat)
 }
 COLOR_WARNING="\033[0;33m"
 COLOR_INFO="\033[0;32m"
@@ -142,24 +149,35 @@ function _config {
 }
 register _config Initialize the adc configuration file
 function _help {
-  COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
-  COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"dbmon list\" to list all database collectors.\nFinally the following commands in the global namespace can be called directly:\n"
-  local NAMESPACE=""
-  local SORTED
-  SORTED=`echo -en "$GLOBAL_HELP" | sort`
-  OLD_IFS=$IFS
-  IFS=$'\n'
-  for LINE in $SORTED; do
-   NEW_NAMESPACE=${LINE%%_*}
-   if [ "$NEW_NAMESPACE" != "$NAMESPACE" ]
-   then
-     COMMAND_RESULT="${COMMAND_RESULT}\n$NEW_NAMESPACE\n"
-     NAMESPACE=$NEW_NAMESPACE
-   fi
-   COMMAND=${LINE##*_}
-   COMMAND_RESULT="${COMMAND_RESULT}\t${COMMAND%% *}\t\t${COMMAND#* }\n"
-  done
-  IFS=$OLD_IFS
+  if [ "$1" = "" ] ; then
+    COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
+    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
+    local NAMESPACE=""
+    local SORTED
+    SORTED=`echo -en "$GLOBAL_HELP" | sort`
+    OLD_IFS=$IFS
+    IFS=$'\n'
+    for LINE in $SORTED; do
+      NEW_NAMESPACE=${LINE%%_*}
+      if [ "$NEW_NAMESPACE" != "$NAMESPACE" ]
+      then
+        COMMAND_RESULT="${COMMAND_RESULT}\n$NEW_NAMESPACE\n"
+        NAMESPACE=$NEW_NAMESPACE
+      fi
+      COMMAND=${LINE##*_}
+      COMMAND_RESULT="${COMMAND_RESULT}\t${COMMAND%% *}\t\t${COMMAND#* }\n"
+    done
+    IFS=$OLD_IFS
+  else
+    COMMAND_RESULT="Usage $SCRIPTNAME $1 <command>"
+    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the $1 namespace provide one of the following commands:\n"
+    for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
+      local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
+      if [[ $COMMAND == $1_* ]] ; then
+        COMMAND_RESULT="${COMMAND_RESULT}\n- ${COMMAND##*_}\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+      fi
+    done
+  fi
 }
 register _help Display the global usage information
 CONTROLLER_LOGIN_STATUS=0
@@ -178,6 +196,9 @@ function controller_login {
   debug "XCSRFTOKEN: $XCSRFTOKEN"
 }
 register controller_login Login to your controller
+describe controller_login << EOF
+Check if the login with your appdynamics controller works properly.
+EOF
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
@@ -211,6 +232,9 @@ function controller_call {
    fi
 }
 register controller_call Send a custom HTTP call to a controller
+describe controller_call << EOF
+Send a custom HTTP call to an AppDynamics controller. 
+EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_ping {
   debug "Ping $CONFIG_CONTROLLER_HOST"
@@ -586,17 +610,17 @@ NAMESPACE=$1
 COMMAND_RESULT=""
 # Check if the namespace is used
 if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
-  debug "_${NAMESPACE} has commands"
+  debug "${NAMESPACE} has commands"
   COMMAND=$2
-  if [ "$COMMAND" == "" ] ; then
-    _help
-  fi
-  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
+  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ]; then
+    debug "Will display help for $NAMESPACE"
+    _help ${NAMESPACE}
+  elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2
     ${NAMESPACE}_${COMMAND} "$@"
   else
-    _help
+    COMMAND_RESULT="Unknown command: $*"
   fi
   # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then

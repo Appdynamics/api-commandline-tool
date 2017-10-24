@@ -11,3 +11,6 @@ function dashboard_delete {
 }
 
 register dashboard_delete Delete a specific dashboard
+describe dashboard_delete << EOF
+Delete a specific dashboard
+EOF

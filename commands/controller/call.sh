@@ -37,3 +37,6 @@ function controller_call {
 }
 
 register controller_call Send a custom HTTP call to a controller
+describe controller_call << EOF
+Send a custom HTTP call to an AppDynamics controller. 
+EOF

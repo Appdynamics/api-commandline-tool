@@ -5,3 +5,6 @@ function controller_status {
 }
 
 register controller_status Get server status from controller
+describe controller_status << EOF
+Get server status from controller
+EOF

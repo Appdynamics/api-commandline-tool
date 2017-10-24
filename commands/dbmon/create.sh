@@ -62,3 +62,6 @@ function dbmon_create {
 }
 
 register dbmon_create Create a new database collector
+describe dbmon_create << EOF
+Create a new database collector
+EOF

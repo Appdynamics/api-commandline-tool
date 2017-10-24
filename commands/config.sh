@@ -60,3 +60,6 @@ function _config {
 }
 
 register _config Initialize the adc configuration file
+describe _config << EOF
+Initialize the adc configuration file
+EOF

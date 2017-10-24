@@ -27,3 +27,6 @@ function timerange_create {
 }
 
 register timerange_create Create a custom time range
+describe timerange_create << EOF
+Create a custom time range
+EOF

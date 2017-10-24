@@ -11,3 +11,6 @@ function timerange_delete {
 }
 
 register timerange_delete Delete a specific time range by id
+describe timerange_delete << EOF
+Delete a specific time range by id
+EOF

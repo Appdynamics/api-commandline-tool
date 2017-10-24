@@ -6,3 +6,6 @@ function metrics_list {
 }
 
 register metrics_list List all metrics available for one application
+describe metrics_list << EOF
+List all metrics available for one application
+EOF

@@ -5,3 +5,6 @@ function dashboard_list {
 }
 
 register dashboard_list List all dashboards available on the controller
+describe dashboard_list << EOF
+List all dashboards available on the controller
+EOF

@@ -30,7 +30,7 @@ Usage: ./adc.sh <namespace> <command>
 To execute a action, provide a namespace and a command, e.g. "dbmon list" to list all database collectors.
 Finally the following commands in the global namespace can be called directly:
 	help		Display the global usage information
-	config		Initialize the adc configuration file
+	config	Initialize the adc configuration file
 
 application
 	list		List all applications available on the controller

@@ -33,3 +33,6 @@ function metrics_get {
 }
 
 register metrics_get List all metrics available for one application
+describe metrics_get << EOF
+List all metrics available for one application
+EOF

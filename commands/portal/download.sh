@@ -69,3 +69,6 @@ function portal_download {
 }
 
 register portal_download Download an appdynamics agent
+describe portal_download << EOF
+Download an appdynamics agent
+EOF

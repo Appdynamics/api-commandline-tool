@@ -5,3 +5,6 @@ function timerange_list {
 }
 
 register timerange_list List all custom timeranges available on the controller
+describe timerange_list << EOF
+List all custom timeranges available on the controller
+EOF

@@ -17,12 +17,20 @@ CONFIG_OUTPUT_VERBOSITY="error,output"
 
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
+GLOBAL_LONG_HELP_COUNTER=0
+declare -a GLOBAL_LONG_HELP_STRINGS
+declare -a GLOBAL_LONG_HELP_COMMANDS
 SCRIPTNAME=$0
 
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
   GLOBAL_HELP="$GLOBAL_HELP\n$*"
+}
+
+function describe {
+  GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
+  GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]=$(cat)
 }
 
 source ./helpers/output.sh
@@ -137,17 +145,17 @@ COMMAND_RESULT=""
 
 # Check if the namespace is used
 if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
-  debug "_${NAMESPACE} has commands"
+  debug "${NAMESPACE} has commands"
   COMMAND=$2
-  if [ "$COMMAND" == "" ] ; then
-    _help
-  fi
-  if [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
+  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ]; then
+    debug "Will display help for $NAMESPACE"
+    _help ${NAMESPACE}
+  elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2
     ${NAMESPACE}_${COMMAND} "$@"
   else
-    _help
+    COMMAND_RESULT="Unknown command: $*"
   fi
   # Check if this is a global command
 elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then

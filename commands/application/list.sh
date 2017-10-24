@@ -5,3 +5,7 @@ function application_list {
 }
 
 register application_list List all applications available on the controller
+
+describe application_list << EOF
+List all applications available on the controller. This command requires no further arguments.
+EOF

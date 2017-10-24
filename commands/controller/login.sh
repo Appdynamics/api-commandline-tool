@@ -18,3 +18,6 @@ function controller_login {
 }
 
 register controller_login Login to your controller
+describe controller_login << EOF
+Check if the login with your appdynamics controller works properly.
+EOF

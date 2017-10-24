@@ -13,3 +13,6 @@ function portal_login {
 }
 
 register portal_login Login to portal.appdynamics.com
+describe portal_login << EOF
+Login to portal.appdynamics.com
+EOF

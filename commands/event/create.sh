@@ -42,3 +42,6 @@ function event_create {
 }
 
 register event_create Create a custom event for a given application
+describe event_create << EOF
+Create a custom event for a given application
+EOF

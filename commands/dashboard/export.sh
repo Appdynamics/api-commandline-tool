@@ -11,3 +11,6 @@ function dashboard_export {
 }
 
 register dashboard_export Export a specific dashboard
+describe dashboard_export << EOF
+Export a specific dashboard
+EOF
