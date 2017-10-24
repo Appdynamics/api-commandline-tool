@@ -3,7 +3,8 @@
 function _config {
   local FORCE=0
   local GLOBAL=0
-  while getopts "gf" opt "$@";
+  local SHOW=0
+  while getopts "gfs" opt "$@";
   do
     case "${opt}" in
       g)
@@ -11,6 +12,9 @@ function _config {
       ;;
       f)
         FORCE=1
+      ;;
+      s)
+        SHOW=1
       ;;
     esac
   done;
@@ -28,21 +32,30 @@ function _config {
     CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-adc-cookie.txt"
   fi
 
-  echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
-  read CONTROLLER_HOST
-
-  echo "Controller Credentials (e.g. user@tenant:password)"
-  read CONTROLLER_CREDENTIALS
-
-  OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
-  if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
-  then
-    mkdir -p $OUTPUT_DIRECTORY
-    echo -e "$OUTPUT" > "$OUTPUT_DIRECTORY/config.sh"
-    COMMAND_RESULT="Created $OUTPUT_DIRECTORY/config.sh successfully"
+  if [ $SHOW -eq 1 ] ; then
+    if [ -r $OUTPUT_DIRECTORY/config.sh ] ; then
+      COMMAND_RESULT=$(<$OUTPUT_DIRECTORY/config.sh)
+    else
+      COMMAND_RESULT="adc is not configured."
+    fi
   else
-    error "Configuration file $OUTPUT_DIRECTORY/config.sh already exists. Please use (-f) to force override"
-    COMMAND_RESULT=""
+
+    echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
+    read CONTROLLER_HOST
+
+    echo "Controller Credentials (e.g. user@tenant:password)"
+    read CONTROLLER_CREDENTIALS
+
+    OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
+    if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
+    then
+      mkdir -p $OUTPUT_DIRECTORY
+      echo -e "$OUTPUT" > "$OUTPUT_DIRECTORY/config.sh"
+      COMMAND_RESULT="Created $OUTPUT_DIRECTORY/config.sh successfully"
+    else
+      error "Configuration file $OUTPUT_DIRECTORY/config.sh already exists. Please use (-f) to force override"
+      COMMAND_RESULT=""
+    fi
   fi
 }
 
