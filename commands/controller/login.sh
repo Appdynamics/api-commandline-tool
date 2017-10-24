@@ -20,4 +20,5 @@ function controller_login {
 register controller_login Login to your controller
 describe controller_login << EOF
 Check if the login with your appdynamics controller works properly.
+If the login fails, use $1 controller ping to check if the controller is running and check your credentials if they are correct.
 EOF

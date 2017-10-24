@@ -26,7 +26,7 @@ function _help {
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ $COMMAND == $1_* ]] ; then
-        COMMAND_RESULT="${COMMAND_RESULT}\n- ${COMMAND##*_}\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+        COMMAND_RESULT="${COMMAND_RESULT}\n--- ${COMMAND##*_} ---\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
       fi
     done
   fi

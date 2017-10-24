@@ -148,6 +148,9 @@ function _config {
   fi
 }
 register _config Initialize the adc configuration file
+describe _config << EOF
+Initialize the adc configuration file
+EOF
 function _help {
   if [ "$1" = "" ] ; then
     COMMAND_RESULT="Usage: $SCRIPTNAME <namespace> <command>\n"
@@ -174,7 +177,7 @@ function _help {
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ $COMMAND == $1_* ]] ; then
-        COMMAND_RESULT="${COMMAND_RESULT}\n- ${COMMAND##*_}\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+        COMMAND_RESULT="${COMMAND_RESULT}\n--- ${COMMAND##*_} ---\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
       fi
     done
   fi
@@ -198,6 +201,7 @@ function controller_login {
 register controller_login Login to your controller
 describe controller_login << EOF
 Check if the login with your appdynamics controller works properly.
+If the login fails, use $1 controller ping to check if the controller is running and check your credentials if they are correct.
 EOF
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
@@ -233,7 +237,9 @@ function controller_call {
 }
 register controller_call Send a custom HTTP call to a controller
 describe controller_call << EOF
-Send a custom HTTP call to an AppDynamics controller. 
+Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter:\n
+$0 controller call /controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233\n
+You can modify the http method with option -X and add payload with option -d.
 EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_ping {
@@ -248,15 +254,24 @@ function controller_ping {
   fi
 }
 register controller_ping Check the availability of an appdynamics controller
+describe controller_ping << EOF
+Check the availability of an appdynamics controller. On success the response time will be provided.
+EOF
 function controller_status {
   controller_call -X GET /controller/rest/serverstatus
 }
 register controller_status Get server status from controller
+describe controller_status << EOF
+This command will return a XML containing status information about the controller.
+EOF
 function controller_version {
   controller_call -X GET /controller/rest/serverstatus
   COMMAND_RESULT=`echo -e $COMMAND_RESULT | sed -n -e 's/.*Controller v\(.*\) Build.*/\1/p'`
 }
 register controller_version Get installed version from controller
+describe controller_version << EOF
+Get installed version from controller
+EOF
 function portal_login {
   debug "Login at 'https://login.appdynamics.com/sso/login/' with $CONFIG_PORTAL_CREDENTIALS"
   httpClient -s -c ${CONFIG_PORTAL_COOKIE_LOCATION} -d "username=${CONFIG_PORTAL_CREDENTIALS%%:*}&password=${CONFIG_PORTAL_CREDENTIALS##*:}" -s 'https://login.appdynamics.com/sso/login/'
@@ -269,6 +284,9 @@ function portal_login {
   fi
 }
 register portal_login Login to portal.appdynamics.com
+describe portal_login << EOF
+Login to portal.appdynamics.com
+EOF
 function portal_download {
   local VERSION=0
   local OPERATING_SYSTEM=`uname -s`
@@ -336,15 +354,24 @@ function portal_download {
   fi
 }
 register portal_download Download an appdynamics agent
+describe portal_download << EOF
+Download an appdynamics agent
+EOF
 function application_list {
   controller_call /controller/rest/applications
 }
 register application_list List all applications available on the controller
+describe application_list << EOF
+List all applications available on the controller. This command requires no further arguments.
+EOF
 function metrics_list {
   local APPLICATION=$*
   controller_call /controller/rest/applications/${APPLICATION}/metrics
 }
 register metrics_list List all metrics available for one application
+describe metrics_list << EOF
+List all metrics available for one application
+EOF
 function metrics_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
@@ -377,6 +404,9 @@ function metrics_get {
   controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
 }
 register metrics_get List all metrics available for one application
+describe metrics_get << EOF
+List all metrics available for one application
+EOF
 function dbmon_create {
   local DB_USER=""
   local DB_HOSTNAME=""
@@ -437,6 +467,9 @@ function dbmon_create {
                     }" /controller/restui/databases/collectors/createConfiguration
 }
 register dbmon_create Create a new database collector
+describe dbmon_create << EOF
+Create a new database collector
+EOF
 function event_create {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local NODE
@@ -478,6 +511,9 @@ function event_create {
   controller_call -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
 }
 register event_create Create a custom event for a given application
+describe event_create << EOF
+Create a custom event for a given application
+EOF
 function timerange_create {
   local START_TIME=-1
   local END_TIME=-1
@@ -504,10 +540,16 @@ function timerange_create {
   controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
 register timerange_create Create a custom time range
+describe timerange_create << EOF
+Create a custom time range
+EOF
 function timerange_list {
   controller_call -X GET /controller/restui/user/getAllCustomTimeRanges
 }
 register timerange_list List all custom timeranges available on the controller
+describe timerange_list << EOF
+List all custom timeranges available on the controller
+EOF
 function timerange_delete {
   local TIMERANGE_ID=$*
   if [[ $TIMERANGE_ID =~ ^[0-9]+$ ]]; then
@@ -518,10 +560,16 @@ function timerange_delete {
   fi
 }
 register timerange_delete Delete a specific time range by id
+describe timerange_delete << EOF
+Delete a specific time range by id
+EOF
 function dashboard_list {
   controller_call -X GET /controller/restui/dashboards/getAllDashboardsByType/false
 }
 register dashboard_list List all dashboards available on the controller
+describe dashboard_list << EOF
+List all dashboards available on the controller
+EOF
 function dashboard_export {
   local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
@@ -532,6 +580,9 @@ function dashboard_export {
   fi
 }
 register dashboard_export Export a specific dashboard
+describe dashboard_export << EOF
+Export a specific dashboard
+EOF
 function dashboard_delete {
   local DASHBOARD_ID=$*
   if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
@@ -542,6 +593,9 @@ function dashboard_delete {
   fi
 }
 register dashboard_delete Delete a specific dashboard
+describe dashboard_delete << EOF
+Delete a specific dashboard
+EOF
 if [ -f "${GLOBAL_CONFIG}" ]; then
   debug "Sourcing global config from ${GLOBAL_CONFIG} "
   . ${GLOBAL_CONFIG}
