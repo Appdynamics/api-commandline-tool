@@ -20,7 +20,7 @@ GLOBAL_HELP=""
 GLOBAL_LONG_HELP_COUNTER=0
 declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
-SCRIPTNAME=$0
+SCRIPTNAME=$(basename "$0")
 
 # register namespace_command help
 function register {
