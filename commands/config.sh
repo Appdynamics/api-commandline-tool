@@ -4,7 +4,8 @@ function _config {
   local FORCE=0
   local GLOBAL=0
   local SHOW=0
-  while getopts "gfs" opt "$@";
+  local PORTAL=0
+  while getopts "gfsp" opt "$@";
   do
     case "${opt}" in
       g)
@@ -16,6 +17,9 @@ function _config {
       s)
         SHOW=1
       ;;
+      p)
+        PORTAL=1
+      ;;
     esac
   done;
   shiftOptInd
@@ -23,8 +27,10 @@ function _config {
 
   local CONTROLLER_HOST=""
   local CONTROLLER_CREDENTIALS=""
+  local PORTAL_PASSWORD=""
+  local PORTAL_USER=""
   local OUTPUT_DIRECTORY="${HOME}/.appdynamics/adc"
-  local USER_PLUGIN_DIRECTORY="{$HOME}/.appdynamics/adc/plugins"
+  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/adc/plugins"
   local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
 
   if [ $GLOBAL -eq 1 ] ; then
@@ -40,13 +46,41 @@ function _config {
     fi
   else
 
-    echo "Controller Host location (e.g. https://appdynamics.example.com:8090)"
+    echo -n "Controller Host location (e.g. https://appdynamics.example.com:8090)"
+    if [ -n "${CONFIG_CONTROLLER_HOST}" ] ; then
+      echo " [${CONFIG_CONTROLLER_HOST}]"
+    else
+      echo " []"
+    fi
     read CONTROLLER_HOST
 
-    echo "Controller Credentials (e.g. user@tenant:password)"
+    if [ -z "$CONTROLLER_HOST" ] ; then
+      CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST
+    fi
+
+    echo -n "Controller Credentials (e.g. user@tenant:password)"
+    if [ -n "${CONFIG_CONTROLLER_CREDENTIALS}" ] ; then
+      echo " [${CONFIG_CONTROLLER_CREDENTIALS%%:*}:********]"
+    else
+      echo " []"
+    fi
     read CONTROLLER_CREDENTIALS
 
-    OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}"
+    if [ -z "$CONTROLLER_CREDENTIALS" ] ; then
+      CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS
+    fi
+
+    if [ $PORTAL -eq 1 ] ; then
+      echo -n "AppDynamics Portal Credentials (e.g. user@example.com:password)"
+      if [ -n "${CONFIG_PORTAL_CREDENTIALS}" ] ; then
+        echo " [${CONFIG_PORTAL_CREDENTIALS%%:*}:********]"
+      else
+        echo " []"
+      fi
+      read PORTAL_CREDENTIALS
+    fi
+
+    OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}\nCONFIG_PORTAL_CREDENTIALS=${PORTAL_CREDENTIALS}"
     if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
     then
       mkdir -p $OUTPUT_DIRECTORY
