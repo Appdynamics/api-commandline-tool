@@ -184,11 +184,12 @@ Initialize the adc configuration file
 EOF
 function _help {
   if [ "$1" = "" ] ; then
-    COMMAND_RESULT="Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] <namespace> <command>\n"
+    COMMAND_RESULT="Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n"
     COMMAND_RESULT="${COMMAND_RESULT}\nYou can use the following options on a global level:\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-H <controller-host>\t\t specify the host of the controller you want to connect to\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-C <controller-credentials>\t provide the credentials for the controller. Format: user@tenant:password\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-D <output-verbosity>\t\t Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output\n"
+    COMMAND_RESULT="${COMMAND_RESULT}\t-D <application-name>\t\t Provide a default application"
     COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
     local NAMESPACE=""
     local SORTED
@@ -424,12 +425,25 @@ describe application_list << EOF
 List all applications available on the controller. This command requires no further arguments.
 EOF
 function metric_list {
-  local APPLICATION=$*
-  controller_call /controller/rest/applications/${APPLICATION}/metrics
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local METRIC_PATH=""
+  while getopts "a:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  METRIC_PATH=`urlencode "$*"`
+  debug "Will call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}"
+  controller_call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}
 }
-register metric_list List all metrics available for one application
+register metric_list List metrics available for one application.
 describe metric_list << EOF
-List all metrics available for one application
+List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
 EOF
 function metric_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
@@ -464,7 +478,64 @@ function metric_get {
 }
 register metric_get Get a specific metric
 describe metric_get << EOF
-Get a specific metric
+Get a specific metric by providing the metric path. Provide the application with option -a
+EOF
+RECURSIVE_COMMAND_RESULT=""
+function metric_tree {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local DEPTH=0
+  declare -i DEPTH
+  local METRIC_PATH
+  local ROOT
+  local TABS=""
+  while getopts "a:d:t:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+      d)
+        DEPTH=${OPTARG}
+      ;;
+      t)
+          TABS=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  METRIC_PATH="$*"
+  metric_list -a $APPLICATION $METRIC_PATH
+  debug $COMMAND_RESULT
+  ROOT=$COMMAND_RESULT
+  COMMAND_RESULT=""
+  OLDIFS=$IFS
+  IFS=$'\n,{'
+  for I in $ROOT ; do
+    case "$I" in
+      *name*)
+        name=${I##*:}
+      ;;
+      *type*)
+        type=${I##*:}
+      ;;
+      *\}*)
+        name=${name:2}
+        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}\n"
+        if [[ "$type" == *folder* ]] ; then
+          local SUB_PATH="${METRIC_PATH}|${name%\"}"
+          metric_tree -d ${DEPTH}+1 -t "${TABS} " -a $APPLICATION ${SUB_PATH#"|"}
+        fi
+      esac
+    done;
+    IFS=$OLDIFS
+    if [ $DEPTH -eq 0 ] ; then
+      echo -e $RECURSIVE_COMMAND_RESULT
+    fi
+}
+register metric_tree Build and return a metrics tree for one application
+describe metric_tree << EOF
+Create a metric tree for the given application (-a). Note that this will create a lot of requests towards your controller.
 EOF
 function dbmon_create {
   local DB_USER=""
@@ -688,8 +759,8 @@ do
       debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
     ;;
     A)
-      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
-      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+      CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
     ;;
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}

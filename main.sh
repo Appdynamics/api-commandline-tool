@@ -55,6 +55,7 @@ source ./commands/application/list.sh
 
 source ./commands/metric/list.sh
 source ./commands/metric/get.sh
+source ./commands/metric/tree.sh
 
 source ./commands/dbmon/create.sh
 
@@ -104,8 +105,8 @@ do
       debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
     ;;
     A)
-      CONFIG_OUTPUT_VERBOSITY=${OPTARG}
-      debug "Set CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}"
+      CONFIG_CONTROLLER_DEFAULT_APPLICATION=${OPTARG}
+      debug "Set CONFIG_CONTROLLER_DEFAULT_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
     ;;
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}

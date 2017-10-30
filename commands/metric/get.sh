@@ -34,5 +34,5 @@ function metric_get {
 
 register metric_get Get a specific metric
 describe metric_get << EOF
-Get a specific metric
+Get a specific metric by providing the metric path. Provide the application with option -a
 EOF
