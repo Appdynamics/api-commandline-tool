@@ -53,8 +53,8 @@ source ./commands/portal/download.sh
 
 source ./commands/application/list.sh
 
-source ./commands/metrics/list.sh
-source ./commands/metrics/get.sh
+source ./commands/metric/list.sh
+source ./commands/metric/get.sh
 
 source ./commands/dbmon/create.sh
 

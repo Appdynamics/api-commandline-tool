@@ -423,15 +423,15 @@ register application_list List all applications available on the controller
 describe application_list << EOF
 List all applications available on the controller. This command requires no further arguments.
 EOF
-function metrics_list {
+function metric_list {
   local APPLICATION=$*
   controller_call /controller/rest/applications/${APPLICATION}/metrics
 }
-register metrics_list List all metrics available for one application
-describe metrics_list << EOF
+register metric_list List all metrics available for one application
+describe metric_list << EOF
 List all metrics available for one application
 EOF
-function metrics_get {
+function metric_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
   local END_TIME=-1
@@ -462,9 +462,9 @@ function metrics_get {
   local METRIC_PATH=`urlencode "$*"`
   controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
 }
-register metrics_get List all metrics available for one application
-describe metrics_get << EOF
-List all metrics available for one application
+register metric_get Get a specific metric
+describe metric_get << EOF
+Get a specific metric
 EOF
 function dbmon_create {
   local DB_USER=""
