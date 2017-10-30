@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function metrics_get {
+function metric_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
   local END_TIME=-1
@@ -32,7 +32,7 @@ function metrics_get {
   controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
 }
 
-register metrics_get List all metrics available for one application
-describe metrics_get << EOF
-List all metrics available for one application
+register metric_get Get a specific metric
+describe metric_get << EOF
+Get a specific metric
 EOF
