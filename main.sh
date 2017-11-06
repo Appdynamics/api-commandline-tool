@@ -52,12 +52,15 @@ source ./commands/portal/login.sh
 source ./commands/portal/download.sh
 
 source ./commands/application/list.sh
+source ./commands/application/export.sh
 
 source ./commands/metric/list.sh
 source ./commands/metric/get.sh
 source ./commands/metric/tree.sh
 
 source ./commands/dbmon/create.sh
+source ./commands/dbmon/list.sh
+source ./commands/dbmon/delete.sh
 
 source ./commands/event/create.sh
 
@@ -67,6 +70,7 @@ source ./commands/timerange/delete.sh
 
 source ./commands/dashboard/list.sh
 source ./commands/dashboard/export.sh
+source ./commands/dashboard/import.sh
 source ./commands/dashboard/delete.sh
 
 if [ -f "${GLOBAL_CONFIG}" ]; then

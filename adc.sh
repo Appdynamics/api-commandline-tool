@@ -57,6 +57,7 @@ function output {
   fi
 }
 function httpClient {
+ debug "$*"
  curl -L --connect-timeout 10 "$@"
 }
 SHIFTS=0
@@ -243,7 +244,8 @@ EOF
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
-  while getopts "X:d:" opt "$@";
+  local FORM=""
+  while getopts "X:d:F:" opt "$@";
   do
     case "${opt}" in
       X)
@@ -251,6 +253,9 @@ function controller_call {
       ;;
       d)
         PAYLOAD=${OPTARG}
+      ;;
+      F)
+        FORM=${OPTARG}
       ;;
     esac
   done
@@ -264,9 +269,10 @@ function controller_call {
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
-          -H "Content-Type: application/json;charset=UTF-8" \
+          "`[ -z "$FORM" ] && echo -H "Content-Type: application/json;charset=UTF-8"`" \
           -H "Accept: application/json, text/plain, */*"\
-          -d "$PAYLOAD" \
+          "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
+          "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
@@ -423,6 +429,19 @@ function application_list {
 register application_list List all applications available on the controller
 describe application_list << EOF
 List all applications available on the controller. This command requires no further arguments.
+EOF
+function application_export {
+  local APPLICATION_ID=$*
+  if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then
+    controller_call /controller/ConfigObjectImportExportServlet?applicationId=97
+  else
+    COMMAND_RESULT=""
+    error "This is not a number: '$APPLICATION_ID'"
+  fi
+}
+register application_export Export an application from the controller
+describe application_export << EOF
+Export a application from the controller. Specifiy the application id as parameter.
 EOF
 function metric_list {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
@@ -600,6 +619,26 @@ register dbmon_create Create a new database collector
 describe dbmon_create << EOF
 Create a new database collector
 EOF
+function dbmon_list {
+  controller_call /controller/restui/databases/collectors/
+}
+register dbmon_list List all database collectors
+describe dbmon_list << EOF
+List all database collectors
+EOF
+function dbmon_delete {
+  local COLLECTOR_ID=$*
+  if [[ $COLLECTOR_ID =~ ^[0-9]+$ ]]; then
+    controller_call -X POST -d "[$COLLECTOR_ID]" /controller/restui/databases/collectors/configuration/batchDelete
+  else
+    COMMAND_RESULT=""
+    error "This is not a number: '$COLLECTOR_ID'"
+  fi
+}
+register dbmon_delete Delete a database collector
+describe dbmon_delete << EOF
+Delete a database collector. Provide the collector id as parameter.
+EOF
 function event_create {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local NODE
@@ -712,6 +751,19 @@ function dashboard_export {
 register dashboard_export Export a specific dashboard
 describe dashboard_export << EOF
 Export a specific dashboard
+EOF
+function dashboard_import {
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    controller_call -X POST -F file=@$FILE /controller/CustomDashboardImportExportServlet
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register dashboard_import Import a dashboard
+describe dashboard_import << EOF
+Import a dashboard from a given file
 EOF
 function dashboard_delete {
   local DASHBOARD_ID=$*

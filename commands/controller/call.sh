@@ -3,7 +3,8 @@
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
-  while getopts "X:d:" opt "$@";
+  local FORM=""
+  while getopts "X:d:F:" opt "$@";
   do
     case "${opt}" in
       X)
@@ -11,6 +12,9 @@ function controller_call {
       ;;
       d)
         PAYLOAD=${OPTARG}
+      ;;
+      F)
+        FORM=${OPTARG}
       ;;
     esac
   done
@@ -27,9 +31,10 @@ function controller_call {
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
-          -H "Content-Type: application/json;charset=UTF-8" \
+          "`[ -z "$FORM" ] && echo -H "Content-Type: application/json;charset=UTF-8"`" \
           -H "Accept: application/json, text/plain, */*"\
-          -d "$PAYLOAD" \
+          "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
+          "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"

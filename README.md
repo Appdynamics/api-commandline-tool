@@ -25,14 +25,21 @@ adc.sh config -f
 `adc.sh` integrates different commands to interact with your AppDynamics controller. Call `adc.sh help` to get a full list:
 
 ```
-Usage: ./adc.sh <namespace> <command>
+Usage: adc.sh [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>
 
-To execute a action, provide a namespace and a command, e.g. "dbmon list" to list all database collectors.
+You can use the following options on a global level:
+	-H <controller-host>		 specify the host of the controller you want to connect to
+	-C <controller-credentials>	 provide the credentials for the controller. Format: user@tenant:password
+	-D <output-verbosity>		 Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output
+	-D <application-name>		 Provide a default application
+To execute a action, provide a namespace and a command, e.g. "metrics get" to get a specific metric.
 Finally the following commands in the global namespace can be called directly:
+	config		Initialize the adc configuration file
 	help		Display the global usage information
-	config	Initialize the adc configuration file
+	install		Run through the process of setting up the appdynamics plattform
 
 application
+	export		Export an application from the controller
 	list		List all applications available on the controller
 
 controller
@@ -40,26 +47,37 @@ controller
 	login		Login to your controller
 	ping		Check the availability of an appdynamics controller
 	status		Get server status from controller
+	version		Get installed version from controller
 
 dashboard
 	delete		Delete a specific dashboard
 	export		Export a specific dashboard
+	import		Import a dashboard
 	list		List all dashboards available on the controller
 
 dbmon
 	create		Create a new database collector
+	delete		Delete a database collector
+	list		List all database collectors
 
 event
 	create		Create a custom event for a given application
 
-metrics
-	get		List all metrics available for one application
-	list		List all metrics available for one application
+metric
+	get		Get a specific metric
+	list		List metrics available for one application.
+	tree		Build and return a metrics tree for one application
+
+portal
+	download		Download an appdynamics agent
+	login		Login to portal.appdynamics.com
 
 timerange
 	create		Create a custom time range
 	delete		Delete a specific time range by id
 	list		List all custom timeranges available on the controller
+
+Run adc.sh help <namespace> to get detailed help on subcommands in that namespace.
 ```
 
 A simple work flow example is listing, exporting and deleting a dashboard:
