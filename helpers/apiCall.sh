@@ -25,14 +25,15 @@ function apiCall {
   OLDIFS=$IFS
   IFS="\$"
   for MATCH in $PAYLOAD ; do
-    if [ "${MATCH::1}" = "{" ] ; then
+    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
       MATCH=${MATCH:1}
       OPT=${MATCH%%\}*}:
       OPTS="${OPTS}${OPT}"
     fi
   done;
+
   for MATCH in $ENDPOINT ; do
-    if [ "${MATCH::1}" = "{" ] ; then
+    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
       MATCH=${MATCH:1}
       OPT=${MATCH%%\}*}:
       OPTS="${OPTS}${OPT}"
@@ -50,6 +51,15 @@ function apiCall {
     shift $SHIFTS
   fi
 
+  while [[ $PAYLOAD =~ \${[^}]*} ]] ; do
+    if [ -z "$1" ] ; then
+      error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+      return;
+    fi
+    PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
+    shift
+  done
+
   while [[ $ENDPOINT =~ \${[^}]*} ]] ; do
     if [ -z "$1" ] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
@@ -61,9 +71,9 @@ function apiCall {
 
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
-    controller_call -X $METHOD -d $PAYLOAD $ENDPOINT
+    echo -X $METHOD -d $PAYLOAD $ENDPOINT
   else
-    controller_call -X $METHOD $ENDPOINT
+    echo -X $METHOD $ENDPOINT
   fi
 }
 

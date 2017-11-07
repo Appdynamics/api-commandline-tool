@@ -120,14 +120,14 @@ function apiCall {
   OLDIFS=$IFS
   IFS="\$"
   for MATCH in $PAYLOAD ; do
-    if [ "${MATCH::1}" = "{" ] ; then
+    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
       MATCH=${MATCH:1}
       OPT=${MATCH%%\}*}:
       OPTS="${OPTS}${OPT}"
     fi
   done;
   for MATCH in $ENDPOINT ; do
-    if [ "${MATCH::1}" = "{" ] ; then
+    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
       MATCH=${MATCH:1}
       OPT=${MATCH%%\}*}:
       OPTS="${OPTS}${OPT}"
@@ -143,6 +143,14 @@ function apiCall {
     shiftOptInd
     shift $SHIFTS
   fi
+  while [[ $PAYLOAD =~ \${[^}]*} ]] ; do
+    if [ -z "$1" ] ; then
+      error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+      return;
+    fi
+    PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
+    shift
+  done
   while [[ $ENDPOINT =~ \${[^}]*} ]] ; do
     if [ -z "$1" ] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
@@ -153,9 +161,9 @@ function apiCall {
   done
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
-    controller_call -X $METHOD -d $PAYLOAD $ENDPOINT
+    echo -X $METHOD -d $PAYLOAD $ENDPOINT
   else
-    controller_call -X $METHOD $ENDPOINT
+    echo -X $METHOD $ENDPOINT
   fi
 }
 # __call GET "/controller/rest/applications/\${a}/business-transactions" -a ECommerce
@@ -644,48 +652,12 @@ describe metric_tree << EOF
 Create a metric tree for the given application (-a). Note that this will create a lot of requests towards your controller.
 EOF
 function dbmon_create {
-  local DB_USER=""
-  local DB_HOSTNAME=""
-  local DB_AGENT=""
-  local DB_TYPE=""
-  local DB_COLLECTOR_NAME=""
-  local DB_NAME=""
-  local DB_PORT=""
-  local DB_PASSWORD=""
-  while getopts "u:h:a:t:n:p:s:" opt "$@";
-  do
-    case "${opt}" in
-      u)
-        DB_USER=${OPTARG}
-      ;;
-      h)
-        DB_HOSTNAME=${OPTARG}
-      ;;
-      a)
-        DB_AGENT=${OPTARG}
-      ;;
-      t)
-        DB_TYPE=${OPTARG}
-      ;;
-      n)
-        DB_NAME=${OPTARG}
-      ;;
-      p)
-        DB_PORT=${OPTARG}
-      ;;
-      s)
-        DB_PASSWORD=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  DB_COLLECTOR_NAME="$*"
-  controller_call -X POST -d "{ \
-                      \"username\": \"$DB_USER\",\
-                      \"hostname\": \"$DB_HOSTNAME\",\
-                      \"agentName\": \"$DB_AGENT\",\
-                      \"type\": \"$DB_TYPE\",\
+  apiCall -X POST -d "{ \
+                      \"name\": \"\${i}\",\
+                      \"username\": \"\${u}\",\
+                      \"hostname\": \"\${h}\",\
+                      \"agentName\": \"\${a}\",\
+                      \"type\": \"\${t}\",\
                       \"orapkiSslEnabled\": false,\
                       \"orasslTruststoreLoc\": null,\
                       \"orasslTruststoreType\": null,\
@@ -694,17 +666,24 @@ function dbmon_create {
                       \"orasslKeystoreLoc\": null,\
                       \"orasslKeystoreType\": null,\
                       \"orasslKeystorePassword\": null,\
-                      \"name\": \"$DB_COLLECTOR_NAME\",\
-                      \"databaseName\": \"$DB_NAME\",\
-                      \"port\": \"$DB_PORT\",\
-                      \"password\": \"$DB_PASSWORD\",\
+                      \"databaseName\": \"\${n}\",\
+                      \"port\": \"\${p}\",\
+                      \"password\": \"\${s}\",\
                       \"excludedSchemas\": [],\
                       \"enabled\": true\
-                    }" /controller/restui/databases/collectors/createConfiguration
+                    }" /controller/restui/databases/collectors/createConfiguration "$@"
 }
 register dbmon_create Create a new database collector
 describe dbmon_create << EOF
-Create a new database collector
+Create a new database collector. You need to provide the following parameters:
+  -i name
+  -u user name
+  -h host name
+  -a agent name
+  -t type
+  -d database name
+  -p port
+  -s password
 EOF
 function dbmon_list {
   controller_call /controller/restui/databases/collectors/
