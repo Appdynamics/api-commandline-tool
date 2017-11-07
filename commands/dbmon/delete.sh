@@ -1,13 +1,7 @@
 #!/bin/bash
 
 function dbmon_delete {
-  local COLLECTOR_ID=$*
-  if [[ $COLLECTOR_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X POST -d "[$COLLECTOR_ID]" /controller/restui/databases/collectors/configuration/batchDelete
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$COLLECTOR_ID'"
-  fi
+    apiCall -X POST -d "[\${c}]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
 }
 
 register dbmon_delete Delete a database collector

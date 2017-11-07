@@ -41,6 +41,7 @@ source ./helpers/httpClient.sh
 source ./helpers/shiftOptInd.sh
 source ./helpers/urlencode.sh
 source ./helpers/recursiveSource.sh
+source ./helpers/apiCall.sh
 
 source ./commands/config.sh
 source ./commands/help.sh
@@ -58,6 +59,9 @@ source ./commands/application/list.sh
 source ./commands/application/export.sh
 
 source ./commands/bt/list.sh
+
+source ./commands/tier/list.sh
+source ./commands/tier/get.sh
 
 source ./commands/metric/list.sh
 source ./commands/metric/get.sh

@@ -98,6 +98,69 @@ function recursiveSource {
     done
   fi
 }
+function apiCall {
+  local OPTS
+  while getopts "X:d:" opt "$@";
+  do
+    case "${opt}" in
+      X)
+	      METHOD=${OPTARG}
+      ;;
+      d)
+        PAYLOAD=${OPTARG}
+      ;;
+    esac
+  done
+  shiftOptInd
+  shift $SHIFTS
+  ENDPOINT=$1
+  debug "Unparsed endpoint is $ENDPOINT"
+  debug "Unparsed payload is $PAYLOAD"
+  shift
+  OLDIFS=$IFS
+  IFS="\$"
+  for MATCH in $PAYLOAD ; do
+    if [ "${MATCH::1}" = "{" ] ; then
+      MATCH=${MATCH:1}
+      OPT=${MATCH%%\}*}:
+      OPTS="${OPTS}${OPT}"
+    fi
+  done;
+  for MATCH in $ENDPOINT ; do
+    if [ "${MATCH::1}" = "{" ] ; then
+      MATCH=${MATCH:1}
+      OPT=${MATCH%%\}*}:
+      OPTS="${OPTS}${OPT}"
+    fi
+  done;
+  IFS=$OLDIFS
+  if [ -n "$OPTS" ] ; then
+    while getopts ${OPTS} opt;
+    do
+      PAYLOAD=${PAYLOAD//\$\{$opt\}/$OPTARG}
+      ENDPOINT=${ENDPOINT//\$\{$opt\}/$OPTARG}
+    done
+    shiftOptInd
+    shift $SHIFTS
+  fi
+  while [[ $ENDPOINT =~ \${[^}]*} ]] ; do
+    if [ -z "$1" ] ; then
+      error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+      return;
+    fi
+    ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$1}
+    shift
+  done
+  debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
+  if [ -n "$PAYLOAD" ] ; then
+    controller_call -X $METHOD -d $PAYLOAD $ENDPOINT
+  else
+    controller_call -X $METHOD $ENDPOINT
+  fi
+}
+# __call GET "/controller/rest/applications/\${a}/business-transactions" -a ECommerce
+# echo "########"
+# __call GET "/controller/rest/applications/\${a}/nodes/\${n}" -n Web2 -a ECommerce
 function _config {
   local FORCE=0
   local GLOBAL=0
@@ -272,7 +335,7 @@ function controller_call {
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
-          "`[ -z "$FORM" ] && echo -H "Content-Type: application/json;charset=UTF-8"`" \
+          "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")" \
           -H "Accept: application/json, text/plain, */*"\
           "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
@@ -447,17 +510,25 @@ describe application_export << EOF
 Export a application from the controller. Specifiy the application id as parameter.
 EOF
 function bt_list {
-  local APPLICATION_ID=$*
-  if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then
-    controller_call /controller/rest/applications/${APPLICATION_ID}/business-transactions
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$APPLICATION_ID'"
-  fi
+  apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
 }
 register bt_list List all business transactions for a given application
 describe bt_list << EOF
 List all business transactions for a given application. Provide the application id as parameter.
+EOF
+function tier_list {
+  apiCall -X GET "/controller/rest/applications/\${a}/tiers" "$@"
+}
+register tier_list List all tiers for a given application
+describe tier_list << EOF
+List all tiers for a given application. Provide the application id as parameter.
+EOF
+function tier_get {
+  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}" "$@"
+}
+register tier_get Retrieve Tier Information by Tier Name
+describe tier_get << EOF
+Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters
 EOF
 function metric_list {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
@@ -643,13 +714,7 @@ describe dbmon_list << EOF
 List all database collectors
 EOF
 function dbmon_delete {
-  local COLLECTOR_ID=$*
-  if [[ $COLLECTOR_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X POST -d "[$COLLECTOR_ID]" /controller/restui/databases/collectors/configuration/batchDelete
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$COLLECTOR_ID'"
-  fi
+    apiCall -X POST -d "[\${c}]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
 }
 register dbmon_delete Delete a database collector
 describe dbmon_delete << EOF

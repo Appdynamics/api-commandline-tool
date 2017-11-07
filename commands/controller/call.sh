@@ -31,7 +31,7 @@ function controller_call {
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
-          "`[ -z "$FORM" ] && echo -H "Content-Type: application/json;charset=UTF-8"`" \
+          "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")" \
           -H "Accept: application/json, text/plain, */*"\
           "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
