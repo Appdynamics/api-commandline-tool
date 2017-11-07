@@ -17,6 +17,8 @@ GLOBAL_LONG_HELP_COUNTER=0
 declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
 SCRIPTNAME=$(basename "$0")
+VERBOSITY_COUNTER=0
+declare -i VERBOSITY_COUNTER
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
@@ -190,7 +192,8 @@ function _help {
     COMMAND_RESULT="${COMMAND_RESULT}\t-H <controller-host>\t\t specify the host of the controller you want to connect to\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-C <controller-credentials>\t provide the credentials for the controller. Format: user@tenant:password\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-D <output-verbosity>\t\t Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-D <application-name>\t\t Provide a default application"
+    COMMAND_RESULT="${COMMAND_RESULT}\t-D <application-name>\t\t Provide a default application\n"
+    COMMAND_RESULT="${COMMAND_RESULT}\t-v[vv] \t\t\t\t Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n"
     COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
     local NAMESPACE=""
     local SORTED
@@ -442,6 +445,19 @@ function application_export {
 register application_export Export an application from the controller
 describe application_export << EOF
 Export a application from the controller. Specifiy the application id as parameter.
+EOF
+function bt_list {
+  local APPLICATION_ID=$*
+  if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then
+    controller_call /controller/rest/applications/${APPLICATION_ID}/business-transactions
+  else
+    COMMAND_RESULT=""
+    error "This is not a number: '$APPLICATION_ID'"
+  fi
+}
+register bt_list List all business transactions for a given application
+describe bt_list << EOF
+List all business transactions for a given application. Provide the application id as parameter.
 EOF
 function metric_list {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
@@ -791,7 +807,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:D:P:S:F:" opt;
+while getopts "H:C:D:P:S:F:v" opt;
 do
   case "${opt}" in
     H)
@@ -831,6 +847,20 @@ do
       [[ ${CONTROLLER_INFO_XML_SSL_ENABLED// /} == "true" ]] && CONTROLLER_INFO_XML_SCHEMA=https || CONTROLLER_INFO_XML_SCHEMA=http
       CONFIG_CONTROLLER_HOST=${CONTROLLER_INFO_XML_SCHEMA}://${CONTROLLER_INFO_XML_HOST// /}:${CONTROLLER_INFO_XML_PORT// /}
       debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
+    ;;
+    v)
+      case $VERBOSITY_COUNTER in
+        0)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},warn"
+        ;;
+        1)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},info"
+        ;;
+        2)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},debug"
+        ;;
+      esac
+      VERBOSITY_COUNTER=${VERBOSITY_COUNTER}+1
     ;;
   esac
 done

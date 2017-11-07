@@ -22,6 +22,9 @@ declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
 SCRIPTNAME=$(basename "$0")
 
+VERBOSITY_COUNTER=0
+declare -i VERBOSITY_COUNTER
+
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
@@ -53,6 +56,8 @@ source ./commands/portal/download.sh
 
 source ./commands/application/list.sh
 source ./commands/application/export.sh
+
+source ./commands/bt/list.sh
 
 source ./commands/metric/list.sh
 source ./commands/metric/get.sh
@@ -89,7 +94,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:D:P:S:F:" opt;
+while getopts "H:C:D:P:S:F:v" opt;
 do
   case "${opt}" in
     H)
@@ -129,6 +134,20 @@ do
       [[ ${CONTROLLER_INFO_XML_SSL_ENABLED// /} == "true" ]] && CONTROLLER_INFO_XML_SCHEMA=https || CONTROLLER_INFO_XML_SCHEMA=http
       CONFIG_CONTROLLER_HOST=${CONTROLLER_INFO_XML_SCHEMA}://${CONTROLLER_INFO_XML_HOST// /}:${CONTROLLER_INFO_XML_PORT// /}
       debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
+    ;;
+    v)
+      case $VERBOSITY_COUNTER in
+        0)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},warn"
+        ;;
+        1)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},info"
+        ;;
+        2)
+        CONFIG_OUTPUT_VERBOSITY="${CONFIG_OUTPUT_VERBOSITY},debug"
+        ;;
+      esac
+      VERBOSITY_COUNTER=${VERBOSITY_COUNTER}+1
     ;;
   esac
 done
