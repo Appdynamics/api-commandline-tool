@@ -433,7 +433,7 @@ EOF
 function application_export {
   local APPLICATION_ID=$*
   if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then
-    controller_call /controller/ConfigObjectImportExportServlet?applicationId=97
+    controller_call /controller/ConfigObjectImportExportServlet?applicationId=$APPLICATION_ID
   else
     COMMAND_RESULT=""
     error "This is not a number: '$APPLICATION_ID'"
