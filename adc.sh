@@ -509,6 +509,20 @@ register application_list List all applications available on the controller
 describe application_list << EOF
 List all applications available on the controller. This command requires no further arguments.
 EOF
+function application_create {
+  apiCall -X POST -d "{\"name\": \"\${n}\", \"description\": \"\"}" "/controller/restui/allApplications/createApplication?applicationType=\${t}" "$@"
+}
+register application_create Create a new application
+describe application_create << EOF
+Create a new application. Provide a name and a type (APM or WEB) as parameter.
+EOF
+function application_delete {
+  apiCall -X POST -d "\${a}" "/controller/restui/allApplications/deleteApplication" "$@"
+}
+register application_delete Delete an application
+describe application_delete << EOF
+Delete an application. Provide application id as parameter.
+EOF
 function application_export {
   local APPLICATION_ID=$*
   if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then

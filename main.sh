@@ -56,6 +56,8 @@ source ./commands/portal/login.sh
 source ./commands/portal/download.sh
 
 source ./commands/application/list.sh
+source ./commands/application/create.sh
+source ./commands/application/delete.sh
 source ./commands/application/export.sh
 
 source ./commands/bt/list.sh
