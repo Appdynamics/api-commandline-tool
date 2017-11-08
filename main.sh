@@ -68,6 +68,7 @@ source ./commands/metric/get.sh
 source ./commands/metric/tree.sh
 
 source ./commands/dbmon/create.sh
+source ./commands/dbmon/get.sh
 source ./commands/dbmon/list.sh
 source ./commands/dbmon/delete.sh
 
@@ -98,7 +99,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:D:P:S:F:v" opt;
+while getopts "H:C:J:D:P:S:F:v" opt;
 do
   case "${opt}" in
     H)

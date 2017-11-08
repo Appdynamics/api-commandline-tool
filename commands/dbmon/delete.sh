@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function dbmon_delete {
-    apiCall -X POST -d "[\${c}]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
+    apiCall -X POST -d "[\"\${c}\"]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
 }
 
 register dbmon_delete Delete a database collector

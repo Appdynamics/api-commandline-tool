@@ -2,6 +2,7 @@
 
 function apiCall {
   local OPTS
+  local METHOD="GET"
 
   while getopts "X:d:" opt "$@";
   do
@@ -71,9 +72,9 @@ function apiCall {
 
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
-    echo -X $METHOD -d $PAYLOAD $ENDPOINT
+    controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
   else
-    echo -X $METHOD $ENDPOINT
+    controller_call -X $METHOD $ENDPOINT
   fi
 }
 

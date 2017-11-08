@@ -60,7 +60,11 @@ function output {
 }
 function httpClient {
  debug "$*"
- curl -L --connect-timeout 10 "$@"
+ local TIMEOUT=10
+ if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
+   TIMEOUT=$CONFIG_HTTP_TIMEOUT
+ fi
+ curl -L --connect-timeout $TIMEOUT "$@"
 }
 SHIFTS=0
 declare -i SHIFTS
@@ -100,6 +104,7 @@ function recursiveSource {
 }
 function apiCall {
   local OPTS
+  local METHOD="GET"
   while getopts "X:d:" opt "$@";
   do
     case "${opt}" in
@@ -161,9 +166,9 @@ function apiCall {
   done
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
-    echo -X $METHOD -d $PAYLOAD $ENDPOINT
+    controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
   else
-    echo -X $METHOD $ENDPOINT
+    controller_call -X $METHOD $ENDPOINT
   fi
 }
 # __call GET "/controller/rest/applications/\${a}/business-transactions" -a ECommerce
@@ -361,9 +366,9 @@ EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_ping {
   debug "Ping $CONFIG_CONTROLLER_HOST"
-  local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "TIME_TOTAL=%{time_total}")
+  local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
   debug "RESPONSE: ${PING_RESPONSE}"
-  if [[ "${PING_RESPONSE/200 OK}" != "$Ping_RESPONSE" ]]; then
+  if [ -n "$PING_RESPONSE" ] && [[ "${PING_RESPONSE/200 OK}" != "$PING_RESPONSE" ]]; then
     local TIME=${PING_RESPONSE##*TIME_TOTAL=}
     COMMAND_RESULT="Pong! Time: ${TIME}"
   else
@@ -685,6 +690,13 @@ Create a new database collector. You need to provide the following parameters:
   -p port
   -s password
 EOF
+function dbmon_get {
+  apiCall "/controller/restui/databases/collectors/configurations/\${c}" "$@"
+}
+register dbmon_get Retrieve information about a specific database collector
+describe dbmon_get << EOF
+Retrieve information about a specific database collector. Provide the collector id as parameter.
+EOF
 function dbmon_list {
   controller_call /controller/restui/databases/collectors/
 }
@@ -693,7 +705,7 @@ describe dbmon_list << EOF
 List all database collectors
 EOF
 function dbmon_delete {
-    apiCall -X POST -d "[\${c}]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
+    apiCall -X POST -d "[\"\${c}\"]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
 }
 register dbmon_delete Delete a database collector
 describe dbmon_delete << EOF
@@ -851,7 +863,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:D:P:S:F:v" opt;
+while getopts "H:C:J:D:P:S:F:v" opt;
 do
   case "${opt}" in
     H)
