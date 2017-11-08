@@ -557,6 +557,13 @@ register tier_get Retrieve Tier Information by Tier Name
 describe tier_get << EOF
 Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters
 EOF
+function tier_nodes {
+  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
+}
+register tier_nodes" Retrieve Node Information for All Nodes in a Tier"
+describe tier_nodes << EOF
+Retrieve Node Information for All Nodes in a Tier. Provide the application and the tier as parameters
+EOF
 function metric_list {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local METRIC_PATH=""

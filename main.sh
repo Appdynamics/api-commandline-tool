@@ -1,5 +1,4 @@
 #!/bin/bash
-
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 
@@ -64,6 +63,7 @@ source ./commands/bt/list.sh
 
 source ./commands/tier/list.sh
 source ./commands/tier/get.sh
+source ./commands/tier/nodes.sh
 
 source ./commands/metric/list.sh
 source ./commands/metric/get.sh
