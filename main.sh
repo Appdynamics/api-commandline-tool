@@ -1,4 +1,6 @@
 #!/bin/bash
+ADC_VERSION="vx.y.z"
+ADC_LAST_COMMIT="xxxxxxxxxx"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 
@@ -44,6 +46,7 @@ source ./helpers/apiCall.sh
 
 source ./commands/config.sh
 source ./commands/help.sh
+source ./commands/version.sh
 
 source ./commands/controller/login.sh
 source ./commands/controller/call.sh

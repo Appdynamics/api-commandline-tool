@@ -1,4 +1,6 @@
 #!/bin/bash
+ADC_VERSION="v0.2.0"
+ADC_LAST_COMMIT="afc07f1824d883268d9e9d007c63ad3fd6e04de3"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -300,6 +302,13 @@ function _help {
   fi
 }
 register _help Display the global usage information
+function _version {
+  COMMAND_RESULT="$ADC_VERSION ~ $ADC_LAST_COMMIT"
+}
+register _config Print the current version of $SCRIPTNAME
+describe _config << EOF
+Print the current version of $SCRIPTNAME
+EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_login {
   debug "Login at $CONFIG_CONTROLLER_HOST with $CONFIG_CONTROLLER_CREDENTIALS"
