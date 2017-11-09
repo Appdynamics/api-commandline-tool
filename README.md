@@ -112,7 +112,19 @@ function namespace_command {
 register namespace_command help text
 ```
 
-Please note, that your plugins will not be validated, so you can change global behavior or break the script.
+To send a call to the AppDynamics controller you can use the `apiCall` helper, that allows you to easily create a subcommand:
+
+```
+function tier_nodes {
+  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
+}
+```
+
+The command `adc.sh tier nodes` will now take two arguments (via -a and -t) and send the given request to the AppDynamics controller.
+
+Since all other sub commands are loaded, you can reuse them in your plugin. Most importantly `call_controller` to send requests to the controller. 
+
+Please note, that your plugins will not be validated, so you can change global behaviour or break the script.
 
 ## Build
 
