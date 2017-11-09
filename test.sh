@@ -3,8 +3,10 @@ START=`date +%s`
 COOKIE_PATH="/tmp/adc-test-cookie"
 SUCCESS_COUNTER=0
 TEST_COUNTER=0
+SKIP_COUNTER=0
 
 declare -i SUCCESS_COUNTER
+declare -i SKIP_COUNTER
 declare -i TEST_COUNTER
 
 function assert_equals {
@@ -13,7 +15,7 @@ function assert_equals {
     SUCCESS_COUNTER=$SUCCESS_COUNTER+1
     echo -en "\033[0;32m.\033[0m"
   else
-    echo -e "\n\033[0;31mTest failed: \033[0;33m$1\033[0;31m doesn't equal \033[0;35m$2\033[0m"
+    echo -e "\n\033[0;31mTest \033[0;34m$3\033[0;31m failed: \033[0;33m$1\033[0;31m doesn't equal \033[0;35m$2\033[0m"
   fi
 }
 
@@ -23,7 +25,7 @@ function assert_empty {
     SUCCESS_COUNTER=$SUCCESS_COUNTER+1
     echo -en "\033[0;32m.\033[0m"
   else
-    echo -e "\n\033[0;31mTest failed: \033[0;33m$1\033[0;31m is not an empty string."
+    echo -e "\n\033[0;31mTest \033[0;34m$3\033[0;31m failed: \033[0;33m$1\033[0;31m is not an empty string."
   fi
 }
 
@@ -33,7 +35,7 @@ function assert_contains_substring {
     SUCCESS_COUNTER=$SUCCESS_COUNTER+1
     echo -en "\033[0;32m.\033[0m"
   else
-    echo -e "\n\033[0;31mTest failed: Couldn't find \033[0;33m$1\033[0;31m in \033[0;35m$2\033[0m"
+    echo -e "\n\033[0;31mTest \033[0;34m$3\033[0;31m failed: Couldn't find \033[0;33m$1\033[0;31m in \033[0;35m$2\033[0m"
   fi
 }
 
@@ -43,7 +45,7 @@ function assert_regex {
     SUCCESS_COUNTER=$SUCCESS_COUNTER+1
     echo -en "\033[0;32m.\033[0m"
   else
-    echo -e "\n\033[0;31mTest failed: Couldn't find \033[0;33m$1\033[0;31m in \033[0;35m$2\033[0m"
+    echo -e "\n\033[0;31mTest \033[0;34m$3\033[0;31m failed: Couldn't find \033[0;33m$1\033[0;31m in \033[0;35m$2\033[0m"
   fi
 }
 
@@ -74,13 +76,17 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_contains_substring "<business-transactions>" "`${ADC} bt list -a $APPLICATION_ID`"
 
   ##### Database Collector Create, List, Get, Delete #####
-  CREATE_DBMON="`${ADC} dbmon create -i adc_test_collector -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
-  assert_contains_substring '"name" : "adc_test_collector",' "$CREATE_DBMON"
-  assert_contains_substring '"name" : "adc_test_collector",' "`${ADC} dbmon list`"
+  DBMON_NAME="adc_test_collector_$RANDOM"
+  CREATE_DBMON="`${ADC} dbmon create -i ${DBMON_NAME} -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
+  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "$CREATE_DBMON" "Create Database Collector"
+  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ADC} dbmon list`" "List Database Collectors"
   if [[ $CREATE_DBMON =~ \"id\"\ \:\ ([0-9]+) ]] ; then
     COLLECTOR_ID=${BASH_REMATCH[1]}
-    assert_contains_substring '"name" : "adc_test_collector",' "`${ADC} dbmon get $COLLECTOR_ID`"
+    assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ADC} dbmon get $COLLECTOR_ID`"
     assert_contains_substring '"status" : "SUCCESS",' "`${ADC} dbmon delete $COLLECTOR_ID`"
+  else
+    SKIP_COUNTER=$SKIP_COUNTER+2
+    echo -en "\033[0;33m!!\033[0m"
   fi
 
   ##### Error handling #####
@@ -107,3 +113,6 @@ rm $COOKIE_PATH
 END=`date +%s`
 
 echo -e "\n$SUCCESS_COUNTER/$TEST_COUNTER ($PERCENTAGE%) tests completed in $((END-START))s.\033[0m"
+if [ $SKIP_COUNTER -gt 0 ] ; then
+  echo -e "\033[0;33m$SKIP_COUNTER tests have been skipped.\033[0m"
+fi
