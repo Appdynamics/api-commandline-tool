@@ -2,6 +2,7 @@
 
 function apiCall {
   local OPTS
+  local OPTIONAL_OPTIONS=""
   local METHOD="GET"
 
   while getopts "X:d:" opt "$@";
@@ -26,34 +27,49 @@ function apiCall {
   OLDIFS=$IFS
   IFS="\$"
   for MATCH in $PAYLOAD ; do
-    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
-      MATCH=${MATCH:1}
-      OPT=${MATCH%%\}*}:
+    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+      OPT=${BASH_REMATCH[1]}:
+      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+        OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
+      fi
       OPTS="${OPTS}${OPT}"
     fi
   done;
 
   for MATCH in $ENDPOINT ; do
-    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
-      MATCH=${MATCH:1}
-      OPT=${MATCH%%\}*}:
+    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+      OPT=${BASH_REMATCH[1]}:
+      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+        OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
+      fi
       OPTS="${OPTS}${OPT}"
     fi
   done;
   IFS=$OLDIFS
 
+  debug "Identified Options: ${OPTS}"
+  debug "Optional Options: $OPTIONAL_OPTIONS"
+
   if [ -n "$OPTS" ] ; then
     while getopts ${OPTS} opt;
     do
-      PAYLOAD=${PAYLOAD//\$\{$opt\}/$OPTARG}
-      ENDPOINT=${ENDPOINT//\$\{$opt\}/$OPTARG}
+      local ARG=`urlencode "$OPTARG"`
+      debug "Applying $opt with $ARG"
+      # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
+      # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
+      while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
+        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$ARG}
+      done;
+      while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
+        ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
+      done;
     done
     shiftOptInd
     shift $SHIFTS
   fi
 
-  while [[ $PAYLOAD =~ \${[^}]*} ]] ; do
-    if [ -z "$1" ] ; then
+  while [[ $PAYLOAD =~ \${([a-zA-Z])(\??)} ]] ; do
+    if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
       return;
     fi
@@ -61,8 +77,8 @@ function apiCall {
     shift
   done
 
-  while [[ $ENDPOINT =~ \${[^}]*} ]] ; do
-    if [ -z "$1" ] ; then
+  while [[ $ENDPOINT =~ \${([a-zA-Z])(\??)} ]] ; do
+    if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
       return;
     fi

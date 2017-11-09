@@ -16,6 +16,13 @@ CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # An empty string silents all output
 CONFIG_OUTPUT_VERBOSITY="error,output"
 
+# Default Colors
+COLOR_WARNING="\033[0;33m"
+COLOR_INFO="\033[0;32m"
+COLOR_ERROR="\033[0;31m"
+COLOR_DEBUG="\033[0;35m"
+COLOR_RESET="\033[0m"
+
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
 GLOBAL_LONG_HELP_COUNTER=0
@@ -78,6 +85,7 @@ source ./commands/dbmon/list.sh
 source ./commands/dbmon/delete.sh
 
 source ./commands/event/create.sh
+source ./commands/event/list.sh
 
 source ./commands/timerange/create.sh
 source ./commands/timerange/list.sh
@@ -104,7 +112,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:J:D:P:S:F:v" opt;
+while getopts "H:C:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
     H)
@@ -134,6 +142,13 @@ do
     S)
       CONFIG_PORTAL_CREDENTIALS=${OPTARG}
       debug "Set CONFIG_PORTAL_CREDENTIALS=${CONFIG_PORTAL_CREDENTIALS}"
+    ;;
+    N)
+      COLOR_WARNING=""
+      COLOR_INFO=""
+      COLOR_ERROR=""
+      COLOR_DEBUG=""
+      COLOR_RESET=""
     ;;
     F)
       CONTROLLER_INFO_XML=${OPTARG}

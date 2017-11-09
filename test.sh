@@ -53,7 +53,7 @@ echo "Sourcing user config for controller host and credentials..."
 source "$HOME/.appdynamics/adc/config.sh"
 echo "Will use the following controller for testing: $CONFIG_CONTROLLER_HOST"
 
-ADC="./adc.sh -H $CONFIG_CONTROLLER_HOST -C $CONFIG_CONTROLLER_CREDENTIALS -J $COOKIE_PATH"
+ADC="./adc.sh -N -H $CONFIG_CONTROLLER_HOST -C $CONFIG_CONTROLLER_CREDENTIALS -J $COOKIE_PATH"
 #### BEGIN TESTS ####
 
 ##### Test controller functionality #####
@@ -68,7 +68,6 @@ CREATE_APPLICATION="`${ADC} application create -t APM -n "$APPNAME"`"
 assert_contains_substring "\"name\" : \"${APPNAME}\"," "$CREATE_APPLICATION"
 if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   APPLICATION_ID=${BASH_REMATCH[1]}
-
 
   ##### List different entities #####
   assert_contains_substring "<applications>" "`${ADC} application list`"
@@ -89,11 +88,21 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
     echo -en "\033[0;33m!!\033[0m"
   fi
 
+  ##### Events #####
+  assert_contains_substring "Successfully created the event id:" "`${ADC} event create -a ${APPLICATION_ID} -s "Test" -l INFO -e CUSTOM`" "Create custom event"
+  assert_contains_substring "Successfully created the event id:" "`${ADC} event create -a ${APPLICATION_ID} -s "Test" -l INFO -e APPLICATION_DEPLOYMENT`" "Create application deployment"
+  assert_contains_substring "Successfully created the event id:" "`${ADC} event create -a ${APPLICATION_ID} -s "Urlencoding Test" -c "With Comment" -l INFO -e APPLICATION_DEPLOYMENT`" "Create application deployment"
+  # It takes the controller several seconds to update the list of events, so we (currently) skip checking the existence of the ids above
+  assert_contains_substring "<events></events>" "`${ADC} event list -a ${APPLICATION_ID} -t BEFORE_NOW -d 60 -e APPLICATION_DEPLOYMENT -s INFO`"
+
+
   ##### Error handling #####
   assert_equals "Error" "`env CONFIG_HTTP_TIMEOUT=1 ./adc.sh -H 127.0.0.2:8009 controller ping`"
+  assert_equals "ERROR: Please provide an argument for paramater -a" "`${ADC} event create`" "Missing required argument"
 
   ##### Delete the test application
-  assert_empty "`${ADC} application delete $APPLICATION_ID`"
+  echo $APPLICATION_ID
+  # assert_empty "`${ADC} application delete $APPLICATION_ID`"
 fi
 #### END TESTS ####
 

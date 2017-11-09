@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.2.0"
-ADC_LAST_COMMIT="423890fe40e000d1f75fa6fc96065877ecdb9e2c"
+ADC_LAST_COMMIT="1b5e629b1d5f9ec47d11e15e71e62df6a301988c"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -13,6 +13,12 @@ CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # - output (msg to stdout)
 # An empty string silents all output
 CONFIG_OUTPUT_VERBOSITY="error,output"
+# Default Colors
+COLOR_WARNING="\033[0;33m"
+COLOR_INFO="\033[0;32m"
+COLOR_ERROR="\033[0;31m"
+COLOR_DEBUG="\033[0;35m"
+COLOR_RESET="\033[0m"
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
 GLOBAL_LONG_HELP_COUNTER=0
@@ -30,11 +36,6 @@ function describe {
   GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
   GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]=$(cat)
 }
-COLOR_WARNING="\033[0;33m"
-COLOR_INFO="\033[0;32m"
-COLOR_ERROR="\033[0;31m"
-COLOR_DEBUG="\033[0;35m"
-COLOR_RESET="\033[0m"
 function debug {
   if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_DEBUG}DEBUG: $*${COLOR_RESET}"
@@ -106,6 +107,7 @@ function recursiveSource {
 }
 function apiCall {
   local OPTS
+  local OPTIONAL_OPTIONS=""
   local METHOD="GET"
   while getopts "X:d:" opt "$@";
   do
@@ -127,39 +129,53 @@ function apiCall {
   OLDIFS=$IFS
   IFS="\$"
   for MATCH in $PAYLOAD ; do
-    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
-      MATCH=${MATCH:1}
-      OPT=${MATCH%%\}*}:
+    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+      OPT=${BASH_REMATCH[1]}:
+      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+        OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
+      fi
       OPTS="${OPTS}${OPT}"
     fi
   done;
   for MATCH in $ENDPOINT ; do
-    if [ "${MATCH::1}" = "{" ] && [ "${MATCH:2:1}" = "}" ] ; then
-      MATCH=${MATCH:1}
-      OPT=${MATCH%%\}*}:
+    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+      OPT=${BASH_REMATCH[1]}:
+      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+        OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
+      fi
       OPTS="${OPTS}${OPT}"
     fi
   done;
   IFS=$OLDIFS
+  debug "Identified Options: ${OPTS}"
+  debug "Optional Options: $OPTIONAL_OPTIONS"
   if [ -n "$OPTS" ] ; then
     while getopts ${OPTS} opt;
     do
-      PAYLOAD=${PAYLOAD//\$\{$opt\}/$OPTARG}
-      ENDPOINT=${ENDPOINT//\$\{$opt\}/$OPTARG}
+      local ARG=`urlencode "$OPTARG"`
+      debug "Applying $opt with $ARG"
+      # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
+      # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
+      while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
+        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$ARG}
+      done;
+      while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
+        ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
+      done;
     done
     shiftOptInd
     shift $SHIFTS
   fi
-  while [[ $PAYLOAD =~ \${[^}]*} ]] ; do
-    if [ -z "$1" ] ; then
+  while [[ $PAYLOAD =~ \${([a-zA-Z])(\??)} ]] ; do
+    if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
       return;
     fi
     PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
     shift
   done
-  while [[ $ENDPOINT =~ \${[^}]*} ]] ; do
-    if [ -z "$1" ] ; then
+  while [[ $ENDPOINT =~ \${([a-zA-Z])(\??)} ]] ; do
+    if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
       return;
     fi
@@ -742,48 +758,18 @@ describe dbmon_delete << EOF
 Delete a database collector. Provide the collector id as parameter.
 EOF
 function event_create {
-  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local NODE
-  local TIER
-  local SEVERITY
-  local EVENTTYPE
-  local BT
-  local COMMENT
-  while getopts "n:e:s:t:c:a:" opt "$@";
-  do
-    case "${opt}" in
-      n)
-        NODE=${OPTARG}
-      ;;
-      t)
-        TIER=${OPTARG}
-      ;;
-      s)
-        SEVERITY=${OPTARG}
-      ;;
-      e)
-        EVENTTYPE=${OPTARG}
-      ;;
-      b)
-        BT=${OPTARG}
-      ;;
-      c)
-        COMMENT=`urlencode "$OPTARG"`
-      ;;
-      a)
-        APPLICATION=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  SUMMARY=`urlencode "$*"`
-  debug -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
-  controller_call -X POST "/controller/rest/applications/${APPLICATION}/events?summary=${SUMMARY}&comment=${COMMENT}&eventtype=${EVENTTYPE}&severity=${SEVERITY}&bt=${BT}&node=${NODE}&tier=${TIER}"
+  apiCall -X POST "/controller/rest/applications/\${a}/events?summary=\${s}&comment=\${c?}&eventtype=\${e}&severity=\${l}&bt=&\${b?}node=\${n?}&tier=\${t?}" "$@"
 }
 register event_create Create a custom event for a given application
 describe event_create << EOF
-Create a custom event for a given application
+Create a custom event for a given application. Application, summary, event type and severity are required parameters.
+EOF
+function event_list {
+  apiCall '/controller/rest/applications/${a}/events?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}&event-types=${e}&severities=${s}' "$@"
+}
+register event_list List all events for a given time range.
+describe event_list << EOF
+List all events for a given time range.
 EOF
 function timerange_create {
   local START_TIME=-1
@@ -893,7 +879,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:J:D:P:S:F:v" opt;
+while getopts "H:C:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
     H)
@@ -923,6 +909,13 @@ do
     S)
       CONFIG_PORTAL_CREDENTIALS=${OPTARG}
       debug "Set CONFIG_PORTAL_CREDENTIALS=${CONFIG_PORTAL_CREDENTIALS}"
+    ;;
+    N)
+      COLOR_WARNING=""
+      COLOR_INFO=""
+      COLOR_ERROR=""
+      COLOR_DEBUG=""
+      COLOR_RESET=""
     ;;
     F)
       CONTROLLER_INFO_XML=${OPTARG}

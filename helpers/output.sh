@@ -1,11 +1,5 @@
 #!/bin/bash
 
-COLOR_WARNING="\033[0;33m"
-COLOR_INFO="\033[0;32m"
-COLOR_ERROR="\033[0;31m"
-COLOR_DEBUG="\033[0;35m"
-COLOR_RESET="\033[0m"
-
 function debug {
   if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_DEBUG}DEBUG: $*${COLOR_RESET}"
