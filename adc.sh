@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.2.0"
-ADC_LAST_COMMIT="1b5e629b1d5f9ec47d11e15e71e62df6a301988c"
+ADC_LAST_COMMIT="b0df122812228c8a0c27fa03a8d54873dc904e99"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -62,7 +62,7 @@ function output {
   fi
 }
 function httpClient {
- debug "$*"
+ # debug "$*"
  local TIMEOUT=10
  if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
    TIMEOUT=$CONFIG_HTTP_TIMEOUT
@@ -157,7 +157,7 @@ function apiCall {
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
       while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
-        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$ARG}
+        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
       while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
@@ -189,9 +189,6 @@ function apiCall {
     controller_call -X $METHOD $ENDPOINT
   fi
 }
-# __call GET "/controller/rest/applications/\${a}/business-transactions" -a ECommerce
-# echo "########"
-# __call GET "/controller/rest/applications/\${a}/nodes/\${n}" -n Web2 -a ECommerce
 function _config {
   local FORCE=0
   local GLOBAL=0
@@ -368,8 +365,9 @@ function controller_call {
   ENDPOINT=$*
   controller_login
   # Debug the COMMAND_RESULT from controller_login
-  debug $COMMAND_RESULT
+  debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
+    debug "Endpoint: $ENDPOINT"
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
@@ -378,6 +376,7 @@ function controller_call {
           "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
+    debug "Command result: $COMMAND_RESULT"
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
    fi
@@ -865,6 +864,75 @@ function dashboard_delete {
 register dashboard_delete Delete a specific dashboard
 describe dashboard_delete << EOF
 Delete a specific dashboard
+EOF
+function federation_createkey {
+  apiCall -X POST -d '{"apiKeyName": "${n}"}' "/controller/rest/federation/apikeyforfederation" "$@"
+}
+register federation_createkey Create API Key for Federation
+describe federation_createkey << EOF
+Create API Key for Federation.
+EOF
+function federation_establish {
+  local ACCOUNT=${CONFIG_CONTROLLER_CREDENTIALS##*@}
+  ACCOUNT=${ACCOUNT%%:*}
+  info "Establishing friendship..."
+  apiCall -X POST -d "{ \
+    \"accountName\": \"${ACCOUNT}\", \
+    \"controllerUrl\": \"${CONFIG_CONTROLLER_HOST}\", \
+    \"friendAccountName\": \"\${a}\", \
+    \"friendAccountApiKey\": \"\${k}\", \
+    \"friendAccountControllerUrl\": \"\${c}\" \
+  }" "/controller/rest/federation/establishmutualfriendship" "$@"
+}
+register federation_establish Establish Mutual Friendship
+describe federation_establish << EOF
+Establish Mutual Friendship
+EOF
+function federation_setup {
+  local FRIEND_CONTROLLER_CREDENTIALS=""
+  local FRIEND_CONTROLLER_HOST=""
+  local KEY_NAME=""
+  local MY_ACCOUNT=${CONFIG_CONTROLLER_CREDENTIALS##*@}
+  MY_ACCOUNT=${MY_ACCOUNT%%:*}
+  while getopts "c:h:k:" opt "$@";
+  do
+    case "${opt}" in
+      c)
+        FRIEND_CONTROLLER_CREDENTIALS=${OPTARG}
+      ;;
+      h)
+        FRIEND_CONTROLLER_HOST=${OPTARG}
+      ;;
+      k)
+        KEY_NAME=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ -z "$KEY_NAME" ] ; then
+    local FRIEND_ACCOUNT=${FRIEND_CONTROLLER_CREDENTIALS##*@}
+    FRIEND_ACCOUNT=${FRIEND_ACCOUNT%%:*}
+    KEY_NAME=${FRIEND_ACCOUNT}_${FRIEND_CONTROLLER_HOST//[:\/]/_}_$RANDOM
+  fi;
+  federation_createkey -n $KEY_NAME
+  debug "Key creation result: $COMMAND_RESULT"
+  KEY=${COMMAND_RESULT##*\"key\": \"}
+  KEY=${KEY%%\",\"*}
+  debug "Identified key: $KEY"
+  debug "Establishing mutual friendship: $0 -J /tmp/appdynamics-federation-cookie.txt -H $FRIEND_CONTROLLER_HOST -C $FRIEND_CONTROLLER_CREDENTIALS federation establish -a $MY_ACCOUNT -k $KEY -c $CONFIG_CONTROLLER_HOST"
+  FRIEND_RESULT=`$0 -J /tmp/appdynamics-federation-cookie.txt -H "$FRIEND_CONTROLLER_HOST" -C "$FRIEND_CONTROLLER_CREDENTIALS" federation establish -a "$MY_ACCOUNT" -k "$KEY" -c "$CONFIG_CONTROLLER_HOST"`
+  if [ -z "$FRIEND_RESULT" ] ; then
+    COMMAND_RESULT="Federation between $CONFIG_CONTROLLER_HOST and $FRIEND_CONTROLLER_HOST successfully established."
+  else
+    COMMAND_RESULT=""
+    error "Federation setup failed. Error from $FRIEND_CONTROLLER_HOST: ${FRIEND_RESULT}"
+  fi
+  rm /tmp/appdynamics-federation-cookie.txt
+}
+register federation_setup Setup a controller federation: Generates a key and establishes the mutal friendship.
+describe federation_setup << EOF
+Setup a controller federation: Generates a key and establishes the mutal friendship.
 EOF
 if [ -f "${GLOBAL_CONFIG}" ]; then
   debug "Sourcing global config from ${GLOBAL_CONFIG} "

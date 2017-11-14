@@ -96,6 +96,11 @@ source ./commands/dashboard/export.sh
 source ./commands/dashboard/import.sh
 source ./commands/dashboard/delete.sh
 
+source ./commands/federation/createkey.sh
+source ./commands/federation/establish.sh
+source ./commands/federation/setup.sh
+
+
 if [ -f "${GLOBAL_CONFIG}" ]; then
   debug "Sourcing global config from ${GLOBAL_CONFIG} "
   . ${GLOBAL_CONFIG}

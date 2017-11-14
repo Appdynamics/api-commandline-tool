@@ -26,8 +26,9 @@ function controller_call {
 
   controller_login
   # Debug the COMMAND_RESULT from controller_login
-  debug $COMMAND_RESULT
+  debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
+    debug "Endpoint: $ENDPOINT"
     COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
           -X $METHOD\
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
@@ -36,6 +37,7 @@ function controller_call {
           "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
+    debug "Command result: $COMMAND_RESULT"
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
    fi

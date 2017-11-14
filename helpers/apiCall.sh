@@ -58,7 +58,7 @@ function apiCall {
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
       while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
-        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$ARG}
+        PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
       while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
@@ -93,7 +93,3 @@ function apiCall {
     controller_call -X $METHOD $ENDPOINT
   fi
 }
-
-# __call GET "/controller/rest/applications/\${a}/business-transactions" -a ECommerce
-# echo "########"
-# __call GET "/controller/rest/applications/\${a}/nodes/\${n}" -n Web2 -a ECommerce
