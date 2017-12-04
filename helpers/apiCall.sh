@@ -88,6 +88,12 @@ function apiCall {
 
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
+
+    if [ "${PAYLOAD:0:1}" = "@" ] ; then
+      debug "Loading payload from file ${PAYLOAD:1}"
+      PAYLOAD=$(<${PAYLOAD:1})
+    fi
+
     controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
   else
     controller_call -X $METHOD $ENDPOINT

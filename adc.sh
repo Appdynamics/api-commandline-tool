@@ -1,6 +1,6 @@
 #!/bin/bash
-ADC_VERSION="v0.2.0"
-ADC_LAST_COMMIT="b0df122812228c8a0c27fa03a8d54873dc904e99"
+ADC_VERSION="v0.3.0"
+ADC_LAST_COMMIT="a19fccf0db917b408bc6dcb8ec57dcc100614baf"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -184,6 +184,10 @@ function apiCall {
   done
   debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
   if [ -n "$PAYLOAD" ] ; then
+    if [ "${PAYLOAD:0:1}" = "@" ] ; then
+      debug "Loading payload from file ${PAYLOAD:1}"
+      PAYLOAD=$(<${PAYLOAD:1})
+    fi
     controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
   else
     controller_call -X $METHOD $ENDPOINT
@@ -864,6 +868,14 @@ function dashboard_delete {
 register dashboard_delete Delete a specific dashboard
 describe dashboard_delete << EOF
 Delete a specific dashboard
+EOF
+#
+function dashboard_update {
+  apiCall -X POST -d @\$\{f\} /controller/restui/dashboards/updateDashboard "$@"
+}
+register dashboard_update Update a specific dashboard
+describe dashboard_update << EOF
+Update a specific dashboard. Please not that the json you need to provide is not compatible with the export format!
 EOF
 function federation_createkey {
   apiCall -X POST -d '{"apiKeyName": "${n}"}' "/controller/rest/federation/apikeyforfederation" "$@"

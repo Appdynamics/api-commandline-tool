@@ -95,6 +95,7 @@ source ./commands/dashboard/list.sh
 source ./commands/dashboard/export.sh
 source ./commands/dashboard/import.sh
 source ./commands/dashboard/delete.sh
+source ./commands/dashboard/update.sh
 
 source ./commands/federation/createkey.sh
 source ./commands/federation/establish.sh
