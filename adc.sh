@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.3.0"
-ADC_LAST_COMMIT="a19fccf0db917b408bc6dcb8ec57dcc100614baf"
+ADC_LAST_COMMIT="26d438d632252ffc3da8c481f64c4d9dbf29c92b"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
