@@ -60,6 +60,7 @@ source ./commands/controller/call.sh
 source ./commands/controller/ping.sh
 source ./commands/controller/status.sh
 source ./commands/controller/version.sh
+source ./commands/controller/isup.sh
 
 source ./commands/portal/login.sh
 source ./commands/portal/download.sh

@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.3.0"
-ADC_LAST_COMMIT="26d438d632252ffc3da8c481f64c4d9dbf29c92b"
+ADC_LAST_COMMIT="ff878c81ccbcf3e53c5f51cc09963ed0219d13b4"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -391,7 +391,6 @@ Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you w
 $0 controller call /controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233\n
 You can modify the http method with option -X and add payload with option -d.
 EOF
-CONTROLLER_LOGIN_STATUS=0
 function controller_ping {
   debug "Ping $CONFIG_CONTROLLER_HOST"
   local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
@@ -421,6 +420,25 @@ function controller_version {
 register controller_version Get installed version from controller
 describe controller_version << EOF
 Get installed version from controller
+EOF
+function controller_isup {
+  local START
+  local END
+  declare -i END
+  START=`date +%s`
+  controller_ping
+  while [ "$COMMAND_RESULT" = "Error" ] ; do
+    controller_ping
+    sleep 1
+  done
+  sleep 1
+  END=`date +%s`
+  END=$END-$START
+  COMMAND_RESULT="Controller at $CONFIG_CONTROLLER_HOST up after $END seconds"
+}
+register controller_isup Pause until controller is up
+describe controller_isup << EOF
+This command will pause until the controller is up. Use this to get notified after the controller is booted successfully.
 EOF
 PORTAL_LOGIN_STATUS=0
 function portal_login {
