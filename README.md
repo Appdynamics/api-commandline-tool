@@ -27,15 +27,23 @@ adc.sh config -f
 A simple work flow example is listing, exporting and deleting a dashboard:
 
 ```
-adc dashboard list
-adc dashboard export 13
-adc dashboard delete 13
+adc.sh dashboard list
+adc.sh dashboard export 13
+adc.sh dashboard delete 13
+```
+
+Another example is getting a notification while your on premise controller is starting up. Combine adc.sh with the notification tool of your choice ([noti](https://github.com/variadico/noti/), [terminal-notifier](https://github.com/julienXX/terminal-notifier), ...) or run commands after the controller is running:
+
+```
+noti adc.sh controller isup
+adc.sh controller isup | terminal-notifier
+adc.sh controller isup ; adc.sh applications list
 ```
 
 Also, you can use `adc.sh` to easily create custom events, like code deployments:
 
 ```
-./adc.sh event create -s INFO -c "This release fixes some minor issues with the mini cart functionality" -e APPLICATION_DEPLOYMENT -a 145 "Version 3.5.1 released"
+adc.sh event create -s INFO -c "This release fixes some minor issues with the mini cart functionality" -e APPLICATION_DEPLOYMENT -a 145 "Version 3.5.1 released"
 ```
 
 If a certain API call is not yet wrapped into a command, you can use `controller call` as general interface:
