@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.3.0"
-ADC_LAST_COMMIT="ff878c81ccbcf3e53c5f51cc09963ed0219d13b4"
+ADC_LAST_COMMIT="a4e1a87c70f8289cfd228f076ff783563c960dea"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -287,7 +287,7 @@ function _help {
     COMMAND_RESULT="${COMMAND_RESULT}\t-H <controller-host>\t\t specify the host of the controller you want to connect to\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-C <controller-credentials>\t provide the credentials for the controller. Format: user@tenant:password\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-D <output-verbosity>\t\t Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-D <application-name>\t\t Provide a default application\n"
+    COMMAND_RESULT="${COMMAND_RESULT}\t-A <application-name>\t\t Provide a default application\n"
     COMMAND_RESULT="${COMMAND_RESULT}\t-v[vv] \t\t\t\t Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n"
     COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
     local NAMESPACE=""
@@ -977,7 +977,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "H:C:J:D:P:S:F:Nv" opt;
+while getopts "A:H:C:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
     H)

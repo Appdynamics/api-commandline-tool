@@ -119,7 +119,7 @@ else
 fi
 
 # Parse global options
-while getopts "H:C:J:D:P:S:F:Nv" opt;
+while getopts "A:H:C:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
     H)
