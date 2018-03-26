@@ -13,7 +13,7 @@ function controller_login {
     COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
     CONTROLLER_LOGIN_STATUS=0
   fi
-  XCSRFTOKEN=$(tail -1 $CONFIG_CONTROLLER_COOKIE_LOCATION | awk 'NF>1{print $NF}')
+  XCSRFTOKEN=$(grep "X-CSRF-TOKEN" $CONFIG_CONTROLLER_COOKIE_LOCATION | awk 'NF>1{print $NF}')
   debug "XCSRFTOKEN: $XCSRFTOKEN"
 }
 

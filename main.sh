@@ -72,6 +72,8 @@ source ./commands/application/export.sh
 
 source ./commands/bt/list.sh
 
+source ./commands/server/list.sh
+
 source ./commands/tier/list.sh
 source ./commands/tier/get.sh
 source ./commands/tier/nodes.sh

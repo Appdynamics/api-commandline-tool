@@ -1,6 +1,6 @@
 #!/bin/bash
 ADC_VERSION="v0.3.0"
-ADC_LAST_COMMIT="a4e1a87c70f8289cfd228f076ff783563c960dea"
+ADC_LAST_COMMIT="3d87e045974500038f0d5dc50084d7872fd2c4bb"
 USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -338,7 +338,7 @@ function controller_login {
     COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
     CONTROLLER_LOGIN_STATUS=0
   fi
-  XCSRFTOKEN=$(tail -1 $CONFIG_CONTROLLER_COOKIE_LOCATION | awk 'NF>1{print $NF}')
+  XCSRFTOKEN=$(grep "X-CSRF-TOKEN" $CONFIG_CONTROLLER_COOKIE_LOCATION | awk 'NF>1{print $NF}')
   debug "XCSRFTOKEN: $XCSRFTOKEN"
 }
 register controller_login Login to your controller
@@ -588,6 +588,13 @@ function bt_list {
 register bt_list List all business transactions for a given application
 describe bt_list << EOF
 List all business transactions for a given application. Provide the application id as parameter.
+EOF
+function server_list {
+  apiCall -X GET "/controller/sim/v2/user/machines" "$@"
+}
+register server_list List all servers
+describe server_list << EOF
+List all servers
 EOF
 function tier_list {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers" "$@"
