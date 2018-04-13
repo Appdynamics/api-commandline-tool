@@ -1,6 +1,6 @@
-# AppDynamics Commandline Tool (ADC)
+# API Commandline Tool
 
-The AppDynamics Commandline Tool (ADC) is a shell script wrapper around [API](https://docs.appdynamics.com/display/PRO43/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
+The API Commandline Tool (ADC) is a shell script wrapper around [API](https://docs.appdynamics.com/display/latest/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
 
 ## Installation
 
