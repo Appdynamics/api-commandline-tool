@@ -1,8 +1,8 @@
 #!/bin/bash
-ADC_VERSION="vx.y.z"
-ADC_LAST_COMMIT="xxxxxxxxxx"
-USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
-GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
+ACT_VERSION="vx.y.z"
+ACT_LAST_COMMIT="xxxxxxxxxx"
+USER_CONFIG="$HOME/.appdynamics/act/config.sh"
+GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
 CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
