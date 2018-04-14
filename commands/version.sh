@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function _version {
-  COMMAND_RESULT="$ADC_VERSION ~ $ADC_LAST_COMMIT"
+  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
 }
 
 register _version Print the current version of $SCRIPTNAME
