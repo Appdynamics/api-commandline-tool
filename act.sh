@@ -1,8 +1,8 @@
 #!/bin/bash
-ADC_VERSION="v0.3.0"
-ADC_LAST_COMMIT="3d87e045974500038f0d5dc50084d7872fd2c4bb"
-USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
-GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
+ACT_VERSION="v0.3.0"
+ACT_LAST_COMMIT="3d87e045974500038f0d5dc50084d7872fd2c4bb"
+USER_CONFIG="$HOME/.appdynamics/act/config.sh"
+GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
 CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # Configure default output verbosity. May contain a combination of the following strings:
@@ -221,18 +221,18 @@ function _config {
   local CONTROLLER_CREDENTIALS=""
   local PORTAL_PASSWORD=""
   local PORTAL_USER=""
-  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/adc"
-  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/adc/plugins"
+  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/act"
+  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/act/plugins"
   local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
   if [ $GLOBAL -eq 1 ] ; then
-    OUTPUT_DIRECTORY="/etc/appdynamics/adc"
-    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-adc-cookie.txt"
+    OUTPUT_DIRECTORY="/etc/appdynamics/act"
+    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-act-cookie.txt"
   fi
   if [ $SHOW -eq 1 ] ; then
     if [ -r $OUTPUT_DIRECTORY/config.sh ] ; then
       COMMAND_RESULT=$(<$OUTPUT_DIRECTORY/config.sh)
     else
-      COMMAND_RESULT="adc is not configured."
+      COMMAND_RESULT="act is not configured."
     fi
   else
     echo -n "Controller Host location (e.g. https://appdynamics.example.com:8090)"
@@ -276,9 +276,9 @@ function _config {
     fi
   fi
 }
-register _config Initialize the adc configuration file
+register _config Initialize the act configuration file
 describe _config << EOF
-Initialize the adc configuration file
+Initialize the act configuration file
 EOF
 function _help {
   if [ "$1" = "" ] ; then
@@ -320,7 +320,7 @@ function _help {
 }
 register _help Display the global usage information
 function _version {
-  COMMAND_RESULT="$ADC_VERSION ~ $ADC_LAST_COMMIT"
+  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
 }
 register _version Print the current version of $SCRIPTNAME
 describe _version << EOF

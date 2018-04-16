@@ -1,8 +1,8 @@
 #!/bin/bash
-ADC_VERSION="vx.y.z"
-ADC_LAST_COMMIT="xxxxxxxxxx"
-USER_CONFIG="$HOME/.appdynamics/adc/config.sh"
-GLOBAL_CONFIG="/etc/appdynamics/adc/config.sh"
+ACT_VERSION="vx.y.z"
+ACT_LAST_COMMIT="xxxxxxxxxx"
+USER_CONFIG="$HOME/.appdynamics/act/config.sh"
+GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
 CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
@@ -44,66 +44,7 @@ function describe {
   GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]=$(cat)
 }
 
-source ./helpers/output.sh
-source ./helpers/httpClient.sh
-source ./helpers/shiftOptInd.sh
-source ./helpers/urlencode.sh
-source ./helpers/recursiveSource.sh
-source ./helpers/apiCall.sh
-
-source ./commands/config.sh
-source ./commands/help.sh
-source ./commands/version.sh
-
-source ./commands/controller/login.sh
-source ./commands/controller/call.sh
-source ./commands/controller/ping.sh
-source ./commands/controller/status.sh
-source ./commands/controller/version.sh
-source ./commands/controller/isup.sh
-
-source ./commands/portal/login.sh
-source ./commands/portal/download.sh
-
-source ./commands/application/list.sh
-source ./commands/application/create.sh
-source ./commands/application/delete.sh
-source ./commands/application/export.sh
-
-source ./commands/bt/list.sh
-
-source ./commands/server/list.sh
-
-source ./commands/tier/list.sh
-source ./commands/tier/get.sh
-source ./commands/tier/nodes.sh
-
-source ./commands/metric/list.sh
-source ./commands/metric/get.sh
-source ./commands/metric/tree.sh
-
-source ./commands/dbmon/create.sh
-source ./commands/dbmon/get.sh
-source ./commands/dbmon/list.sh
-source ./commands/dbmon/delete.sh
-
-source ./commands/event/create.sh
-source ./commands/event/list.sh
-
-source ./commands/timerange/create.sh
-source ./commands/timerange/list.sh
-source ./commands/timerange/delete.sh
-
-source ./commands/dashboard/list.sh
-source ./commands/dashboard/export.sh
-source ./commands/dashboard/import.sh
-source ./commands/dashboard/delete.sh
-source ./commands/dashboard/update.sh
-
-source ./commands/federation/createkey.sh
-source ./commands/federation/establish.sh
-source ./commands/federation/setup.sh
-
+#script_placeholder
 
 if [ -f "${GLOBAL_CONFIG}" ]; then
   debug "Sourcing global config from ${GLOBAL_CONFIG} "

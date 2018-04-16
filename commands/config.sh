@@ -29,20 +29,20 @@ function _config {
   local CONTROLLER_CREDENTIALS=""
   local PORTAL_PASSWORD=""
   local PORTAL_USER=""
-  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/adc"
-  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/adc/plugins"
+  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/act"
+  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/act/plugins"
   local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
 
   if [ $GLOBAL -eq 1 ] ; then
-    OUTPUT_DIRECTORY="/etc/appdynamics/adc"
-    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-adc-cookie.txt"
+    OUTPUT_DIRECTORY="/etc/appdynamics/act"
+    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-act-cookie.txt"
   fi
 
   if [ $SHOW -eq 1 ] ; then
     if [ -r $OUTPUT_DIRECTORY/config.sh ] ; then
       COMMAND_RESULT=$(<$OUTPUT_DIRECTORY/config.sh)
     else
-      COMMAND_RESULT="adc is not configured."
+      COMMAND_RESULT="act is not configured."
     fi
   else
 
@@ -93,7 +93,7 @@ function _config {
   fi
 }
 
-register _config Initialize the adc configuration file
+register _config Initialize the act configuration file
 describe _config << EOF
-Initialize the adc configuration file
+Initialize the act configuration file
 EOF
