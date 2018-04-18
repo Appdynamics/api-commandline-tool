@@ -9,7 +9,7 @@ function apiCall {
   do
     case "${opt}" in
       X)
-	      METHOD=${OPTARG}
+	    METHOD=${OPTARG}
       ;;
       d)
         PAYLOAD=${OPTARG}
@@ -57,10 +57,10 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
+      while [[ $PAYLOAD =~ \$\{$opt\??\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
+      while [[ $ENDPOINT =~ \$\{$opt\??\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done

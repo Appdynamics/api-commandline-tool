@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.3.0"
-ACT_LAST_COMMIT="1682ba551b5d65892f300b5a737b46e1c0f691af"
+ACT_LAST_COMMIT="13b1692a909cb01fbf21c38ef46ac9950d92b7be"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -60,7 +60,7 @@ function apiCall {
   do
     case "${opt}" in
       X)
-	      METHOD=${OPTARG}
+	    METHOD=${OPTARG}
       ;;
       d)
         PAYLOAD=${OPTARG}
@@ -103,10 +103,10 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \${$opt\??} ]] ; do
+      while [[ $PAYLOAD =~ \$\{$opt\??\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \${$opt\??} ]] ; do
+      while [[ $ENDPOINT =~ \$\{$opt\??\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done
