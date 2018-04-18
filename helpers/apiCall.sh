@@ -70,8 +70,13 @@ function apiCall {
 
   while [[ $PAYLOAD =~ \${([a-zA-Z])(\??)} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
-      error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
-      return;
+      local MISSING=${BASH_REMATCH:2:1}
+      if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
+        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+      else
+        error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+        return;
+      fi
     fi
     PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
     shift
@@ -79,8 +84,13 @@ function apiCall {
 
   while [[ $ENDPOINT =~ \${([a-zA-Z])(\??)} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
-      error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
-      return;
+      local MISSING=${BASH_REMATCH:2:1}
+      if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
+        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+      else
+        error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+        return;
+      fi
     fi
     ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$1}
     shift
