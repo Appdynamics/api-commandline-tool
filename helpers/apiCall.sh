@@ -68,7 +68,7 @@ function apiCall {
     shift $SHIFTS
   fi
 
-  while [[ $PAYLOAD =~ \${([a-zA-Z])(\??)} ]] ; do
+  while [[ $PAYLOAD =~ \$\{([a-zA-Z])(\??)\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
@@ -82,7 +82,7 @@ function apiCall {
     shift
   done
 
-  while [[ $ENDPOINT =~ \${([a-zA-Z])(\??)} ]] ; do
+  while [[ $ENDPOINT =~ \$\{([a-zA-Z])(\??)\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then

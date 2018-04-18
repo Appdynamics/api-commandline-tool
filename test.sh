@@ -44,7 +44,7 @@ function assert_empty {
 
 function assert_contains_substring {
   TEST_COUNTER=$TEST_COUNTER+1
-  if [[ $2 == *$1* ]]; then
+  if [[ $2 = *$1* ]]; then
     SUCCESS_COUNTER=$SUCCESS_COUNTER+1
     echo -en "\033[0;32m.\033[0m"
     LAST_TEST_STATUS=0
@@ -91,12 +91,13 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   ##### Database Collector Create, List, Get, Delete #####
   DBMON_NAME="act_test_collector_$RANDOM"
   CREATE_DBMON="`${ACT} dbmon create -i ${DBMON_NAME} -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
-  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "$CREATE_DBMON" "Create Database Collector"
+  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "${CREATE_DBMON}" "Create Database Collector"
+  sleep 10
   assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon list`" "List Database Collectors"
   if [[ $CREATE_DBMON =~ \"id\"\ \:\ ([0-9]+) ]] ; then
     COLLECTOR_ID=${BASH_REMATCH[1]}
-    assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon get $COLLECTOR_ID`"
-    assert_contains_substring '"status" : "SUCCESS",' "`${ACT} dbmon delete $COLLECTOR_ID`"
+    assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon get -c $COLLECTOR_ID`"
+    assert_contains_substring '"status" : "SUCCESS",' "`${ACT} dbmon delete -c $COLLECTOR_ID`"
   else
     SKIP_COUNTER=$SKIP_COUNTER+2
     echo -en "\033[0;33m!!\033[0m"

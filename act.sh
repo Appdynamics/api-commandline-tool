@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.3.0"
-ACT_LAST_COMMIT="13b1692a909cb01fbf21c38ef46ac9950d92b7be"
+ACT_LAST_COMMIT="bf89de71a23bb6b3df269b8fca4c95da5ec34b40"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -113,7 +113,7 @@ function apiCall {
     shiftOptInd
     shift $SHIFTS
   fi
-  while [[ $PAYLOAD =~ \${([a-zA-Z])(\??)} ]] ; do
+  while [[ $PAYLOAD =~ \$\{([a-zA-Z])(\??)\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
@@ -126,7 +126,7 @@ function apiCall {
     PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
     shift
   done
-  while [[ $ENDPOINT =~ \${([a-zA-Z])(\??)} ]] ; do
+  while [[ $ENDPOINT =~ \$\{([a-zA-Z])(\??)\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
