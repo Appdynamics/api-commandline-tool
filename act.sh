@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.3.0"
-ACT_LAST_COMMIT="7cb9213978eeeb16e44cfbb714052ea1702e4b75"
+ACT_LAST_COMMIT="1682ba551b5d65892f300b5a737b46e1c0f691af"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -364,6 +364,13 @@ function metric_list {
 register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
+EOF
+function eum_getapps {
+  apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
+}
+register eum_getapps Get EUM App Keys
+describe eum_getapps << EOF
+Get EUM Apps.
 EOF
 function _version {
   COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
