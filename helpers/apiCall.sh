@@ -92,7 +92,9 @@ function apiCall {
         return;
       fi
     fi
-    ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$1}
+    local ARG=`urlencode "$1"`
+    debug "Applying ${BASH_REMATCH[0]} with $ARG"
+    ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
     shift
   done
 

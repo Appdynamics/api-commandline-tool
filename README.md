@@ -1,6 +1,6 @@
 # API Commandline Tool
 
-The API Commandline Tool (ACT) is a shell script wrapper around [API](https://docs.appdynamics.com/display/latest/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
+The [API Commandline Tool](https://github.com/Appdynamics/api-commandline-tool) (ACT) is a shell script wrapper around [API](https://docs.appdynamics.com/display/latest/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
 
 ## Installation
 
