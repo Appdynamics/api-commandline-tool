@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="1b89f3d1b67ef38e07a4b9499ddb2db7105a4844"
+ACT_LAST_COMMIT="8649225dabc81a6ed084290f88e88e618d18a601"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -785,6 +785,14 @@ function metric_list {
 register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
+EOF
+function healthrule_export {
+  #apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
+  apiCall -X GET "/controller/healthrules/\${a}/?name=\${n}" "$@"
+}
+register healthrule_export Export a health rule
+describe healthrule_export << EOF
+Export a health rule. Provide parameter a for the application and parameter n for the name of the health rule. Leve the name empty to export all healthrules
 EOF
 function event_create {
   apiCall -X POST "/controller/rest/applications/\${a}/events?summary=\${s}&comment=\${c?}&eventtype=\${e}&severity=\${l}&bt=&\${b?}node=\${n?}&tier=\${t?}" "$@"
