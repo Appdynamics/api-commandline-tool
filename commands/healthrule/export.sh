@@ -1,8 +1,7 @@
 #!/bin/bash
 
 function healthrule_export {
-  #apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
-  apiCall -X GET "/controller/healthrules/\${a}/?name=\${n}" "$@"
+  apiCall -X GET '/controller/healthrules/${a}/?name=${n?}' "$@"
 }
 
 register healthrule_export Export a health rule

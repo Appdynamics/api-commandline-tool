@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="8649225dabc81a6ed084290f88e88e618d18a601"
+ACT_LAST_COMMIT="614705e6e421ae2aeb02666018c90f7646434f3e"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -786,9 +786,33 @@ register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
 EOF
+function healthrule_import {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local FILE=""
+  while getopts "a:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    controller_call -X POST -F file="@$FILE" "/controller/healthrules/${APPLICATION}"
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register healthrule_import Import a health rule
+describe healthrule_import << EOF
+Import a health rule.
+EOF
 function healthrule_export {
-  #apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
-  apiCall -X GET "/controller/healthrules/\${a}/?name=\${n}" "$@"
+  apiCall -X GET '/controller/healthrules/${a}/?name=${n?}' "$@"
 }
 register healthrule_export Export a health rule
 describe healthrule_export << EOF
