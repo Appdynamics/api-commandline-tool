@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="614705e6e421ae2aeb02666018c90f7646434f3e"
+ACT_LAST_COMMIT="6e2a81f692487650462e5e299f6a8f8ad1087cf8"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -811,12 +811,55 @@ register healthrule_import Import a health rule
 describe healthrule_import << EOF
 Import a health rule.
 EOF
+function healthrule_list {
+  apiCall -X GET '/controller/healthrules/${a}/' "$@"
+}
+register healthrule_list List all healthrules
+describe healthrule_list << EOF
+List all health rules. Provide parameter a for the application and parameter.
+EOF
 function healthrule_export {
   apiCall -X GET '/controller/healthrules/${a}/?name=${n?}' "$@"
 }
 register healthrule_export Export a health rule
 describe healthrule_export << EOF
-Export a health rule. Provide parameter a for the application and parameter n for the name of the health rule. Leve the name empty to export all healthrules
+Export a health rule. Provide parameter a for the application and parameter n for the name of the health rule. If you want to export all healthrules use the "list" command
+EOF
+function healthrule_copy {
+  local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local TARGET_APPLICATION=""
+  local HEALTH_RULE_NAME=""
+  while getopts "s:t:n:" opt "$@";
+  do
+    case "${opt}" in
+      s)
+        SOURCE_APPLICATION="${OPTARG}"
+      ;;
+      t)
+        TARGET_APPLICATION="${OPTARG}"
+      ;;
+      n)
+        HEALTH_RULE_NAME="${OPTARG}"
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  healthrule_list -a ${SOURCE_APPLICATION}
+  if [ "${COMMAND_RESULT:1:12}" == "health-rules" ]
+  then
+    local R=${RANDOM}
+    echo "$COMMAND_RESULT" > "/tmp/act-output-${R}"
+    healthrule_import -a ${TARGET_APPLICATION} "/tmp/act-output-${R}"
+    rm "/tmp/act-output-${R}"
+  else
+    COMMAND_RESULT="Could not export health rules from source application: ${COMMAND_RESULT}"
+  fi
+}
+register healthrule_copy Copy healthrules from one application to another.
+describe healthrule_list << EOF
+Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
+If you provide ("-n") only the named health rule will be copied.
 EOF
 function event_create {
   apiCall -X POST "/controller/rest/applications/\${a}/events?summary=\${s}&comment=\${c?}&eventtype=\${e}&severity=\${l}&bt=&\${b?}node=\${n?}&tier=\${t?}" "$@"
