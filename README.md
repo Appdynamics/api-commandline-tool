@@ -1,6 +1,10 @@
 # API Commandline Tool
 
-The [API Commandline Tool](https://github.com/Appdynamics/api-commandline-tool) (ACT) is a shell script wrapper around [API](https://docs.appdynamics.com/display/latest/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller.
+The [API Commandline Tool](https://github.com/Appdynamics/api-commandline-tool) (ACT) is a shell script wrapper around [API](https://docs.appdynamics.com/display/latest/AppDynamics+APIs#AppDynamicsAPIs-apiindex) calls towards an AppDynamics controller. It allows you to run common commands from your shell, integrate them with other shell commands and automate certain tasks.
+
+ACT is completely bash based, so you don't need to install or compile anything, just download and run it!
+
+If you want to see some examples what ACT can do, before installing it, look into the list of [RECIPES.md](RECIPES.md)
 
 ## Installation
 
@@ -14,9 +18,9 @@ CONFIG_CONTROLLER_CREDENTIALS=me@customer1:secure2
 CONFIG_CONTROLLER_COOKIE_LOCATION=/home/ubuntu/.appdynamics/act/cookie.txt
 ```
 
-If you want to change your configuration, you can either edit this file or you can re-run the self setup:
+If you want to change your configuration, you can either edit this file or you can re-run the setup:
 
-```
+```shell
 act.sh config -f
 ```
 
@@ -26,7 +30,7 @@ act.sh config -f
 
 A simple work flow example is listing, exporting and deleting a dashboard:
 
-```
+```shell
 act.sh dashboard list
 act.sh dashboard export 13
 act.sh dashboard delete 13
@@ -34,7 +38,7 @@ act.sh dashboard delete 13
 
 Another example is getting a notification while your on premise controller is starting up. Combine act.sh with the notification tool of your choice ([noti](https://github.com/variadico/noti/), [terminal-notifier](https://github.com/julienXX/terminal-notifier), ...) or run commands after the controller is running:
 
-```
+```shell
 noti act.sh controller isup
 act.sh controller isup | terminal-notifier
 act.sh controller isup ; act.sh applications list
@@ -42,8 +46,15 @@ act.sh controller isup ; act.sh applications list
 
 Also, you can use `act.sh` to easily create custom events, like code deployments:
 
+```shell
+act.sh event create -l INFO -c "This release fixes some minor issues with the mini cart functionality" -e APPLICATION_DEPLOYMENT -a 145 -s "Version 3.5.1 released"
 ```
-act.sh event create -s INFO -c "This release fixes some minor issues with the mini cart functionality" -e APPLICATION_DEPLOYMENT -a 145 "Version 3.5.1 released"
+
+For some activities, that require multiple API calls, there are combined commands, e.g. controller federation or copying health rules from one application to another
+
+```bash
+act.sh federation setup -h "http://anothercontroller" -c "admin:customer1@password"
+act.sh healthrule copy -s 546 -t 1000
 ```
 
 If a certain API call is not yet wrapped into a command, you can use `controller call` as general interface:
@@ -52,11 +63,14 @@ If a certain API call is not yet wrapped into a command, you can use `controller
 act.sh controller call /controller/rest/applications?output=JSON
 ```
 
+Finally, you can find some more recipes on using ACT in [RECIPES.md](RECIPES.md).
+
+
 ## Plugins
 
 If you want to use custom plugins with `act.sh` you can place shell scripts into a plugin folder (default: `~/.appdynamics/act/plugins`) and they will be sourced automatically. A command plugin requires the following structure:
 
-```
+```shell
 #!/bin/bash
 function namespace_command {
 ...
@@ -66,7 +80,7 @@ register namespace_command help text
 
 To send a call to the AppDynamics controller you can use the `apiCall` helper, that allows you to easily create a subcommand:
 
-```
+```shell
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
 }

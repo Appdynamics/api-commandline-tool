@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="6e2a81f692487650462e5e299f6a8f8ad1087cf8"
+ACT_LAST_COMMIT="1672669cff76db0e706fe367c06769f295b4d84a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -90,6 +90,13 @@ function dbmon_list {
 register dbmon_list List all database collectors
 describe dbmon_list << EOF
 List all database collectors
+EOF
+function snapshot_list {
+  apiCall '/controller/rest/applications/${a}/request-snapshots?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}' "$@"
+}
+register snapshot_list Retrieve a list of snapshots for a specific application
+describe application_list << EOF
+Retrieve a list of snapshots for a specific application.
 EOF
 PORTAL_LOGIN_STATUS=0
 function portal_login {
@@ -482,6 +489,13 @@ register federation_establish Establish Mutual Friendship
 describe federation_establish << EOF
 Establish Mutual Friendship
 EOF
+function application_get {
+  apiCall '/controller/rest/applications/${a}' "$@"
+}
+register application_get Get an application
+describe application_get << EOF
+Get an application. Provide application id or name as parameter (-a).
+EOF
 function bt_list {
   apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
 }
@@ -638,6 +652,13 @@ function _version {
 register _version Print the current version of $SCRIPTNAME
 describe _version << EOF
 Print the current version of $SCRIPTNAME
+EOF
+function bt_get {
+  apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@"
+}
+register bt_get Get an BT by id
+describe bt_get << EOF
+Get an BT. Provide as parameters bt id (-b) and application id (-a).
 EOF
 function application_delete {
   apiCall -X POST -d "\${a}" "/controller/restui/allApplications/deleteApplication" "$@"
