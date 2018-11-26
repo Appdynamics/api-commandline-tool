@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="80e5ef015ee79c44f2bc7a75c1647815c3e7ee7a"
+ACT_LAST_COMMIT="5179ce886a202ef7e3632f462ea24f0a2468bd5b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -693,6 +693,27 @@ function application_export {
 register application_export Export an application from the controller
 describe application_export << EOF
 Export a application from the controller. Specifiy the application id as parameter.
+EOF
+function node_markhistorical {
+  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids=${n}' "$@"
+}
+register node_markhistorical Mark Nodes as Historical
+describe node_markhistorical << EOF
+Mark Nodes as Historical. Provide a comma separated list of node ids.
+EOF
+function node_get {
+  apiCall -X GET "/controller/rest/applications/\${a}/nodes/\${n}" "$@"
+}
+register node_get Retrieve Node Information by Node Name
+describe node_get << EOF
+Retrieve Node Information by Node Name. Provide the application and the node as parameters
+EOF
+function node_list {
+  apiCall -X GET "/controller/rest/applications/\${a}/nodes" "$@"
+}
+register node_list Retrieve Node Information for All Nodes in a Business Application
+describe node_list << EOF
+Retrieve Node Information for All Nodes in a Business Application. Provide the application as parameter.
 EOF
 function metric_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
