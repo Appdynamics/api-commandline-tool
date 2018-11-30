@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="5179ce886a202ef7e3632f462ea24f0a2468bd5b"
+ACT_LAST_COMMIT="a776cedd2109c670668701e2e6be9f51ecbc87ea"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -559,12 +559,28 @@ register timerange_list List all custom timeranges available on the controller
 describe timerange_list << EOF
 List all custom timeranges available on the controller
 EOF
-function _config {
+function environment_get {  
+  COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
+}
+register environment_get Retrieve an environment
+describe environment_get << EOF
+Retrieve an environment
+EOF
+function environment_delete {
+  rm "${HOME}/.appdynamics/act/config.$1.sh"
+  COMMAND_RESULT="${1} deleted"
+}
+register environment_delete Delete an environment
+describe environment_delete << EOF
+Delete an environment
+EOF
+function environment_add {
   local FORCE=0
   local GLOBAL=0
   local SHOW=0
   local PORTAL=0
-  while getopts "gfsp" opt "$@";
+  local DEFAULT=0
+  while getopts "gfspd" opt "$@";
   do
     case "${opt}" in
       g)
@@ -579,10 +595,14 @@ function _config {
       p)
         PORTAL=1
       ;;
+      d)
+        DEFAULT=1
+      ;;
     esac
   done;
   shiftOptInd
   shift $SHIFTS
+  local ENVIRONMENT=""
   local CONTROLLER_HOST=""
   local CONTROLLER_CREDENTIALS=""
   local PORTAL_PASSWORD=""
@@ -601,6 +621,18 @@ function _config {
       COMMAND_RESULT="act is not configured."
     fi
   else
+    if [ $DEFAULT -eq 0 ] ; then
+      echo -n "Environment name"
+      if [ -n "${CONFIG_ENVIRONMENT}" ] ; then
+        echo " [${CONFIG_ENVIRONMENT}]"
+      else
+        echo " []"
+      fi
+      read ENVIRONMENT
+    fi
+    if [ -z "$ENVIRONMENT" ] ; then
+      ENVIRONMENT=$CONFIG_ENVIRONMENT
+    fi
     echo -n "Controller Host location (e.g. https://appdynamics.example.com:8090)"
     if [ -n "${CONFIG_CONTROLLER_HOST}" ] ; then
       echo " [${CONFIG_CONTROLLER_HOST}]"
@@ -631,20 +663,46 @@ function _config {
       read PORTAL_CREDENTIALS
     fi
     OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}\nCONFIG_PORTAL_CREDENTIALS=${PORTAL_CREDENTIALS}"
-    if [ ! -s "$OUTPUT_DIRECTORY/config.sh" ] || [ $FORCE -eq 1 ]
+    OUTPUT_FILE="$OUTPUT_DIRECTORY/config.${ENVIRONMENT}.sh"
+    if [ $DEFAULT -eq 1 ] ; then
+      OUTPUT_FILE="$OUTPUT_DIRECTORY/config.sh"
+    fi
+    if [ ! -s "$OUTPUT_DIRECTORY/config.${ENVIRONMENT}.sh" ] || [ $FORCE -eq 1 ]
     then
       mkdir -p $OUTPUT_DIRECTORY
-      echo -e "$OUTPUT" > "$OUTPUT_DIRECTORY/config.sh"
-      COMMAND_RESULT="Created $OUTPUT_DIRECTORY/config.sh successfully"
+      echo -e "$OUTPUT" > "${OUTPUT_FILE}"
+      COMMAND_RESULT="Created ${OUTPUT_FILE} successfully"
     else
-      error "Configuration file $OUTPUT_DIRECTORY/config.sh already exists. Please use (-f) to force override"
+      error "Configuration file ${OUTPUT_FILE} already exists. Please use (-f) to force override"
       COMMAND_RESULT=""
     fi
   fi
 }
-register _config Initialize the act configuration file
+register environment_add Add a new environment.
+describe environment_add << EOF
+Add a new environment.
+EOF
+function environment_list {
+  local BASE
+  local TEMP
+  COMMAND_RESULT="(default)"
+  for file in "${HOME}/.appdynamics/act/config."*".sh"
+  do
+    BASE=`basename "${file}"`
+    TEMP=${BASE#*.}
+    COMMAND_RESULT="${COMMAND_RESULT} ${TEMP%.*}"
+  done
+}
+register environment_list List all your environments
+describe environment_list << EOF
+List all your environments
+EOF
+function _config {
+  environment_add -d "$@"
+}
+register _config Initialize the default environment. This is an alias for "${0} environment add -d"
 describe _config << EOF
-Initialize the act configuration file
+Initialize the default environment.
 EOF
 function _version {
   COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
@@ -1121,9 +1179,20 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "A:H:C:J:D:P:S:F:Nv" opt;
+while getopts "A:H:C:E:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
+    E)
+      CONFIG_ENVIRONMENT="${OPTARG}"
+      debug "Set CONFIG_ENVIRONMENT=${CONFIG_ENVIRONMENT}"
+      ENVIRONMENT_CONFIG="${HOME}/.appdynamics/act/config.${CONFIG_ENVIRONMENT}.sh"
+      if [ -f "${ENVIRONMENT_CONFIG}" ]; then
+        debug "Sourcing user config from ${ENVIRONMENT_CONFIG} "
+        . ${ENVIRONMENT_CONFIG}
+      else
+        warning "File ${ENVIRONMENT_CONFIG} not found!"
+      fi
+    ;;
     H)
       CONFIG_CONTROLLER_HOST=${OPTARG}
       debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"

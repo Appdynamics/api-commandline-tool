@@ -62,9 +62,20 @@ else
 fi
 
 # Parse global options
-while getopts "A:H:C:J:D:P:S:F:Nv" opt;
+while getopts "A:H:C:E:J:D:P:S:F:Nv" opt;
 do
   case "${opt}" in
+    E)
+      CONFIG_ENVIRONMENT="${OPTARG}"
+      debug "Set CONFIG_ENVIRONMENT=${CONFIG_ENVIRONMENT}"
+      ENVIRONMENT_CONFIG="${HOME}/.appdynamics/act/config.${CONFIG_ENVIRONMENT}.sh"
+      if [ -f "${ENVIRONMENT_CONFIG}" ]; then
+        debug "Sourcing user config from ${ENVIRONMENT_CONFIG} "
+        . ${ENVIRONMENT_CONFIG}
+      else
+        warning "File ${ENVIRONMENT_CONFIG} not found!"
+      fi
+    ;;
     H)
       CONFIG_CONTROLLER_HOST=${OPTARG}
       debug "Set CONFIG_CONTROLLER_HOST=${CONFIG_CONTROLLER_HOST}"
