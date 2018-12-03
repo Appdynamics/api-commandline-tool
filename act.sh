@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="c5d0fbe34b22c7baac39dca68f8789c5166cb75c"
+ACT_LAST_COMMIT="1b29c89463442c19eacb406f903ac797b3d3846a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -440,6 +440,13 @@ function dashboard_export {
 register dashboard_export Export a specific dashboard
 describe dashboard_export << EOF
 Export a specific dashboard
+EOF
+function actiontemplate_createmediatype {
+  apiCall -X POST -d '{"name":"${n}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@"
+}
+register actiontemplate_createmediatype "Create a custom media type"
+describe actiontemplate_createmediatype << EOF
+Create a custom media type. Provide the name of the media type as parameter (-n)
 EOF
 function actiontemplate_import {
   local FILE=""
