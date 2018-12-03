@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="a776cedd2109c670668701e2e6be9f51ecbc87ea"
+ACT_LAST_COMMIT="1c488125ddafb477e1e978b7a68d9ca03838bb95"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -419,6 +419,38 @@ function dashboard_export {
 register dashboard_export Export a specific dashboard
 describe dashboard_export << EOF
 Export a specific dashboard
+EOF
+function actiontemplate_import {
+  local FILE=""
+  local TYPE="httprequest"
+  while getopts "t:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    controller_call -X POST -F file="@$FILE" "/controller/actiontemplate/${TYPE}"
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register actiontemplate_import "Import an action template of a given type (email, httprequest)"
+describe actiontemplate_import << EOF
+Import an action template of a given type (email, httprequest)
+EOF
+function actiontemplate_export {
+  apiCall -X GET '/controller/actiontemplate/${t}/ ' "$@"
+}
+register actiontemplate_export "Export all templates of a given type (-t email or httprequest)"
+describe actiontemplate_export << EOF
+Export all templates of a given type (-t email or httprequest)
 EOF
 function federation_setup {
   local FRIEND_CONTROLLER_CREDENTIALS=""
@@ -975,6 +1007,14 @@ register event_list List all events for a given time range.
 describe event_list << EOF
 List all events for a given time range.
 EOF
+function analytics_key_create {
+  apiCall -X GET '/controller/actiontemplate/${t}/ ' "$@"
+}
+register analytics_key_create "Create an anyltics key"
+describe analytics_key_create << EOF
+Export all templates of a given type (-t email or httprequest)
+EOF
+# curl 'http://osxltsneum.fritz.box:8090/controller/restui/analyticsApiKeyGen/create' -H 'Pragma: no-cache' -H 'Origin: http://osxltsneum.fritz.box:8090' -H 'Accept-Encoding: gzip, deflate' -H 'X-CSRF-TOKEN: ecbfcab6adc134e16d4f034220b3ad69e59a4dce' -H 'Accept-Language: de,en-US;q=0.9,en;q=0.8' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36' -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json, text/plain, */*' -H 'Cache-Control: no-cache' -H 'Referer: http://osxltsneum.fritz.box:8090/controller/' -H 'Cookie: ad-remember-user=admin; ad-remember-account=customer1; ad-remember-user-account=true; JSESSIONID=41ee6afd78cbf286bf0477e734df; X-CSRF-TOKEN=ecbfcab6adc134e16d4f034220b3ad69e59a4dce; TOKEN_KEY=%7B%22token%22%3A%22sv982kabbpe8a079kbuti0ulp8%22%2C%22username%22%3A%22%22%2C%22description%22%3A%22%22%2C%22created%22%3A%222018-11-30T09%3A10%3A53.762Z%22%2C%22last_used%22%3A%222018-11-30T09%3A10%3A53.762Z%22%2C%22expiry%22%3A43800%7D' -H 'Connection: keep-alive' --data-binary '{"permissions":{"±CUSTOM_EVENTS±":["MANAGE_SCHEMA","QUERY","PUBLISH"],"biz_txn_v1":["QUERY"],"log_v1":["QUERY"],"browserrecord":["QUERY"],"sessionrecord":["QUERY"],"mobilesnapshot":["QUERY"],"mobilecrashreport":["QUERY"],"mobilesessionrecord":["QUERY"],"synthsessionrecord":["QUERY"]},"eventAccessFilters":[{"eventType":"biz_txn_v1","searchFilters":[]},{"eventType":"log_v1","searchFilters":[]},{"eventType":"browserrecord","searchFilters":[]},{"eventType":"sessionrecord","searchFilters":[]},{"eventType":"mobilesnapshot","searchFilters":[]},{"eventType":"mobilecrashreport","searchFilters":[]},{"eventType":"mobilesessionrecord","searchFilters":[]},{"eventType":"synthsessionrecord","searchFilters":[]}],"name":"Admin Key","description":"My Super Duper Admin Key","enabled":true}' --compressed
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
 }
