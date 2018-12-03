@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="1c488125ddafb477e1e978b7a68d9ca03838bb95"
+ACT_LAST_COMMIT="c5d0fbe34b22c7baac39dca68f8789c5166cb75c"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -97,6 +97,27 @@ function snapshot_list {
 register snapshot_list Retrieve a list of snapshots for a specific application
 describe application_list << EOF
 Retrieve a list of snapshots for a specific application.
+EOF
+function configuration_set {
+  apiCall -X POST '/controller/rest/configuration?name=${n}&value=${v}' "$@"
+}
+register configuration_set Set a Controller setting to a specified value.
+describe configuration_set << EOF
+Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters
+EOF
+function configuration_get {
+  apiCall -X GET '/controller/rest/configuration?name=${n}' "$@"
+}
+register configuration_get Retrieve a Controller Setting by Name
+describe configuration_get << EOF
+Retrieve a Controller Setting by Name. Provide a name (-n) as parameter
+EOF
+function configuration_list {
+  apiCall -X GET "/controller/rest/configuration" "$@"
+}
+register configuration_list Retrieve All Controller Settings
+describe configuration_list << EOF
+Retrieve All Controller Settings
 EOF
 PORTAL_LOGIN_STATUS=0
 function portal_login {
@@ -1007,14 +1028,6 @@ register event_list List all events for a given time range.
 describe event_list << EOF
 List all events for a given time range.
 EOF
-function analytics_key_create {
-  apiCall -X GET '/controller/actiontemplate/${t}/ ' "$@"
-}
-register analytics_key_create "Create an anyltics key"
-describe analytics_key_create << EOF
-Export all templates of a given type (-t email or httprequest)
-EOF
-# curl 'http://osxltsneum.fritz.box:8090/controller/restui/analyticsApiKeyGen/create' -H 'Pragma: no-cache' -H 'Origin: http://osxltsneum.fritz.box:8090' -H 'Accept-Encoding: gzip, deflate' -H 'X-CSRF-TOKEN: ecbfcab6adc134e16d4f034220b3ad69e59a4dce' -H 'Accept-Language: de,en-US;q=0.9,en;q=0.8' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36' -H 'Content-Type: application/json;charset=UTF-8' -H 'Accept: application/json, text/plain, */*' -H 'Cache-Control: no-cache' -H 'Referer: http://osxltsneum.fritz.box:8090/controller/' -H 'Cookie: ad-remember-user=admin; ad-remember-account=customer1; ad-remember-user-account=true; JSESSIONID=41ee6afd78cbf286bf0477e734df; X-CSRF-TOKEN=ecbfcab6adc134e16d4f034220b3ad69e59a4dce; TOKEN_KEY=%7B%22token%22%3A%22sv982kabbpe8a079kbuti0ulp8%22%2C%22username%22%3A%22%22%2C%22description%22%3A%22%22%2C%22created%22%3A%222018-11-30T09%3A10%3A53.762Z%22%2C%22last_used%22%3A%222018-11-30T09%3A10%3A53.762Z%22%2C%22expiry%22%3A43800%7D' -H 'Connection: keep-alive' --data-binary '{"permissions":{"±CUSTOM_EVENTS±":["MANAGE_SCHEMA","QUERY","PUBLISH"],"biz_txn_v1":["QUERY"],"log_v1":["QUERY"],"browserrecord":["QUERY"],"sessionrecord":["QUERY"],"mobilesnapshot":["QUERY"],"mobilecrashreport":["QUERY"],"mobilesessionrecord":["QUERY"],"synthsessionrecord":["QUERY"]},"eventAccessFilters":[{"eventType":"biz_txn_v1","searchFilters":[]},{"eventType":"log_v1","searchFilters":[]},{"eventType":"browserrecord","searchFilters":[]},{"eventType":"sessionrecord","searchFilters":[]},{"eventType":"mobilesnapshot","searchFilters":[]},{"eventType":"mobilecrashreport","searchFilters":[]},{"eventType":"mobilesessionrecord","searchFilters":[]},{"eventType":"synthsessionrecord","searchFilters":[]}],"name":"Admin Key","description":"My Super Duper Admin Key","enabled":true}' --compressed
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
 }
