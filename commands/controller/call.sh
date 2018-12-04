@@ -11,10 +11,10 @@ function controller_call {
 	METHOD=${OPTARG}
       ;;
       d)
-        PAYLOAD=${OPTARG}
+        PAYLOAD="${OPTARG}"
       ;;
       F)
-        FORM=${OPTARG}
+        FORM="${OPTARG}"
       ;;
     esac
   done
@@ -34,7 +34,7 @@ function controller_call {
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
           "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")" \
           -H "Accept: application/json, text/plain, */*"\
-          "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
+          "`[ -n "${PAYLOAD}" ] && echo -d "${PAYLOAD}"`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
     debug "Command result: $COMMAND_RESULT"

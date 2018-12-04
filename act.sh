@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="bbcc9da147aba4682c4939d050e3330ac3bfb179"
+ACT_LAST_COMMIT="76977c878a5b93a1df8fb0af03e39b66b450c62a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -303,10 +303,10 @@ function controller_call {
 	METHOD=${OPTARG}
       ;;
       d)
-        PAYLOAD=${OPTARG}
+        PAYLOAD="${OPTARG}"
       ;;
       F)
-        FORM=${OPTARG}
+        FORM="${OPTARG}"
       ;;
     esac
   done
@@ -323,7 +323,7 @@ function controller_call {
           -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
           "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")" \
           -H "Accept: application/json, text/plain, */*"\
-          "`[ -n "$PAYLOAD" ] && echo -d ${PAYLOAD}`" \
+          "`[ -n "${PAYLOAD}" ] && echo -d "${PAYLOAD}"`" \
           "`[ -n "$FORM" ] && echo -F ${FORM}`" \
           $CONFIG_CONTROLLER_HOST$ENDPOINT)
     debug "Command result: $COMMAND_RESULT"
@@ -1040,6 +1040,30 @@ function analyticssearch_get {
 }
 register analyticssearch_get Get an analytics search by id.
 describe analyticssearch_get << EOF
+Get an analytics search by id. Provide the id as parameter (-i)
+EOF
+function analyticssearch_import {
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    DATA=$(<${FILE})
+    regex='("id" *: *[0-9]+,)'
+    if [[ ${DATA} =~ $regex ]]; then
+      DATA=${DATA/${BASH_REMATCH[0]}/}
+    fi
+    if [[ $DATA == '['* ]]
+    then
+      COMMAND_RESULT=""
+      error "File contains multiple saved searches. Please provide only a single element."
+    else
+      controller_call -X POST -d "${DATA}" '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch'
+    fi
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register analyticssearch_import Get an analytics search by id.
+describe analyticssearch_import << EOF
 Get an analytics search by id. Provide the id as parameter (-i)
 EOF
 function analyticssearch_list {
