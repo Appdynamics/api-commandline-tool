@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="1b29c89463442c19eacb406f903ac797b3d3846a"
+ACT_LAST_COMMIT="bbcc9da147aba4682c4939d050e3330ac3bfb179"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1034,6 +1034,20 @@ function event_list {
 register event_list List all events for a given time range.
 describe event_list << EOF
 List all events for a given time range.
+EOF
+function analyticssearch_get {
+  apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/${i}' "$@"
+}
+register analyticssearch_get Get an analytics search by id.
+describe analyticssearch_get << EOF
+Get an analytics search by id. Provide the id as parameter (-i)
+EOF
+function analyticssearch_list {
+  apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@"
+}
+register analyticssearch_list List all analytics searches on the controller.
+describe analyticssearch_list << EOF
+List all analytics searches available on the controller. This command requires no further arguments.
 EOF
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
