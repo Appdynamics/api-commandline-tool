@@ -28,7 +28,7 @@ echo "DELETE ${APPLICATION}"
 done;
 ```
 
-### Events
+## Events
 
 ### Application Deployment
 
@@ -40,4 +40,50 @@ APPLICATION=$1
 SUBJECT=$2
 COMMENT=$3
 ../act.sh event create -s INFO -c "${COMMENT}" -e APPLICATION_DEPLOYMENT -a ${APPLICATION} -s "${SUBJECT}" -l INFO
+```
+
+## Config
+
+### EUM Verficiation
+
+Use the following script to verify the values configured in your on-premise EUM installation
+
+```shell
+#!/bin/bash
+ES_EUM_KEY=`../act.sh configuration get -n appdynamics.es.eum.key | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+EUM_ES_HOST=`../act.sh configuration get -n eum.es.host | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+EUM_CLOUD_HOST=`../act.sh configuration get -n eum.cloud.host | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+EUM_BEACON_HOST=`../act.sh configuration get -n eum.beacon.host | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+EUM_BEACON_HTTPS_HOST=`../act.sh configuration get -n eum.beacon.https.host | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+EUM_MOBILE_SCREENSHOT_HOST=`../act.sh configuration get -n eum.mobile.screenshot.host | grep value | sed -e "s#.*<value>\(.*\)</value>.*#\1#"`
+
+
+echo "appdynamics.es.eum.key: ${ES_EUM_KEY}"
+echo "eum.es.host: ${EUM_ES_HOST}"
+echo "eum.cloud.host: ${EUM_CLOUD_HOST}"
+echo "eum.beacon.host: ${EUM_BEACON_HOST}"
+echo "eum.beacon.https.host: ${EUM_BEACON_HTTPS_HOST}"
+echo "eum.mobile.screenshot.host: ${EUM_MOBILE_SCREENSHOT_HOST}"
+```
+
+## Time Ranges
+
+### Relative time ranges
+
+Use the following script with a cronjob, that is run every day after midnight. You might need to adjust for timezones:
+
+```shell
+#!/bin/bash
+
+TODAY_MIDNIGHT=$(date -r $(((`date +%s`/86400*86400))) +%s)
+declare -i TODAY_MIDNIGHT
+
+# yesterday, 0:00 - today, 0:00)
+../act.sh timerange create -s "$((${TODAY_MIDNIGHT}-86400))000" -e "${TODAY_MIDNIGHT}000" yesterday
+
+# "Business Hours", today, 6am-8pm
+../act.sh timerange create -s "$((${TODAY_MIDNIGHT}+21600))000" -e "$((${TODAY_MIDNIGHT}+72000))000" 'Business Hours'
+
+# "Same Weekday, 7 days ago"
+../act.sh timerange create -s "$((${TODAY_MIDNIGHT}-604800))000" -e "$((${TODAY_MIDNIGHT}-518400))000" '7 days ago'
 ```
