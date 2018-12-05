@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="ff461238e0c819e8be6bf8dc5865b0c462e4843b"
+ACT_LAST_COMMIT="71591cb30f6a6b8022b5ca2de1e877c88d2aee4f"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1044,8 +1044,8 @@ Get an analytics search by id. Provide the id as parameter (-i)
 EOF
 function analyticssearch_import {
   FILE="$*"
-  if [ -r $FILE ] ; then
-    DATA=$(<${FILE})
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
     regex='("id" *: *[0-9]+,)'
     if [[ ${DATA} =~ $regex ]]; then
       DATA=${DATA/${BASH_REMATCH[0]}/}
@@ -1073,10 +1073,10 @@ register analyticssearch_list List all analytics searches on the controller.
 describe analyticssearch_list << EOF
 List all analytics searches available on the controller. This command requires no further arguments.
 EOF
-function actiontemplate_import {
+function bizjourney_import {
   local FILE="$*"
-  if [ -r $FILE ] ; then
-    DATA=$(<${FILE})
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
     controller_call -X POST -d "${DATA}" '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft'
   else
     COMMAND_RESULT=""

@@ -2,8 +2,8 @@
 
 function bizjourney_import {
   local FILE="$*"
-  if [ -r $FILE ] ; then
-    DATA=$(<${FILE})
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
     controller_call -X POST -d "${DATA}" '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft'
   else
     COMMAND_RESULT=""

@@ -2,8 +2,8 @@
 
 function analyticssearch_import {
   FILE="$*"
-  if [ -r $FILE ] ; then
-    DATA=$(<${FILE})
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
     regex='("id" *: *[0-9]+,)'
     if [[ ${DATA} =~ $regex ]]; then
       DATA=${DATA/${BASH_REMATCH[0]}/}
