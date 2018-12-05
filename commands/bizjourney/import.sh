@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function actiontemplate_import {
+function bizjourney_import {
   local FILE="$*"
   if [ -r $FILE ] ; then
     DATA=$(<${FILE})
