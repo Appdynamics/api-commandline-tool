@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="76977c878a5b93a1df8fb0af03e39b66b450c62a"
+ACT_LAST_COMMIT="ff461238e0c819e8be6bf8dc5865b0c462e4843b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1072,6 +1072,20 @@ function analyticssearch_list {
 register analyticssearch_list List all analytics searches on the controller.
 describe analyticssearch_list << EOF
 List all analytics searches available on the controller. This command requires no further arguments.
+EOF
+function actiontemplate_import {
+  local FILE="$*"
+  if [ -r $FILE ] ; then
+    DATA=$(<${FILE})
+    controller_call -X POST -d "${DATA}" '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft'
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register bizjourney_import Create a new business journey
+describe bizjourney_import << EOF
+Create a new business journey. Provide a name and a type (APM or WEB) as parameter.
 EOF
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
