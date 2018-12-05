@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="71591cb30f6a6b8022b5ca2de1e877c88d2aee4f"
+ACT_LAST_COMMIT="03a637cc7185edd475fc4bce149fbbb65fec8833"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1072,6 +1072,20 @@ function analyticssearch_list {
 register analyticssearch_list List all analytics searches on the controller.
 describe analyticssearch_list << EOF
 List all analytics searches available on the controller. This command requires no further arguments.
+EOF
+function bizjourney_disable {
+  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/userDisable' "$@"
+}
+register bizjourney_disable "Disable a valid business journey draft"
+describe bizjourney_disable << EOF
+Disable a valid business journey draft. Provide the journey id (-i) as parameter
+EOF
+function bizjourney_enable {
+  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/enable' "$@"
+}
+register bizjourney_enable "Enable a valid business journey draft"
+describe bizjourney_enable << EOF
+Enable a valid business journey draft. Provide the journey id (-i) as parameter
 EOF
 function bizjourney_import {
   local FILE="$*"
