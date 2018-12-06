@@ -27,3 +27,7 @@ register actiontemplate_import "Import an action template of a given type (email
 describe actiontemplate_import << EOF
 Import an action template of a given type (email, httprequest)
 EOF
+
+example actiontemplate_import << EOF
+template.json
+EOF

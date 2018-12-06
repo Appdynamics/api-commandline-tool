@@ -9,3 +9,7 @@ register actiontemplate_export "Export all templates of a given type (-t email o
 describe actiontemplate_export << EOF
 Export all templates of a given type (-t email or httprequest)
 EOF
+
+example actiontemplate_export << EOF
+-t httprequest
+EOF

@@ -8,3 +8,7 @@ register _version Print the current version of $SCRIPTNAME
 describe _version << EOF
 Print the current version of $SCRIPTNAME
 EOF
+
+example _version << EOF
+
+EOF

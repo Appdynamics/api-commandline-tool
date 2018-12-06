@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="03a637cc7185edd475fc4bce149fbbb65fec8833"
+ACT_LAST_COMMIT="ad7dece609c66c7dfac3ce362358c48342304192"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -24,6 +24,10 @@ GLOBAL_HELP=""
 GLOBAL_LONG_HELP_COUNTER=0
 declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
+declare -a GLOBAL_EXAMPLE_COMMANDS
+declare -a GLOBAL_EXAMPLE_STRINGS
+declare -a GLOBAL_DOC_NAMESPACES
+declare -a GLOBAL_DOC_STRINGS
 SCRIPTNAME=$(basename "$0")
 VERBOSITY_COUNTER=0
 declare -i VERBOSITY_COUNTER
@@ -34,7 +38,15 @@ function register {
 }
 function describe {
   GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
-  GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]=$(cat)
+  read -r -d '' GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]
+}
+function example {
+  GLOBAL_EXAMPLE_COMMANDS[${#GLOBAL_EXAMPLE_COMMANDS[@]}]="$1"
+  read -r -d '' GLOBAL_EXAMPLE_STRINGS[${#GLOBAL_EXAMPLE_STRINGS[@]}]
+}
+function doc {
+  GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
+  read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
 function dbmon_get {
   apiCall "/controller/restui/databases/collectors/configurations/\${c}" "$@"
@@ -227,16 +239,63 @@ register portal_download Download an appdynamics agent
 describe portal_download << EOF
 Download an appdynamics agent
 EOF
+function _doc {
+read -r -d '' COMMAND_RESULT <<- EOM
+# Usage
+Below you will find a list of all available namespaces and commands available with
+`act.sh`. The given examples allow you to understand, how each command is used.
+For more complex examples, have a look into [RECIPES.md](RECIPES.md)
+EOM
+  local NAMESPACES=""
+  for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
+    local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
+    NAMESPACES="${NAMESPACES}\n${COMMAND%%_*}"
+  done
+  for NS in "" $(echo -en $NAMESPACES | sort -u); do
+    COMMAND_RESULT="${COMMAND_RESULT}\n\n## ${NS:-Global}\n"
+    for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
+      local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
+      if [ "${NS}" == "${NS2}" ] ; then
+        local DOC=${GLOBAL_DOC_STRINGS[$INDEX]}
+        COMMAND_RESULT="${COMMAND_RESULT}\n${DOC}\n"
+      fi
+    done;
+    COMMAND_RESULT="${COMMAND_RESULT}\n| Command | Description | Example |"
+    COMMAND_RESULT="${COMMAND_RESULT}\n| ------- | ----------- | ------- |"
+    for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
+      local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
+      if [[ ${COMMAND} == ${NS}_* ]] ; then
+        local HELP=${GLOBAL_LONG_HELP_STRINGS[$INDEX]}
+        local EXAMPLE=""
+        for INDEX2 in "${!GLOBAL_EXAMPLE_COMMANDS[@]}" ; do
+          local EXAMPLE_COMMAND="${GLOBAL_EXAMPLE_COMMANDS[$INDEX2]}"
+          if [ "${COMMAND}" == "${EXAMPLE_COMMAND}" ] ; then
+            EXAMPLE='`'"${SCRIPTNAME} ${NS} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}"'`'
+          fi
+        done
+        COMMAND_RESULT="${COMMAND_RESULT}\n| ${COMMAND##*_} | ${HELP//$'\n'/"<br>"/} | ${EXAMPLE} |"
+      fi
+    done
+    COMMAND_RESULT="${COMMAND_RESULT}\n"
+  done;
+}
+register _doc Print the output of help in markdown
+doc "" << EOF
+The following commands in the global namespace can be called directly.
+EOF
 function _help {
   if [ "$1" = "" ] ; then
-    COMMAND_RESULT="Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\nYou can use the following options on a global level:\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-H <controller-host>\t\t specify the host of the controller you want to connect to\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-C <controller-credentials>\t provide the credentials for the controller. Format: user@tenant:password\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-D <output-verbosity>\t\t Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-A <application-name>\t\t Provide a default application\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-v[vv] \t\t\t\t Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
+    read -r -d '' COMMAND_RESULT <<- EOM
+Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n
+You can use the following options on a global level:\n
+  -H <controller-host>          specify the host of the controller you want to connect to
+  -C <controller-credentials>   provide the credentials for the controller. Format: user@tenant:password
+  -D <output-verbosity>         Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output
+  -A <application-name>         Provide a default application
+  -v[vv]                        Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n
+To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
+The following commands in the global namespace can be called directly:\n
+EOM
     local NAMESPACE=""
     local SORTED
     SORTED=`echo -en "$GLOBAL_HELP" | sort`
@@ -255,12 +314,25 @@ function _help {
     IFS=$OLD_IFS
     COMMAND_RESULT="${COMMAND_RESULT}\nRun $SCRIPTNAME help <namespace> to get detailed help on subcommands in that namespace."
   else
-    COMMAND_RESULT="Usage $SCRIPTNAME $1 <command>"
-    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the $1 namespace provide one of the following commands:\n"
+    COMMAND_RESULT="Usage $SCRIPTNAME ${1} <command>"
+    for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
+      local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
+      if [ "${1}" == "${NS2}" ] ; then
+        local DOC=${GLOBAL_DOC_STRINGS[$INDEX]}
+        COMMAND_RESULT="${COMMAND_RESULT}\n\n${DOC}\n"
+      fi
+    done;
+    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the ${1} namespace provide one of the following commands:\n"
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ $COMMAND == $1_* ]] ; then
         COMMAND_RESULT="${COMMAND_RESULT}\n--- ${COMMAND##*_} ---\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+        for INDEX2 in "${!GLOBAL_EXAMPLE_COMMANDS[@]}" ; do
+          local EXAMPLE_COMMAND="${GLOBAL_EXAMPLE_COMMANDS[$INDEX2]}"
+          if [ "${COMMAND}" == "${EXAMPLE_COMMAND}" ] ; then
+            COMMAND_RESULT="${COMMAND_RESULT}\nExample: ${SCRIPTNAME} ${1} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}\n"
+          fi
+        done
       fi
     done
   fi
@@ -333,9 +405,10 @@ function controller_call {
 }
 register controller_call Send a custom HTTP call to a controller
 describe controller_call << EOF
-Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter:\n
-$0 controller call /controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233\n
-You can modify the http method with option -X and add payload with option -d.
+Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d.
+EOF
+example controller_call << EOF
+/controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233
 EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_login {
@@ -441,12 +514,21 @@ register dashboard_export Export a specific dashboard
 describe dashboard_export << EOF
 Export a specific dashboard
 EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates.
+A common use pattern is exporting the commands from one controller and importing
+into another. Please note that the export is a list of templates and the import
+expects a single object, so you need to split the json inbetween.
+EOF
 function actiontemplate_createmediatype {
   apiCall -X POST -d '{"name":"${n}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@"
 }
 register actiontemplate_createmediatype "Create a custom media type"
 describe actiontemplate_createmediatype << EOF
 Create a custom media type. Provide the name of the media type as parameter (-n)
+EOF
+example actiontemplate_createmediatype << EOF
+-n 'application/vnd.appd.events+json'
 EOF
 function actiontemplate_import {
   local FILE=""
@@ -473,12 +555,18 @@ register actiontemplate_import "Import an action template of a given type (email
 describe actiontemplate_import << EOF
 Import an action template of a given type (email, httprequest)
 EOF
+example actiontemplate_import << EOF
+template.json
+EOF
 function actiontemplate_export {
   apiCall -X GET '/controller/actiontemplate/${t}/ ' "$@"
 }
 register actiontemplate_export "Export all templates of a given type (-t email or httprequest)"
 describe actiontemplate_export << EOF
 Export all templates of a given type (-t email or httprequest)
+EOF
+example actiontemplate_export << EOF
+-t httprequest
 EOF
 function federation_setup {
   local FRIEND_CONTROLLER_CREDENTIALS=""
@@ -760,9 +848,11 @@ EOF
 function _config {
   environment_add -d "$@"
 }
-register _config Initialize the default environment. This is an alias for "${0} environment add -d"
+register _config "Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`"
 describe _config << EOF
-Initialize the default environment.
+Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`
+EOF
+example _config << EOF
 EOF
 function _version {
   COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
@@ -770,6 +860,8 @@ function _version {
 register _version Print the current version of $SCRIPTNAME
 describe _version << EOF
 Print the current version of $SCRIPTNAME
+EOF
+example _version << EOF
 EOF
 function bt_get {
   apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@"
@@ -1035,6 +1127,9 @@ register event_list List all events for a given time range.
 describe event_list << EOF
 List all events for a given time range.
 EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
 function analyticssearch_get {
   apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/${i}' "$@"
 }
@@ -1100,6 +1195,13 @@ function bizjourney_import {
 register bizjourney_import Create a new business journey
 describe bizjourney_import << EOF
 Create a new business journey. Provide a name and a type (APM or WEB) as parameter.
+EOF
+function bizjourney_list {
+  controller_call '/controller/restui/analytics/biz_outcome/definitions/summary'
+}
+register bizjourney_list List all business journeys
+describe bizjourney_list << EOF
+List all business journeys. This command requires no further arguments.
 EOF
 function tier_nodes {
   apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"

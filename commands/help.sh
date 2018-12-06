@@ -2,14 +2,20 @@
 
 function _help {
   if [ "$1" = "" ] ; then
-    COMMAND_RESULT="Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\nYou can use the following options on a global level:\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-H <controller-host>\t\t specify the host of the controller you want to connect to\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-C <controller-credentials>\t provide the credentials for the controller. Format: user@tenant:password\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-D <output-verbosity>\t\t Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-A <application-name>\t\t Provide a default application\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\t-v[vv] \t\t\t\t Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n"
-    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\nFinally the following commands in the global namespace can be called directly:\n"
+    read -r -d '' COMMAND_RESULT <<- EOM
+Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n
+
+You can use the following options on a global level:\n
+
+  -H <controller-host>          specify the host of the controller you want to connect to
+  -C <controller-credentials>   provide the credentials for the controller. Format: user@tenant:password
+  -D <output-verbosity>         Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output
+  -A <application-name>         Provide a default application
+  -v[vv]                        Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n
+
+To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
+The following commands in the global namespace can be called directly:\n
+EOM
     local NAMESPACE=""
     local SORTED
     SORTED=`echo -en "$GLOBAL_HELP" | sort`
@@ -28,12 +34,25 @@ function _help {
     IFS=$OLD_IFS
     COMMAND_RESULT="${COMMAND_RESULT}\nRun $SCRIPTNAME help <namespace> to get detailed help on subcommands in that namespace."
   else
-    COMMAND_RESULT="Usage $SCRIPTNAME $1 <command>"
-    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the $1 namespace provide one of the following commands:\n"
+    COMMAND_RESULT="Usage $SCRIPTNAME ${1} <command>"
+    for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
+      local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
+      if [ "${1}" == "${NS2}" ] ; then
+        local DOC=${GLOBAL_DOC_STRINGS[$INDEX]}
+        COMMAND_RESULT="${COMMAND_RESULT}\n\n${DOC}\n"
+      fi
+    done;
+    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the ${1} namespace provide one of the following commands:\n"
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ $COMMAND == $1_* ]] ; then
         COMMAND_RESULT="${COMMAND_RESULT}\n--- ${COMMAND##*_} ---\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+        for INDEX2 in "${!GLOBAL_EXAMPLE_COMMANDS[@]}" ; do
+          local EXAMPLE_COMMAND="${GLOBAL_EXAMPLE_COMMANDS[$INDEX2]}"
+          if [ "${COMMAND}" == "${EXAMPLE_COMMAND}" ] ; then
+            COMMAND_RESULT="${COMMAND_RESULT}\nExample: ${SCRIPTNAME} ${1} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}\n"
+          fi
+        done
       fi
     done
   fi

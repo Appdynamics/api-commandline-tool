@@ -45,9 +45,9 @@ function controller_call {
 
 register controller_call Send a custom HTTP call to a controller
 describe controller_call << EOF
-Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter:\n
+Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d.
+EOF
 
-$0 controller call /controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233\n
-
-You can modify the http method with option -X and add payload with option -d.
+example controller_call << EOF
+/controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233
 EOF

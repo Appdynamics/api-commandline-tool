@@ -9,3 +9,7 @@ register actiontemplate_createmediatype "Create a custom media type"
 describe actiontemplate_createmediatype << EOF
 Create a custom media type. Provide the name of the media type as parameter (-n)
 EOF
+
+example actiontemplate_createmediatype << EOF
+-n 'application/vnd.appd.events+json'
+EOF

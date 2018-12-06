@@ -26,7 +26,7 @@ act.sh config -f
 
 ## Usage
 
-`act.sh` integrates different commands to interact with your AppDynamics controller. Call `act.sh help` to get a full list of commands.
+`act.sh` integrates different commands to interact with your AppDynamics controller. See [USAGE.md](USAGE.md) for a full list of commands or call `act.sh help` from the command line.
 
 A simple work flow example is listing, exporting and deleting a dashboard:
 
