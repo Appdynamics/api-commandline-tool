@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="ad7dece609c66c7dfac3ce362358c48342304192"
+ACT_LAST_COMMIT="d96dfe9ebbf93563befd45253551ead1c0529f18"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -243,7 +243,7 @@ function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with
-`act.sh`. The given examples allow you to understand, how each command is used.
+\`act.sh\`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 EOM
   local NAMESPACES=""
@@ -408,7 +408,7 @@ describe controller_call << EOF
 Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d.
 EOF
 example controller_call << EOF
-/controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233
+/controller/rest/serverstatus
 EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_login {
@@ -707,20 +707,31 @@ register timerange_list List all custom timeranges available on the controller
 describe timerange_list << EOF
 List all custom timeranges available on the controller
 EOF
-function environment_get {  
+doc environment << EOF
+If you want to use ${SCRIPTNAME} to manage multiple controllers, you can use environments to add and manage them easily.
+Use \`${SCRIPTNAME} environment add\` to create an environment providing a name, controller url and credentials.
+Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
+EOF
+function environment_get {
   COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
 }
 register environment_get Retrieve an environment
 describe environment_get << EOF
-Retrieve an environment
+Retrieve an environment. Provide the name of the environment as parameter.
+EOF
+example environment_get << EOF
+myaccount
 EOF
 function environment_delete {
   rm "${HOME}/.appdynamics/act/config.$1.sh"
   COMMAND_RESULT="${1} deleted"
 }
-register environment_delete Delete an environment
+register environment_delete "Delete an environment"
 describe environment_delete << EOF
-Delete an environment
+Delete an environment. Provide the name of the environment as parameter.
+EOF
+example environment_delete << EOF
+myaccount
 EOF
 function environment_add {
   local FORCE=0
@@ -828,7 +839,10 @@ function environment_add {
 }
 register environment_add Add a new environment.
 describe environment_add << EOF
-Add a new environment.
+Add a new environment. To change the default environment, run with \`-d\`
+EOF
+example environment_add << EOF
+-d
 EOF
 function environment_list {
   local BASE
@@ -844,6 +858,8 @@ function environment_list {
 register environment_list List all your environments
 describe environment_list << EOF
 List all your environments
+EOF
+example environment_list << EOF
 EOF
 function _config {
   environment_add -d "$@"
@@ -1137,6 +1153,9 @@ register analyticssearch_get Get an analytics search by id.
 describe analyticssearch_get << EOF
 Get an analytics search by id. Provide the id as parameter (-i)
 EOF
+example analyticssearch_get << EOF
+-i 6
+EOF
 function analyticssearch_import {
   FILE="$*"
   if [ -r "${FILE}" ] ; then
@@ -1157,9 +1176,12 @@ function analyticssearch_import {
     error "File not found or not readable: $FILE"
   fi
 }
-register analyticssearch_import Get an analytics search by id.
+register analyticssearch_import Import an analytics search. Provide a json file as parameter.
 describe analyticssearch_import << EOF
-Get an analytics search by id. Provide the id as parameter (-i)
+Import an analytics search. Provide a json file as parameter.
+EOF
+example analyticssearch_import << EOF
+search.json
 EOF
 function analyticssearch_list {
   apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@"
@@ -1167,6 +1189,8 @@ function analyticssearch_list {
 register analyticssearch_list List all analytics searches on the controller.
 describe analyticssearch_list << EOF
 List all analytics searches available on the controller. This command requires no further arguments.
+EOF
+example analyticssearch_list << EOF
 EOF
 function bizjourney_disable {
   apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/userDisable' "$@"

@@ -4,7 +4,7 @@ function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with
-`act.sh`. The given examples allow you to understand, how each command is used.
+\`act.sh\`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 EOM
   local NAMESPACES=""

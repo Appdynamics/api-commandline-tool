@@ -21,8 +21,12 @@ function analyticssearch_import {
   fi
 }
 
-register analyticssearch_import Get an analytics search by id.
+register analyticssearch_import Import an analytics search. Provide a json file as parameter.
 
 describe analyticssearch_import << EOF
-Get an analytics search by id. Provide the id as parameter (-i)
+Import an analytics search. Provide a json file as parameter.
+EOF
+
+example analyticssearch_import << EOF
+search.json
 EOF

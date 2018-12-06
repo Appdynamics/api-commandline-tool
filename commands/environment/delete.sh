@@ -5,7 +5,12 @@ function environment_delete {
   COMMAND_RESULT="${1} deleted"
 }
 
-register environment_delete Delete an environment
+register environment_delete "Delete an environment"
+
 describe environment_delete << EOF
-Delete an environment
+Delete an environment. Provide the name of the environment as parameter.
+EOF
+
+example environment_delete << EOF
+myaccount
 EOF

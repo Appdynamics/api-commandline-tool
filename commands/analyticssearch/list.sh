@@ -9,3 +9,6 @@ register analyticssearch_list List all analytics searches on the controller.
 describe analyticssearch_list << EOF
 List all analytics searches available on the controller. This command requires no further arguments.
 EOF
+
+example analyticssearch_list << EOF
+EOF

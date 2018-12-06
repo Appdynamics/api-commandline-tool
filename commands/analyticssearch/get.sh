@@ -9,3 +9,7 @@ register analyticssearch_get Get an analytics search by id.
 describe analyticssearch_get << EOF
 Get an analytics search by id. Provide the id as parameter (-i)
 EOF
+
+example analyticssearch_get << EOF
+-i 6
+EOF

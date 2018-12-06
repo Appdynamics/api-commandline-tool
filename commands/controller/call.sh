@@ -49,5 +49,5 @@ Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you w
 EOF
 
 example controller_call << EOF
-/controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233
+/controller/rest/serverstatus
 EOF

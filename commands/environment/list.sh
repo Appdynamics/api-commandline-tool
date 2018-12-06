@@ -16,3 +16,6 @@ register environment_list List all your environments
 describe environment_list << EOF
 List all your environments
 EOF
+
+example environment_list << EOF
+EOF

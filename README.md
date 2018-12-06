@@ -18,11 +18,14 @@ CONFIG_CONTROLLER_CREDENTIALS=me@customer1:secure2
 CONFIG_CONTROLLER_COOKIE_LOCATION=/home/ubuntu/.appdynamics/act/cookie.txt
 ```
 
-If you want to change your configuration, you can either edit this file or you can re-run the setup:
+To update your configuration, you can either edit this file or you can re-run the setup:
 
 ```shell
 act.sh config -f
 ```
+
+If you want to work with multiple controllers, you can use [environments](USAGE.md#environment)
+
 
 ## Usage
 

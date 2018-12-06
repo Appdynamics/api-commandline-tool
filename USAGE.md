@@ -1,6 +1,6 @@
 # Usage
 Below you will find a list of all available namespaces and commands available with
-. The given examples allow you to understand, how each command is used.
+`act.sh`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 
 ## Global
@@ -33,9 +33,9 @@ These commands allow you to import and export email/http saved analytics searche
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Get an analytics search by id. Provide the id as parameter (-i) |  |
-| import | Get an analytics search by id. Provide the id as parameter (-i) |  |
-| list | List all analytics searches available on the controller. This command requires no further arguments. |  |
+| get | Get an analytics search by id. Provide the id as parameter (-i) | `act.sh analyticssearch get -i 6` |
+| import | Import an analytics search. Provide a json file as parameter. | `act.sh analyticssearch import search.json` |
+| list | List all analytics searches available on the controller. This command requires no further arguments. | `act.sh analyticssearch list ` |
 
 
 ## application
@@ -82,7 +82,7 @@ These commands allow you to import and export email/http saved analytics searche
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | isup | This command will pause until the controller is up. Use this to get notified after the controller is booted successfully. |  |
-| call | Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d. | `act.sh controller call /controller/restui/health_rules/getHealthRuleCurrentEvaluationStatus/app/41/healthRuleID/233` |
+| call | Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d. | `act.sh controller call /controller/rest/serverstatus` |
 | login | Check if the login with your appdynamics controller works properly."<br>"/If the login fails, use doc controller ping to check if the controller is running and check your credentials if they are correct. |  |
 | ping | Check the availability of an appdynamics controller. On success the response time will be provided. |  |
 | status | This command will return a XML containing status information about the controller. |  |
@@ -112,12 +112,16 @@ These commands allow you to import and export email/http saved analytics searche
 
 ## environment
 
+If you want to use act.sh to manage multiple controllers, you can use environments to add and manage them easily.
+Use `act.sh environment add` to create an environment providing a name, controller url and credentials.
+Afterwards you can use `act.sh -E <name>` to call the given controller.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Retrieve an environment |  |
-| delete | Delete an environment |  |
-| add | Add a new environment. |  |
-| list | List all your environments |  |
+| get | Retrieve an environment. Provide the name of the environment as parameter. | `act.sh environment get myaccount` |
+| delete | Delete an environment. Provide the name of the environment as parameter. | `act.sh environment delete myaccount` |
+| add | Add a new environment. To change the default environment, run with `-d` | `act.sh environment add -d` |
+| list | List all your environments | `act.sh environment list ` |
 
 
 ## eum

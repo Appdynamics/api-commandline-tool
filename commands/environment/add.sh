@@ -118,5 +118,9 @@ function environment_add {
 
 register environment_add Add a new environment.
 describe environment_add << EOF
-Add a new environment.
+Add a new environment. To change the default environment, run with \`-d\`
+EOF
+
+example environment_add << EOF
+-d
 EOF
