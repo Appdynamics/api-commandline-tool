@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="72fe1f7bd303c8e8d4175af047d3a2a4ac1b2354"
+ACT_LAST_COMMIT="88e34e646e3ac0d35d59c4e1747955d5e944087d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -48,6 +48,9 @@ function doc {
   GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
 function dbmon_get {
   apiCall '/controller/rest/databases/collectors/${c}' "$@"
 }
@@ -55,12 +58,35 @@ register dbmon_get Retrieve information about a specific database collector
 describe dbmon_get << EOF
 Retrieve information about a specific database collector. Provide the collector id as parameter (-c).
 EOF
+example dbmon_get << EOF
+-c 17
+EOF
 function dbmon_delete {
     apiCall -X DELETE '/controller/rest/databases/collectors/${c}' "$@"
 }
 register dbmon_delete Delete a database collector
 describe dbmon_delete << EOF
 Delete a database collector. Provide the collector id as parameter (-c).
+EOF
+example dbmon_delete << EOF
+-c 17
+EOF
+function dbmon_import {
+  local FILE="$*"
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
+    controller_call -X POST -d "${DATA}" '/controller/rest/databases/collectors/create'
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register dbmon_import Import a database collector from a json file.
+describe dbmon_import << EOF
+Create a new database collector. Provide a valid json file as parameter.
+EOF
+example dbmon_import << EOF
+dbmon.json
 EOF
 function dbmon_create {
   apiCall -X POST -d "{ \
@@ -96,12 +122,27 @@ Create a new database collector. You need to provide the following parameters:
   -p port
   -s password
 EOF
+example dbmon_create << EOF
+-i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
+EOF
 function dbmon_list {
   controller_call /controller/rest/databases/collectors
 }
 register dbmon_list List all database collectors
 describe dbmon_list << EOF
 List all database collectors
+EOF
+example dbmon_list << EOF
+EOF
+function dbmon_events {
+  event_list -a '_dbmon' "$@"
+}
+register dbmon_events List all database agent events.
+describe dbmon_events << EOF
+List all database agent events. This is an alias for \`${SCRIPTNAME} event list -a '_dbmon'\`, so you can use the same parameters for querying the events.
+EOF
+example dbmon_events << EOF
+-t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
 EOF
 function snapshot_list {
   apiCall '/controller/rest/applications/${a}/request-snapshots?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}' "$@"
@@ -1161,11 +1202,28 @@ describe event_create << EOF
 Create a custom event for a given application. Application, summary, event type and severity are required parameters.
 EOF
 function event_list {
-  apiCall '/controller/rest/applications/${a}/events?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}&event-types=${e}&severities=${s}' "$@"
+  # Add some "ALL" magic
+  local PREV=""
+  local ARGS=()
+  for ARG in "$@"; do
+    if [ "${PREV}" == "-s" ] && [ "${ARG}" == "ALL" ] ; then
+      ARG="INFO,WARN,ERROR"
+    fi;
+    if [ "${PREV}" == "-e" ] && [ "${ARG}" == "ALL" ] ; then
+      # DB_SERVER_PARAMETER_CHANGE
+      ARG="ACTIVITY_TRACE,ADJUDICATION_CANCELLED,AGENT_ADD_BLACKLIST_REG_LIMIT_REACHED,AGENT_ASYNC_ADD_REG_LIMIT_REACHED,AGENT_CONFIGURATION_ERROR,APPLICATION_CRASH,AGENT_DIAGNOSTICS,AGENT_ERROR_ADD_REG_LIMIT_REACHED,AGENT_EVENT,AGENT_METRIC_BLACKLIST_REG_LIMIT_REACHED,AGENT_METRIC_REG_LIMIT_REACHED,AGENT_STATUS,ALREADY_ADJUDICATED,APPDYNAMICS_DATA,APPDYNAMICS_INTERNAL_DIAGNOSTICS,APPLICATION_CONFIG_CHANGE,APPLICATION_DEPLOYMENT,APPLICATION_DISCOVERED,APPLICATION_ERROR,APP_SERVER_RESTART,AZURE_AUTO_SCALING,BACKEND_DISCOVERED,BT_DISCOVERED,BUSINESS_ERROR,CLR_CRASH,CONTROLLER_AGENT_VERSION_INCOMPATIBILITY,CONTROLLER_ASYNC_ADD_REG_LIMIT_REACHED,CONTROLLER_COLLECTIONS_ADD_REG_LIMIT_REACHED,CONTROLLER_ERROR_ADD_REG_LIMIT_REACHED,CONTROLLER_EVENT_UPLOAD_LIMIT_REACHED,CONTROLLER_MEMORY_ADD_REG_LIMIT_REACHED,CONTROLLER_METADATA_REGISTRATION_LIMIT_REACHED,CONTROLLER_METRIC_DATA_BUFFER_OVERFLOW,CONTROLLER_METRIC_REG_LIMIT_REACHED,CONTROLLER_PSD_UPLOAD_LIMIT_REACHED,CONTROLLER_RSD_UPLOAD_LIMIT_REACHED,CONTROLLER_SEP_ADD_REG_LIMIT_REACHED,CONTROLLER_STACKTRACE_ADD_REG_LIMIT_REACHED,CONTROLLER_TRACKED_OBJECT_ADD_REG_LIMIT_REACHED,CUSTOM,CUSTOM_ACTION_END,CUSTOM_ACTION_FAILED,CUSTOM_ACTION_STARTED,CUSTOM_EMAIL_ACTION_END,CUSTOM_EMAIL_ACTION_FAILED,CUSTOM_EMAIL_ACTION_STARTED,DEADLOCK,DEV_MODE_CONFIG_UPDATE,DIAGNOSTIC_SESSION,DISK_SPACE,EMAIL_ACTION_FAILED,EMAIL_SENT,EUM_CLOUD_BROWSER_EVENT,EUM_CLOUD_SYNTHETIC_BROWSER_EVENT,EUM_INTERNAL_ERROR,HTTP_REQUEST_ACTION_END,HTTP_REQUEST_ACTION_FAILED,HTTP_REQUEST_ACTION_STARTED,INFO_INSTRUMENTATION_VISIBILITY,INTERNAL_UI_EVENT,JIRA_ACTION_END,JIRA_ACTION_FAILED,JIRA_ACTION_STARTED,LICENSE,MACHINE_AGENT_LOG,MACHINE_DISCOVERED,MEMORY,MEMORY_LEAK_DIAGNOSTICS,MOBILE_CRASH_IOS_EVENT,MOBILE_CRASH_ANDROID_EVENT,NETWORK,NODE_DISCOVERED,NORMAL,OBJECT_CONTENT_SUMMARY,POLICY_CANCELED_CRITICAL,POLICY_CANCELED_WARNING,POLICY_CLOSE_CRITICAL,POLICY_CLOSE_WARNING,POLICY_CONTINUES_CRITICAL,POLICY_CONTINUES_WARNING,POLICY_DOWNGRADED,POLICY_OPEN_CRITICAL,POLICY_OPEN_WARNING,POLICY_UPGRADED,RESOURCE_POOL_LIMIT,RUNBOOK_DIAGNOSTIC_SESSION_END,RUNBOOK_DIAGNOSTIC_SESSION_FAILED,RUNBOOK_DIAGNOSTIC_SESSION_STARTED,RUN_LOCAL_SCRIPT_ACTION_END,RUN_LOCAL_SCRIPT_ACTION_FAILED,RUN_LOCAL_SCRIPT_ACTION_STARTED,SERVICE_ENDPOINT_DISCOVERED,SLOW,SMS_SENT,STALL,SYSTEM_LOG,THREAD_DUMP_ACTION_END,THREAD_DUMP_ACTION_FAILED,THREAD_DUMP_ACTION_STARTED,TIER_DISCOVERED,VERY_SLOW,WARROOM_NOTE"
+    fi;
+    PREV="${ARG}"
+    ARGS+=("${ARG}")
+  done;
+  apiCall '/controller/rest/applications/${a}/events?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}&event-types=${e}&severities=${s}' "${ARGS[@]}"
 }
 register event_list List all events for a given time range.
 describe event_list << EOF
 List all events for a given time range.
+EOF
+example event_list << EOF
+-a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
 EOF
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.

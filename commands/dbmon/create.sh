@@ -36,3 +36,7 @@ Create a new database collector. You need to provide the following parameters:
   -p port
   -s password
 EOF
+
+example dbmon_create << EOF
+-i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
+EOF

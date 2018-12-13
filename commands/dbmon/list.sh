@@ -8,3 +8,5 @@ register dbmon_list List all database collectors
 describe dbmon_list << EOF
 List all database collectors
 EOF
+example dbmon_list << EOF
+EOF

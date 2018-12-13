@@ -102,12 +102,16 @@ These commands allow you to import and export email/http saved analytics searche
 
 ## dbmon
 
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Retrieve information about a specific database collector. Provide the collector id as parameter (-c). |  |
-| delete | Delete a database collector. Provide the collector id as parameter (-c). |  |
-| create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password |  |
-| list | List all database collectors |  |
+| get | Retrieve information about a specific database collector. Provide the collector id as parameter (-c). | `act.sh dbmon get -c 17` |
+| delete | Delete a database collector. Provide the collector id as parameter (-c). | `act.sh dbmon delete -c 17` |
+| import | Create a new database collector. Provide a valid json file as parameter. | `act.sh dbmon import dbmon.json` |
+| create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password | `act.sh dbmon create -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password` |
+| list | List all database collectors | `act.sh dbmon list ` |
+| events | List all database agent events. This is an alias for `act.sh event list -a '_dbmon'`, so you can use the same parameters for querying the events. | `act.sh dbmon events -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT` |
 
 
 ## environment
@@ -136,7 +140,7 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | create | Create a custom event for a given application. Application, summary, event type and severity are required parameters. |  |
-| list | List all events for a given time range. |  |
+| list | List all events for a given time range. | `act.sh event list -a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL` |
 
 
 ## federation
