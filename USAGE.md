@@ -104,8 +104,8 @@ These commands allow you to import and export email/http saved analytics searche
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Retrieve information about a specific database collector. Provide the collector id as parameter. |  |
-| delete | Delete a database collector. Provide the collector id as parameter. |  |
+| get | Retrieve information about a specific database collector. Provide the collector id as parameter (-c). |  |
+| delete | Delete a database collector. Provide the collector id as parameter (-c). |  |
 | create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password |  |
 | list | List all database collectors |  |
 

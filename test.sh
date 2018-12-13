@@ -11,7 +11,7 @@ declare -i SKIP_COUNTER
 declare -i TEST_COUNTER
 
 FRIEND_CONTROLLER_HOST="http://controller.local:8090"
-FRIEND_CONTROLLER_CREDENTIALS="admin@customer1:admin"
+FRIEND_CONTROLLER_CREDENTIALS="admin@customer1:appdynamics123"
 FRIEND_COOKIE_PATH="/tmp/act-test-friend-cookie"
 
 echo "Sourcing user config for controller host and credentials..."
@@ -91,10 +91,11 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   ##### Database Collector Create, List, Get, Delete #####
   DBMON_NAME="act_test_collector_$RANDOM"
   CREATE_DBMON="`${ACT} dbmon create -i ${DBMON_NAME} -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
-  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "${CREATE_DBMON}" "Create Database Collector"
+  assert_contains_substring "HTTP Status: 201" "${CREATE_DBMON}" "Create Database Collector"
   sleep 10
-  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon list`" "List Database Collectors"
-  if [[ $CREATE_DBMON =~ \"id\"\ \:\ ([0-9]+) ]] ; then
+  assert_contains_substring "\"name\":\"${DBMON_NAME}\"," "`${ACT} dbmon list`" "List Database Collectors"
+  echo $CREATE_DBMON
+  if [[ $CREATE_DBMON =~ \"id\"\:([0-9]+) ]] ; then
     COLLECTOR_ID=${BASH_REMATCH[1]}
     assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon get -c $COLLECTOR_ID`"
     assert_contains_substring '"status" : "SUCCESS",' "`${ACT} dbmon delete -c $COLLECTOR_ID`"
@@ -115,7 +116,7 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_contains_substring "Login Successful" "$FRIEND_LOGIN" "Federation Friend login successful"
   if [ $LAST_TEST_STATUS -eq 0 ]; then
     assert_contains_substring "Federation Key for account {customer1}" "`${ACT} federation createkey -n key_${RANDOM}`" "Create federation key"
-    assert_contains_substring "successfully established" "`${ACT_FRIEND} federation setup -h "${CONFIG_CONTROLLER_HOST}" -c "${CONFIG_CONTROLLER_CREDENTIALS}"`" "Federation Setup"
+    assert_contains_substring "HTTP Status: 200" "`${ACT_FRIEND} federation setup -h "${CONFIG_CONTROLLER_HOST}" -c "${CONFIG_CONTROLLER_CREDENTIALS}"`" "Federation Setup"
   else
     SKIP_COUNTER=$SKIP_COUNTER+2
     echo -en "\033[0;33m!!\033[0m"
@@ -125,7 +126,7 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_equals "ERROR: Please provide an argument for paramater -a" "`${ACT} event create`" "Missing required argument"
 
   ##### Delete the test application
-  assert_empty "`${ACT} application delete $APPLICATION_ID`"
+  assert_contains_substring "HTTP Status: 204" "`${ACT} application delete $APPLICATION_ID`"
 fi
 #### END TESTS ####
 

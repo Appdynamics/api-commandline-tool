@@ -20,7 +20,7 @@ function dbmon_create {
                       \"password\": \"\${s}\",\
                       \"excludedSchemas\": [],\
                       \"enabled\": true\
-                    }" /controller/restui/databases/collectors/createConfiguration "$@"
+                    }" /controller/rest/databases/collectors/create "$@"
 }
 
 register dbmon_create Create a new database collector

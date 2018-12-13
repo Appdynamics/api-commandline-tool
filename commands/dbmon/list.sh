@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function dbmon_list {
-  controller_call /controller/restui/databases/collectors/
+  controller_call /controller/rest/databases/collectors
 }
 
 register dbmon_list List all database collectors

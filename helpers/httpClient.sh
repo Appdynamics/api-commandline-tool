@@ -6,5 +6,6 @@ function httpClient {
  if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
    TIMEOUT=$CONFIG_HTTP_TIMEOUT
  fi
- curl -L --connect-timeout $TIMEOUT "$@"
+ debug "curl -L --connect-timeout ${TIMEOUT} $*"
+ curl -L --connect-timeout ${TIMEOUT} "$@"
 }

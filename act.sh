@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="d96dfe9ebbf93563befd45253551ead1c0529f18"
+ACT_LAST_COMMIT="72fe1f7bd303c8e8d4175af047d3a2a4ac1b2354"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -49,18 +49,18 @@ function doc {
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
 function dbmon_get {
-  apiCall "/controller/restui/databases/collectors/configurations/\${c}" "$@"
+  apiCall '/controller/rest/databases/collectors/${c}' "$@"
 }
 register dbmon_get Retrieve information about a specific database collector
 describe dbmon_get << EOF
-Retrieve information about a specific database collector. Provide the collector id as parameter.
+Retrieve information about a specific database collector. Provide the collector id as parameter (-c).
 EOF
 function dbmon_delete {
-    apiCall -X POST -d "[\"\${c}\"]" /controller/restui/databases/collectors/configuration/batchDelete "$@"
+    apiCall -X DELETE '/controller/rest/databases/collectors/${c}' "$@"
 }
 register dbmon_delete Delete a database collector
 describe dbmon_delete << EOF
-Delete a database collector. Provide the collector id as parameter.
+Delete a database collector. Provide the collector id as parameter (-c).
 EOF
 function dbmon_create {
   apiCall -X POST -d "{ \
@@ -82,7 +82,7 @@ function dbmon_create {
                       \"password\": \"\${s}\",\
                       \"excludedSchemas\": [],\
                       \"enabled\": true\
-                    }" /controller/restui/databases/collectors/createConfiguration "$@"
+                    }" /controller/rest/databases/collectors/create "$@"
 }
 register dbmon_create Create a new database collector
 describe dbmon_create << EOF
@@ -97,7 +97,7 @@ Create a new database collector. You need to provide the following parameters:
   -s password
 EOF
 function dbmon_list {
-  controller_call /controller/restui/databases/collectors/
+  controller_call /controller/rest/databases/collectors
 }
 register dbmon_list List all database collectors
 describe dbmon_list << EOF
@@ -390,15 +390,39 @@ function controller_call {
   debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
     debug "Endpoint: $ENDPOINT"
-    COMMAND_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
-          -X $METHOD\
-          -H "X-CSRF-TOKEN: $XCSRFTOKEN" \
-          "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")" \
-          -H "Accept: application/json, text/plain, */*"\
-          "`[ -n "${PAYLOAD}" ] && echo -d "${PAYLOAD}"`" \
-          "`[ -n "$FORM" ] && echo -F ${FORM}`" \
-          $CONFIG_CONTROLLER_HOST$ENDPOINT)
-    debug "Command result: $COMMAND_RESULT"
+    # Note that the line for FORM and PAYLOAD is not breaking since curl will have issues with multiple line breaks
+    # assuming that every empty line contains an additional URL.
+    local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
+    #local HTTP_CLIENT_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
+    #      -X "${METHOD}"\
+    #      -H "X-CSRF-TOKEN: ${XCSRFTOKEN}"\
+    #      "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")"\
+    #      "`[ -n "${PAYLOAD}" ] && echo "-d ${PAYLOAD}"`""`[ -n "$FORM" ] && echo " -F ${FORM}"`"\
+    #      "${CONFIG_CONTROLLER_HOST}${ENDPOINT}"\
+    #      -w  "\"${SEPERATOR} %{http_code}; %{time_total}\""
+    #      )
+    local HTTP_CLIENT_RESULT=""
+    HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+    if [ -n "$FORM" ] ; then
+      HTTP_CALL+=("-F" "${FORM}")
+    else
+      HTTP_CALL+=("-H" "Content-Type: application/json;charset=UTF-8")
+    fi;
+    if [ -n "${PAYLOAD}" ] ; then
+      HTTP_CALL+=("-d" "${PAYLOAD}")
+    fi;
+    HTTP_CALL+=("-w" "${SEPERATOR}%{http_code}")
+    HTTP_CALL+=("${CONFIG_CONTROLLER_HOST}${ENDPOINT}")
+    HTTP_CLIENT_RESULT=`httpClient "${HTTP_CALL[@]}"`
+    COMMAND_RESULT=${HTTP_CLIENT_RESULT%${SEPERATOR}*}
+    COMMAND_STATS=${HTTP_CLIENT_RESULT##*${SEPERATOR}}
+    COMMAND_STATS_HTTP_CODE="${COMMAND_STATS#*;}"
+    COMMAND_STATS_HTTP_TIME="${COMMAND_STATS%;*}"
+     debug "Command result: ($COMMAND_RESULT)"
+     info "HTTP Status Code: $COMMAND_STATS"
+     if [ -z "${COMMAND_RESULT}" ] ; then
+       COMMAND_RESULT="HTTP Status: ${COMMAND_STATS}"
+     fi
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
    fi
@@ -1415,7 +1439,8 @@ function httpClient {
  if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
    TIMEOUT=$CONFIG_HTTP_TIMEOUT
  fi
- curl -L --connect-timeout $TIMEOUT "$@"
+ debug "curl -L --connect-timeout ${TIMEOUT} $*"
+ curl -L --connect-timeout ${TIMEOUT} "$@"
 }
 #script_placeholder
 if [ -f "${GLOBAL_CONFIG}" ]; then
