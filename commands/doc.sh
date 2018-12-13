@@ -5,7 +5,15 @@ read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with
 \`act.sh\`. The given examples allow you to understand, how each command is used.
-For more complex examples, have a look into [RECIPES.md](RECIPES.md)
+For more complex examples, have a look into [RECIPES.md](RECIPES.md)\n
+
+## Options
+
+The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):\n
+
+| Option | Description |
+|--------|-------------|
+${AVAILABLE_GLOBAL_OPTIONS}
 EOM
   local NAMESPACES=""
   for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do

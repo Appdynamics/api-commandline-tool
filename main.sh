@@ -16,6 +16,8 @@ CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # An empty string silents all output
 CONFIG_OUTPUT_VERBOSITY="error,output"
 
+CONFIG_OUTPUT_COMMAND=0
+
 # Default Colors
 COLOR_WARNING="\033[0;33m"
 COLOR_INFO="\033[0;32m"
@@ -76,7 +78,19 @@ else
 fi
 
 # Parse global options
-while getopts "A:H:C:E:J:D:P:S:F:Nv" opt;
+read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
+|-H <controller-host>          |specify the host of the controller you want to connect to|
+|-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
+|-D <output-verbosity>         |Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output|
+|-E <environment>              |Call the controller within the given environment|
+|-A <application-name>         |Provide a default application.|
+|-J <cookie-location>          |Store the session cookie at a different location.|
+|-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
+|-O                            |Don't execute the command and just print the curl call.|
+|-N                            |Don't use colors for the verbose output.|
+|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|\n
+EOM
+while getopts "A:H:C:E:J:D:OP:S:F:Nv" opt;
 do
   case "${opt}" in
     E)
@@ -113,6 +127,10 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    O)
+      CONFIG_OUTPUT_COMMAND=1
+      debug "Set CONFIG_OUTPUT_COMMAND=${CONFIG_OUTPUT_COMMAND}"
     ;;
     S)
       CONFIG_PORTAL_CREDENTIALS=${OPTARG}

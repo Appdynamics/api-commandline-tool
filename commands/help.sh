@@ -7,11 +7,7 @@ Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <out
 
 You can use the following options on a global level:\n
 
-  -H <controller-host>          specify the host of the controller you want to connect to
-  -C <controller-credentials>   provide the credentials for the controller. Format: user@tenant:password
-  -D <output-verbosity>         Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output
-  -A <application-name>         Provide a default application
-  -v[vv]                        Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n
+${AVAILABLE_GLOBAL_OPTIONS//|/}
 
 To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
 The following commands in the global namespace can be called directly:\n

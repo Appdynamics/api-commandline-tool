@@ -3,6 +3,23 @@ Below you will find a list of all available namespaces and commands available wi
 `act.sh`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 
+## Options
+The following options are available on a global level. Put them in front of your command (e.g. `act.sh -E testenv -vvv application list`):
+
+| Option | Description |
+|--------|-------------|
+|-H <controller-host>          |specify the host of the controller you want to connect to|
+|-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
+|-D <output-verbosity>         |Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output|
+|-E <environment>              |Call the controller within the given environment|
+|-A <application-name>         |Provide a default application.|
+|-J <cookie-location>          |Store the session cookie at a different location.|
+|-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
+|-O                            |Don't execute the command and just print the curl call.|
+|-N                            |Don't use colors for the verbose output.|
+|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
+
+
 ## Global
 
 The following commands in the global namespace can be called directly.
@@ -122,10 +139,12 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| source | Load environment variables |  |
 | get | Retrieve an environment. Provide the name of the environment as parameter. | `act.sh environment get myaccount` |
 | delete | Delete an environment. Provide the name of the environment as parameter. | `act.sh environment delete myaccount` |
 | add | Add a new environment. To change the default environment, run with `-d` | `act.sh environment add -d` |
 | list | List all your environments | `act.sh environment list ` |
+| export | Export an environment into a postman environment | `act.sh environment export > output.json` |
 
 
 ## eum

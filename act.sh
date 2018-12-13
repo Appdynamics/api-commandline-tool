@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="88e34e646e3ac0d35d59c4e1747955d5e944087d"
+ACT_LAST_COMMIT="64b66d1edcb7337e338605cf7536eef9bf3bce08"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -13,6 +13,7 @@ CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # - output (msg to stdout)
 # An empty string silents all output
 CONFIG_OUTPUT_VERBOSITY="error,output"
+CONFIG_OUTPUT_COMMAND=0
 # Default Colors
 COLOR_WARNING="\033[0;33m"
 COLOR_INFO="\033[0;32m"
@@ -285,7 +286,12 @@ read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with
 \`act.sh\`. The given examples allow you to understand, how each command is used.
-For more complex examples, have a look into [RECIPES.md](RECIPES.md)
+For more complex examples, have a look into [RECIPES.md](RECIPES.md)\n
+## Options
+The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):\n
+| Option | Description |
+|--------|-------------|
+${AVAILABLE_GLOBAL_OPTIONS}
 EOM
   local NAMESPACES=""
   for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
@@ -329,11 +335,7 @@ function _help {
     read -r -d '' COMMAND_RESULT <<- EOM
 Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n
 You can use the following options on a global level:\n
-  -H <controller-host>          specify the host of the controller you want to connect to
-  -C <controller-credentials>   provide the credentials for the controller. Format: user@tenant:password
-  -D <output-verbosity>         Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output
-  -A <application-name>         Provide a default application
-  -v[vv]                        Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug\n
+${AVAILABLE_GLOBAL_OPTIONS//|/}
 To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
 The following commands in the global namespace can be called directly:\n
 EOM
@@ -431,17 +433,7 @@ function controller_call {
   debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
     debug "Endpoint: $ENDPOINT"
-    # Note that the line for FORM and PAYLOAD is not breaking since curl will have issues with multiple line breaks
-    # assuming that every empty line contains an additional URL.
     local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
-    #local HTTP_CLIENT_RESULT=$(httpClient -s -b $CONFIG_CONTROLLER_COOKIE_LOCATION \
-    #      -X "${METHOD}"\
-    #      -H "X-CSRF-TOKEN: ${XCSRFTOKEN}"\
-    #      "$([ -z "$FORM" ] && echo "-HContent-Type: application/json;charset=UTF-8")"\
-    #      "`[ -n "${PAYLOAD}" ] && echo "-d ${PAYLOAD}"`""`[ -n "$FORM" ] && echo " -F ${FORM}"`"\
-    #      "${CONFIG_CONTROLLER_HOST}${ENDPOINT}"\
-    #      -w  "\"${SEPERATOR} %{http_code}; %{time_total}\""
-    #      )
     local HTTP_CLIENT_RESULT=""
     HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     if [ -n "$FORM" ] ; then
@@ -452,18 +444,28 @@ function controller_call {
     if [ -n "${PAYLOAD}" ] ; then
       HTTP_CALL+=("-d" "${PAYLOAD}")
     fi;
-    HTTP_CALL+=("-w" "${SEPERATOR}%{http_code}")
-    HTTP_CALL+=("${CONFIG_CONTROLLER_HOST}${ENDPOINT}")
-    HTTP_CLIENT_RESULT=`httpClient "${HTTP_CALL[@]}"`
-    COMMAND_RESULT=${HTTP_CLIENT_RESULT%${SEPERATOR}*}
-    COMMAND_STATS=${HTTP_CLIENT_RESULT##*${SEPERATOR}}
-    COMMAND_STATS_HTTP_CODE="${COMMAND_STATS#*;}"
-    COMMAND_STATS_HTTP_TIME="${COMMAND_STATS%;*}"
-     debug "Command result: ($COMMAND_RESULT)"
-     info "HTTP Status Code: $COMMAND_STATS"
-     if [ -z "${COMMAND_RESULT}" ] ; then
-       COMMAND_RESULT="HTTP Status: ${COMMAND_STATS}"
-     fi
+    if [ "${CONFIG_OUTPUT_COMMAND}" -eq 1 ] ; then
+      HTTP_CALL+=("${CONFIG_CONTROLLER_HOST}${ENDPOINT}")
+      COMMAND_RESULT="curl -L"
+      for P in "${HTTP_CALL[@]}" ; do
+        if [[ "$P" == -* ]]; then
+          COMMAND_RESULT="$COMMAND_RESULT $P"
+        else
+          COMMAND_RESULT="$COMMAND_RESULT '$P'"
+        fi
+      done
+    else
+      HTTP_CALL+=("-w" "${SEPERATOR}%{http_code}")
+      HTTP_CALL+=("${CONFIG_CONTROLLER_HOST}${ENDPOINT}")
+      HTTP_CLIENT_RESULT=`httpClient "${HTTP_CALL[@]}"`
+      COMMAND_RESULT=${HTTP_CLIENT_RESULT%${SEPERATOR}*}
+      COMMAND_STATS=${HTTP_CLIENT_RESULT##*${SEPERATOR}}
+       debug "Command result: ($COMMAND_RESULT)"
+       info "HTTP Status Code: $COMMAND_STATS"
+       if [ -z "${COMMAND_RESULT}" ] ; then
+         COMMAND_RESULT="HTTP Status: ${COMMAND_STATS}"
+       fi
+    fi
    else
      COMMAND_RESULT="Controller Login Error! Please check hostname and credentials"
    fi
@@ -777,6 +779,16 @@ If you want to use ${SCRIPTNAME} to manage multiple controllers, you can use env
 Use \`${SCRIPTNAME} environment add\` to create an environment providing a name, controller url and credentials.
 Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
 EOF
+function environment_source {
+  source "${HOME}/.appdynamics/act/config.$1.sh"
+}
+register environment_source Load environment variables
+describe environment_source << EOF
+Load environment variables
+EOF
+example environment_get << EOF
+myaccount
+EOF
 function environment_get {
   COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
 }
@@ -925,6 +937,36 @@ describe environment_list << EOF
 List all your environments
 EOF
 example environment_list << EOF
+EOF
+function environment_export {
+  environment_source "${1}";
+  read -r -d '' COMMAND_RESULT << EOF
+  {
+  	"name": "${1}",
+  	"values": [
+  		{
+  			"key": "controller_host",
+  			"value": "${CONFIG_CONTROLLER_HOST}",
+  			"description": "",
+  			"enabled": true
+  		},
+  		{
+  			"key": "controller_credentials",
+  			"value": "${CONFIG_CONTROLLER_CREDENTIALS}",
+  			"description": "",
+  			"enabled": true
+  		}
+  	],
+  	"_postman_variable_scope": "environment"
+  }
+EOF
+}
+register environment_export Export an environment into a postman environment
+describe environment_export << EOF
+Export an environment into a postman environment
+EOF
+example environment_export << EOF
+> output.json
 EOF
 function _config {
   environment_add -d "$@"
@@ -1514,7 +1556,19 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
-while getopts "A:H:C:E:J:D:P:S:F:Nv" opt;
+read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
+|-H <controller-host>          |specify the host of the controller you want to connect to|
+|-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
+|-D <output-verbosity>         |Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output|
+|-E <environment>              |Call the controller within the given environment|
+|-A <application-name>         |Provide a default application.|
+|-J <cookie-location>          |Store the session cookie at a different location.|
+|-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
+|-O                            |Don't execute the command and just print the curl call.|
+|-N                            |Don't use colors for the verbose output.|
+|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|\n
+EOM
+while getopts "A:H:C:E:J:D:OP:S:F:Nv" opt;
 do
   case "${opt}" in
     E)
@@ -1551,6 +1605,10 @@ do
     P)
       CONFIG_USER_PLUGIN_DIRECTORY=${OPTARG}
       debug "Set CONFIG_USER_PLUGIN_DIRECTORY=${CONFIG_USER_PLUGIN_DIRECTORY}"
+    ;;
+    O)
+      CONFIG_OUTPUT_COMMAND=1
+      debug "Set CONFIG_OUTPUT_COMMAND=${CONFIG_OUTPUT_COMMAND}"
     ;;
     S)
       CONFIG_PORTAL_CREDENTIALS=${OPTARG}
