@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="64b66d1edcb7337e338605cf7536eef9bf3bce08"
+ACT_LAST_COMMIT="e1c89686485d0152ab042a0edad779ef0c71e6fd"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -411,7 +411,8 @@ function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""
-  while getopts "X:d:F:" opt "$@";
+  local USE_BASIC_AUTH=0
+  while getopts "X:d:F:B" opt "$@";
   do
     case "${opt}" in
       X)
@@ -423,19 +424,32 @@ function controller_call {
       F)
         FORM="${OPTARG}"
       ;;
+      B)
+        USE_BASIC_AUTH=1
+      ;;
     esac
   done
   shiftOptInd
   shift $SHIFTS
   ENDPOINT=$*
-  controller_login
+  if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
+    debug "Using basic authentication"
+    CONTROLLER_LOGIN_STATUS=1
+  else
+    controller_login
+  fi
   # Debug the COMMAND_RESULT from controller_login
   debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
     debug "Endpoint: $ENDPOINT"
     local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
     local HTTP_CLIENT_RESULT=""
-    HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+    local HTTP_CALL=("-s")
+    if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
+      HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
+    else
+      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+    fi
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
     else
@@ -479,10 +493,10 @@ example controller_call << EOF
 EOF
 CONTROLLER_LOGIN_STATUS=0
 function controller_login {
-  debug "Login at $CONFIG_CONTROLLER_HOST with $CONFIG_CONTROLLER_CREDENTIALS"
-  LOGIN_RESPONSE=$(httpClient -sI -c $CONFIG_CONTROLLER_COOKIE_LOCATION --user $CONFIG_CONTROLLER_CREDENTIALS $CONFIG_CONTROLLER_HOST/controller/auth?action=login)
+  debug "Login at ${CONFIG_CONTROLLER_HOST} with ${CONFIG_CONTROLLER_CREDENTIALS}"
+  LOGIN_RESPONSE=$(httpClient -sI -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login")
   debug "RESPONSE: ${LOGIN_RESPONSE}"
-  if [[ "${LOGIN_RESPONSE/200 OK}" != "$LOGIN_RESPONSE" ]]; then
+  if [[ "${LOGIN_RESPONSE/200 OK}" != "${LOGIN_RESPONSE}" ]]; then
     COMMAND_RESULT="Controller Login Successful"
     CONTROLLER_LOGIN_STATUS=1
   else

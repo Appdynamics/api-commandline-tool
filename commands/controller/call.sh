@@ -4,7 +4,8 @@ function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""
-  while getopts "X:d:F:" opt "$@";
+  local USE_BASIC_AUTH=0
+  while getopts "X:d:F:B" opt "$@";
   do
     case "${opt}" in
       X)
@@ -16,6 +17,9 @@ function controller_call {
       F)
         FORM="${OPTARG}"
       ;;
+      B)
+        USE_BASIC_AUTH=1
+      ;;
     esac
   done
 
@@ -24,7 +28,12 @@ function controller_call {
 
   ENDPOINT=$*
 
-  controller_login
+  if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
+    debug "Using basic authentication"
+    CONTROLLER_LOGIN_STATUS=1
+  else
+    controller_login
+  fi
   # Debug the COMMAND_RESULT from controller_login
   debug "Login result: $COMMAND_RESULT"
   if [ $CONTROLLER_LOGIN_STATUS -eq 1 ]; then
@@ -34,7 +43,15 @@ function controller_call {
 
     local HTTP_CLIENT_RESULT=""
 
-    HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+    local HTTP_CALL=("-s")
+
+    if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
+      HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
+    else
+      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+    fi
+
+
 
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
