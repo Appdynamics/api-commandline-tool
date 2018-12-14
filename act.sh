@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="e1c89686485d0152ab042a0edad779ef0c71e6fd"
+ACT_LAST_COMMIT="1a4fc019e529196e5a41be592e69e6f796f53d7b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -49,6 +49,111 @@ function doc {
   GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+function application_create {
+  apiCall -X POST -d '{name: ${n}, description: }' '/controller/restui/allApplications/createApplication?applicationType=${t}' "$@"
+}
+register application_create "Create a new application"
+describe application_create << EOF
+Create a new application. Provide a name and a type (APM or WEB) as parameter.
+EOF
+example << EOF
+-t APM -n MyNewApplication
+EOF
+function application_delete {
+  apiCall -X POST -d '${a}' '/controller/restui/allApplications/deleteApplication' "$@"
+}
+register application_delete "Delete an application"
+describe application_delete << EOF
+Delete an application. Provide an application id as parameter (-a)
+EOF
+example << EOF
+-a 29
+EOF
+function application_export {
+  apiCall '/controller/ConfigObjectImportExportServlet?applicationId=${a}' "$@"
+}
+register application_export "Export an application from the controller"
+describe application_export << EOF
+Export a application from the controller. Provide an application id as parameter (-a)
+EOF
+example << EOF
+-a 29
+EOF
+function application_get {
+  apiCall '/controller/rest/applications/${a}' "$@"
+}
+register application_get "Get an application"
+describe application_get << EOF
+Get an application. Provide application id or name as parameter (-a).
+EOF
+example << EOF
+-a 15
+EOF
+function application_list {
+  apiCall '/controller/rest/applications' "$@"
+}
+register application_list "List all applications available on the controller"
+describe application_list << EOF
+List all applications available on the controller. This command requires no further arguments.
+EOF
+example << EOF
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+function bt_creategroup {
+  apiCall -X POST -d '[${b}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId=${a}&groupName=${n}' "$@"
+}
+register bt_creategroup "Create a business transactions group."
+describe bt_creategroup << EOF
+Create a business transactions group. Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)
+EOF
+example << EOF
+-b 13,14 -n MyGroup
+EOF
+function bt_delete {
+  apiCall -X POST -d '[${b}]' '/controller/restui/bt/deleteBTs' "$@"
+}
+register bt_delete "Delete a business transaction"
+describe bt_delete << EOF
+Delete a business transaction. Provide the bt id as parameter (-b)
+EOF
+example << EOF
+-b 13
+EOF
+function bt_get {
+  apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@"
+}
+register bt_get "Get a BT"
+describe bt_get << EOF
+Get a BT. Provide as parameters bt id (-b) and application id (-a).
+EOF
+example << EOF
+-a 29 -b 13
+EOF
+function bt_list {
+  apiCall '/controller/rest/applications/${a}/business-transactions' "$@"
+}
+register bt_list "List all BTs for a given application"
+describe bt_list << EOF
+List all BTs for a given application. Provide the application id as parameter (-a)
+EOF
+example << EOF
+-a 29
+EOF
+function bt_rename {
+  apiCall -X POST -d '${n}' '/controller/restui/bt/renameBT?id=${b}' "$@"
+}
+register bt_rename "Rename a business transaction"
+describe bt_rename << EOF
+Rename a business transaction. Provide the bt id (-b) and the new name (-n) as parameters
+EOF
+example << EOF
+-b 13 -n Checkout
+EOF
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
@@ -149,7 +254,7 @@ function snapshot_list {
   apiCall '/controller/rest/applications/${a}/request-snapshots?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}' "$@"
 }
 register snapshot_list Retrieve a list of snapshots for a specific application
-describe application_list << EOF
+describe snapshot_list << EOF
 Retrieve a list of snapshots for a specific application.
 EOF
 function configuration_set {
@@ -412,8 +517,10 @@ function controller_call {
   local METHOD="GET"
   local FORM=""
   local USE_BASIC_AUTH=0
+  debug "$@"
   while getopts "X:d:F:B" opt "$@";
   do
+    debug "${opt}"
     case "${opt}" in
       X)
 	METHOD=${OPTARG}
@@ -429,6 +536,7 @@ function controller_call {
       ;;
     esac
   done
+  debug "ASDF"
   shiftOptInd
   shift $SHIFTS
   ENDPOINT=$*
@@ -448,7 +556,7 @@ function controller_call {
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
-      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+      HTTP_CALL=("-v" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     fi
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
@@ -718,20 +826,6 @@ register federation_establish Establish Mutual Friendship
 describe federation_establish << EOF
 Establish Mutual Friendship
 EOF
-function application_get {
-  apiCall '/controller/rest/applications/${a}' "$@"
-}
-register application_get Get an application
-describe application_get << EOF
-Get an application. Provide application id or name as parameter (-a).
-EOF
-function bt_list {
-  apiCall -X GET "/controller/rest/applications/\${a}/business-transactions" "$@"
-}
-register bt_list List all business transactions for a given application
-describe bt_list << EOF
-List all business transactions for a given application. Provide the application id as parameter.
-EOF
 function eum_getapps {
   apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
 }
@@ -794,7 +888,11 @@ Use \`${SCRIPTNAME} environment add\` to create an environment providing a name,
 Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
 EOF
 function environment_source {
-  source "${HOME}/.appdynamics/act/config.$1.sh"
+  if [ "$1" == "" ] ; then
+    source "${HOME}/.appdynamics/act/config.sh"
+  else
+    source "${HOME}/.appdynamics/act/config.$1.sh"
+  fi
 }
 register environment_source Load environment variables
 describe environment_source << EOF
@@ -956,7 +1054,7 @@ function environment_export {
   environment_source "${1}";
   read -r -d '' COMMAND_RESULT << EOF
   {
-  	"name": "${1}",
+  	"name": "${1:-default}",
   	"values": [
   		{
   			"key": "controller_host",
@@ -999,47 +1097,6 @@ describe _version << EOF
 Print the current version of $SCRIPTNAME
 EOF
 example _version << EOF
-EOF
-function bt_get {
-  apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@"
-}
-register bt_get Get an BT by id
-describe bt_get << EOF
-Get an BT. Provide as parameters bt id (-b) and application id (-a).
-EOF
-function application_delete {
-  apiCall -X POST -d "\${a}" "/controller/restui/allApplications/deleteApplication" "$@"
-}
-register application_delete Delete an application
-describe application_delete << EOF
-Delete an application. Provide application id as parameter.
-EOF
-function application_create {
-  apiCall -X POST -d "{\"name\": \"\${n}\", \"description\": \"\"}" "/controller/restui/allApplications/createApplication?applicationType=\${t}" "$@"
-}
-register application_create Create a new application
-describe application_create << EOF
-Create a new application. Provide a name and a type (APM or WEB) as parameter.
-EOF
-function application_list {
-  controller_call /controller/rest/applications
-}
-register application_list List all applications available on the controller
-describe application_list << EOF
-List all applications available on the controller. This command requires no further arguments.
-EOF
-function application_export {
-  local APPLICATION_ID=$*
-  if [[ $APPLICATION_ID =~ ^[0-9]+$ ]]; then
-    controller_call /controller/ConfigObjectImportExportServlet?applicationId=$APPLICATION_ID
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$APPLICATION_ID'"
-  fi
-}
-register application_export Export an application from the controller
-describe application_export << EOF
-Export a application from the controller. Specifiy the application id as parameter.
 EOF
 function node_markhistorical {
   apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids=${n}' "$@"
@@ -1174,6 +1231,45 @@ function metric_list {
 register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
+EOF
+function _export {
+  local WITH_ENVIRONMENTS="1"
+  while getopts "e" opt "$@";
+  do
+    case "${opt}" in
+      e)
+        WITH_ENVIRONMENTS="0"
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  local ENVIRONMENTS=""
+  local COLLECTIONS=""
+  if [ "${WITH_ENVIRONMENTS}" -eq "1" ] ; then
+    environment_list
+    for ENVIRONMENT in ${COMMAND_RESULT} ; do
+      environment_export ${ENVIRONMENT/(default)/}
+      ENVIRONMENTS+="${COMMAND_RESULT},"
+    done;
+    ENVIRONMENTS=${ENVIRONMENTS%,}
+  fi
+  read -r -d '' COMMAND_RESULT << EOF
+  {
+  	"version": 1,
+  	"collections": [${COLLECTIONS}],
+  	"environments": [
+    ${ENVIRONMENTS}
+    ]
+  }
+EOF
+}
+register _export "Export to postman"
+describe _export << EOF
+Export to postman
+EOF
+example _export << EOF
+> postman.json
 EOF
 function healthrule_import {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
@@ -1345,18 +1441,11 @@ describe bizjourney_enable << EOF
 Enable a valid business journey draft. Provide the journey id (-i) as parameter
 EOF
 function bizjourney_import {
-  local FILE="$*"
-  if [ -r "${FILE}" ] ; then
-    DATA="$(<${FILE})"
-    controller_call -X POST -d "${DATA}" '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft'
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
+  apiCall -X POST -d '${d}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
 }
-register bizjourney_import Create a new business journey
+register bizjourney_import Import a business journey
 describe bizjourney_import << EOF
-Create a new business journey. Provide a name and a type (APM or WEB) as parameter.
+Import a business journey. Provide a json string or a file (with @ as prefix) as paramater (-d)
 EOF
 function bizjourney_list {
   controller_call '/controller/restui/analytics/biz_outcome/definitions/summary'
@@ -1488,16 +1577,26 @@ function apiCall {
     ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
     shift
   done
-  debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
+  local CONTROLLER_ARGS=()
+  if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
+    CONTROLLER_ARGS+=("-B")
+  fi;
   if [ -n "$PAYLOAD" ] ; then
     if [ "${PAYLOAD:0:1}" = "@" ] ; then
       debug "Loading payload from file ${PAYLOAD:1}"
-      PAYLOAD=$(<${PAYLOAD:1})
+      if [ -r "${PAYLOAD:1}" ] ; then
+        PAYLOAD=$(<${PAYLOAD:1})
+        CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
+      else
+        COMMAND_RESULT=""
+        error "File not found or not readable: ${PAYLOAD:1}"
+        exit
+      fi
     fi
-    controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
-  else
-    controller_call -X $METHOD $ENDPOINT
-  fi
+  fi;
+  CONTROLLER_ARGS=("-X" "${METHOD}" "${ENDPOINT}")
+  debug "Call Controller with ${CONTROLLER_ARGS[*]}"
+  controller_call "${CONTROLLER_ARGS[@]}"
 }
 SHIFTS=0
 declare -i SHIFTS

@@ -98,16 +98,28 @@ function apiCall {
     shift
   done
 
-  debug "Call Controller: -X $METHOD -d $PAYLOAD $ENDPOINT"
-  if [ -n "$PAYLOAD" ] ; then
+  local CONTROLLER_ARGS=()
 
+  if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
+    CONTROLLER_ARGS+=("-B")
+  fi;
+
+  if [ -n "$PAYLOAD" ] ; then
     if [ "${PAYLOAD:0:1}" = "@" ] ; then
       debug "Loading payload from file ${PAYLOAD:1}"
-      PAYLOAD=$(<${PAYLOAD:1})
+      if [ -r "${PAYLOAD:1}" ] ; then
+        PAYLOAD=$(<${PAYLOAD:1})
+        CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
+      else
+        COMMAND_RESULT=""
+        error "File not found or not readable: ${PAYLOAD:1}"
+        exit
+      fi
     fi
+  fi;
 
-    controller_call -X $METHOD -d "$PAYLOAD" "$ENDPOINT"
-  else
-    controller_call -X $METHOD $ENDPOINT
-  fi
+  CONTROLLER_ARGS=("-X" "${METHOD}" "${ENDPOINT}")
+
+  debug "Call Controller with ${CONTROLLER_ARGS[*]}"
+  controller_call "${CONTROLLER_ARGS[@]}"
 }

@@ -5,8 +5,10 @@ function controller_call {
   local METHOD="GET"
   local FORM=""
   local USE_BASIC_AUTH=0
+  debug "$@"
   while getopts "X:d:F:B" opt "$@";
   do
+    debug "${opt}"
     case "${opt}" in
       X)
 	METHOD=${OPTARG}
@@ -22,6 +24,8 @@ function controller_call {
       ;;
     esac
   done
+
+  debug "ASDF"
 
   shiftOptInd
   shift $SHIFTS
@@ -48,7 +52,7 @@ function controller_call {
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
-      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+      HTTP_CALL=("-v" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     fi
 
 

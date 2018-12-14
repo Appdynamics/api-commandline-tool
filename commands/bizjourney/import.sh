@@ -1,18 +1,11 @@
 #!/bin/bash
 
 function bizjourney_import {
-  local FILE="$*"
-  if [ -r "${FILE}" ] ; then
-    DATA="$(<${FILE})"
-    controller_call -X POST -d "${DATA}" '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft'
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
+  apiCall -X POST -d '${d}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
 }
 
-register bizjourney_import Create a new business journey
+register bizjourney_import Import a business journey
 
 describe bizjourney_import << EOF
-Create a new business journey. Provide a name and a type (APM or WEB) as parameter.
+Import a business journey. Provide a json string or a file (with @ as prefix) as paramater (-d)
 EOF

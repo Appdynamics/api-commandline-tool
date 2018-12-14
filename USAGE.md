@@ -28,6 +28,7 @@ The following commands in the global namespace can be called directly.
 | ------- | ----------- | ------- |
 | config | Initialize the default environment. This is an alias for `act.sh environment add -d` | `act.sh  config ` |
 | version | Print the current version of act.sh | `act.sh  version ` |
+| export | Export to postman | `act.sh  export > postman.json` |
 
 
 ## actiontemplate
@@ -57,14 +58,15 @@ These commands allow you to import and export email/http saved analytics searche
 
 ## application
 
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | Retrieve a list of snapshots for a specific application. |  |
-| get | Get an application. Provide application id or name as parameter (-a). |  |
-| delete | Delete an application. Provide application id as parameter. |  |
 | create | Create a new application. Provide a name and a type (APM or WEB) as parameter. |  |
+| delete | Delete an application. Provide an application id as parameter (-a) |  |
+| export | Export a application from the controller. Provide an application id as parameter (-a) |  |
+| get | Get an application. Provide application id or name as parameter (-a). |  |
 | list | List all applications available on the controller. This command requires no further arguments. |  |
-| export | Export a application from the controller. Specifiy the application id as parameter. |  |
 
 
 ## bizjourney
@@ -73,16 +75,21 @@ These commands allow you to import and export email/http saved analytics searche
 | ------- | ----------- | ------- |
 | disable | Disable a valid business journey draft. Provide the journey id (-i) as parameter |  |
 | enable | Enable a valid business journey draft. Provide the journey id (-i) as parameter |  |
-| import | Create a new business journey. Provide a name and a type (APM or WEB) as parameter. |  |
+| import | Import a business journey. Provide a json string or a file (with @ as prefix) as paramater (-d) |  |
 | list | List all business journeys. This command requires no further arguments. |  |
 
 
 ## bt
 
+Retrieve information about business transactions within a given business application
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | List all business transactions for a given application. Provide the application id as parameter. |  |
-| get | Get an BT. Provide as parameters bt id (-b) and application id (-a). |  |
+| creategroup | Create a business transactions group. Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b) |  |
+| delete | Delete a business transaction. Provide the bt id as parameter (-b) |  |
+| get | Get a BT. Provide as parameters bt id (-b) and application id (-a). |  |
+| list | List all BTs for a given application. Provide the application id as parameter (-a) |  |
+| rename | Rename a business transaction. Provide the bt id (-b) and the new name (-n) as parameters |  |
 
 
 ## configuration
@@ -212,6 +219,13 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | list | List all servers |  |
+
+
+## snapshot
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| list | Retrieve a list of snapshots for a specific application. |  |
 
 
 ## tier

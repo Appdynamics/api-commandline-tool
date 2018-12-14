@@ -6,6 +6,6 @@ function snapshot_list {
 
 register snapshot_list Retrieve a list of snapshots for a specific application
 
-describe application_list << EOF
+describe snapshot_list << EOF
 Retrieve a list of snapshots for a specific application.
 EOF

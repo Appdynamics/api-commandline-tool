@@ -3,9 +3,10 @@
 function environment_export {
   environment_source "${1}";
 
+
   read -r -d '' COMMAND_RESULT << EOF
   {
-  	"name": "${1}",
+  	"name": "${1:-default}",
   	"values": [
   		{
   			"key": "controller_host",
