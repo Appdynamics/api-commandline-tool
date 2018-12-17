@@ -2,7 +2,7 @@
 
 #
 function dashboard_update {
-  apiCall -X POST -d @\$\{f\} /controller/restui/dashboards/updateDashboard "$@"
+  apiCall -X POST -d '@{{f}}' '/controller/restui/dashboards/updateDashboard' "$@"
 }
 
 register dashboard_update Update a specific dashboard

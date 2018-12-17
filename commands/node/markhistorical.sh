@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function node_markhistorical {
-  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids=${n}' "$@"
+  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@"
 }
 
 register node_markhistorical Mark Nodes as Historical

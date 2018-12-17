@@ -2,11 +2,11 @@
 
 function dbmon_create {
   apiCall -X POST -d "{ \
-                      \"name\": \"\${i}\",\
-                      \"username\": \"\${u}\",\
-                      \"hostname\": \"\${h}\",\
-                      \"agentName\": \"\${a}\",\
-                      \"type\": \"\${t}\",\
+                      \"name\": \"{{i}}\",\
+                      \"username\": \"{{u}}\",\
+                      \"hostname\": \"{{h}}\",\
+                      \"agentName\": \"{{a}}\",\
+                      \"type\": \"{{t}}\",\
                       \"orapkiSslEnabled\": false,\
                       \"orasslTruststoreLoc\": null,\
                       \"orasslTruststoreType\": null,\
@@ -15,9 +15,9 @@ function dbmon_create {
                       \"orasslKeystoreLoc\": null,\
                       \"orasslKeystoreType\": null,\
                       \"orasslKeystorePassword\": null,\
-                      \"databaseName\": \"\${n}\",\
-                      \"port\": \"\${p}\",\
-                      \"password\": \"\${s}\",\
+                      \"databaseName\": \"{{n}}\",\
+                      \"port\": \"{{p}}\",\
+                      \"password\": \"{{s}}\",\
                       \"excludedSchemas\": [],\
                       \"enabled\": true\
                     }" /controller/rest/databases/collectors/create "$@"

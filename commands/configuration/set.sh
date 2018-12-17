@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function configuration_set {
-  apiCall -X POST '/controller/rest/configuration?name=${n}&value=${v}' "$@"
+  apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@"
 }
 
 register configuration_set Set a Controller setting to a specified value.

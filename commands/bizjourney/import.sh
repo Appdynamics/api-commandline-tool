@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function bizjourney_import {
-  apiCall -X POST -d '${d}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
+  apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
 }
 
 register bizjourney_import Import a business journey

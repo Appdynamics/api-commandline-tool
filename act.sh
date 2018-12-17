@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="c6028841e1a368102bb68272840c1a89548326c3"
+ACT_LAST_COMMIT="786f67a86d9f7ed7e2663a31b3cbb24f8e363e88"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -61,28 +61,28 @@ RRREOF
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
-function application_create { apiCall -X POST -d '{"name": "${n}", "description": ""}' '/controller/restui/allApplications/createApplication?applicationType=${t}' "$@" ; }
+function application_create { apiCall -X POST -d '{"name": "{{n}}", "description": ""}' '/controller/restui/allApplications/createApplication?applicationType={{t}}' "$@" ; }
 rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
-function application_delete { apiCall -X POST -d '${a}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+function application_delete { apiCall -X POST -d '{{a}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
 rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
-function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId=${a}' "$@" ; }
+function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a}}' "$@" ; }
 rde application_export "Export an application from the controller." "Provide an application id as parameter (-a)" "-a 29"
-function application_get { apiCall '/controller/rest/applications/${a}' "$@" ; }
+function application_get { apiCall '/controller/rest/applications/{{a}}' "$@" ; }
 rde application_get "Get an application." "Provide application id or name as parameter (-a)." "-a 15"
 function application_list { apiCall '/controller/rest/applications' "$@" ; }
 rde application_list "List all applications available on the controller" "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
-function bt_creategroup { apiCall -X POST -d '[${b}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId=${a}&groupName=${n}' "$@" ; }
+function bt_creategroup { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}' "$@" ; }
 rde bt_creategroup "Create a business transactions group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
-function bt_delete { apiCall -X POST -d '[${b}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+function bt_delete { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
 rde bt_delete "Delete a business transaction." "Provide the bt id as parameter (-b)" "-b 13"
-function bt_get { apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@" ; }
+function bt_get { apiCall '/controller/rest/applications/{{a}}/business-transactions/{{b}}' "$@" ; }
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
-function bt_list { apiCall '/controller/rest/applications/${a}/business-transactions' "$@" ; }
+function bt_list { apiCall '/controller/rest/applications/{{a}}/business-transactions' "$@" ; }
 rde bt_list "List all BTs for a given application." "Provide the application id as parameter (-a)" "-a 29"
-function bt_rename { apiCall -X POST -d '${n}' '/controller/restui/bt/renameBT?id=${b}' "$@" ; }
+function bt_rename { apiCall -X POST -d '{{n}}' '/controller/restui/bt/renameBT?id={{b}}' "$@" ; }
 rde bt_rename "Rename a business transaction." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
@@ -477,11 +477,11 @@ function controller_call {
     debug "Endpoint: $ENDPOINT"
     local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
     local HTTP_CLIENT_RESULT=""
-    local HTTP_CALL=("-s")
+    local HTTP_CALL=("-v")
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
-      HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
+      HTTP_CALL+=("--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
-      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+      HTTP_CALL+=("-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     fi
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
@@ -1435,9 +1435,9 @@ function apiCall {
   debug "Unparsed payload is $PAYLOAD"
   shift
   OLDIFS=$IFS
-  IFS="\$"
+  IFS="{{"
   for MATCH in $PAYLOAD ; do
-    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
       if [ "${BASH_REMATCH[2]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
@@ -1446,7 +1446,7 @@ function apiCall {
     fi
   done;
   for MATCH in $ENDPOINT ; do
-    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
       if [ "${BASH_REMATCH[2]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
@@ -1464,21 +1464,21 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \$\{$opt\??\} ]] ; do
+      while [[ $PAYLOAD =~ \{\{$opt\??\}\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \$\{$opt\??\} ]] ; do
+      while [[ $ENDPOINT =~ \{\{$opt\??\}\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done
     shiftOptInd
     shift $SHIFTS
   fi
-  while [[ $PAYLOAD =~ \$\{([a-zA-Z])(\??)\} ]] ; do
+  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
         error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
         return;
@@ -1487,11 +1487,11 @@ function apiCall {
     PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
     shift
   done
-  while [[ $ENDPOINT =~ \$\{([a-zA-Z])(\??)\} ]] ; do
+  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
         error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
         return;
@@ -1505,6 +1505,7 @@ function apiCall {
   local CONTROLLER_ARGS=()
   if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
     CONTROLLER_ARGS+=("-B")
+    debug "Using basic http authentication"
   fi;
   if [ -n "$PAYLOAD" ] ; then
     if [ "${PAYLOAD:0:1}" = "@" ] ; then
@@ -1519,7 +1520,7 @@ function apiCall {
       fi
     fi
   fi;
-  CONTROLLER_ARGS=("-X" "${METHOD}" "${ENDPOINT}")
+  CONTROLLER_ARGS+=("-X" "${METHOD}" "${ENDPOINT}")
   debug "Call Controller with ${CONTROLLER_ARGS[*]}"
   controller_call "${CONTROLLER_ARGS[@]}"
 }

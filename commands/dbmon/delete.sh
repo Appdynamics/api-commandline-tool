@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function dbmon_delete {
-    apiCall -X DELETE '/controller/rest/databases/collectors/${c}' "$@"
+    apiCall -X DELETE '/controller/rest/databases/collectors/{{c}}' "$@"
 }
 
 register dbmon_delete Delete a database collector

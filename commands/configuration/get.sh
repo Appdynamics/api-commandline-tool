@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function configuration_get {
-  apiCall -X GET '/controller/rest/configuration?name=${n}' "$@"
+  apiCall -X GET '/controller/rest/configuration?name={{n}}' "$@"
 }
 
 register configuration_get Retrieve a Controller Setting by Name

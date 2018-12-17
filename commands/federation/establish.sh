@@ -7,9 +7,9 @@ function federation_establish {
   apiCall -X POST -d "{ \
     \"accountName\": \"${ACCOUNT}\", \
     \"controllerUrl\": \"${CONFIG_CONTROLLER_HOST}\", \
-    \"friendAccountName\": \"\${a}\", \
-    \"friendAccountApiKey\": \"\${k}\", \
-    \"friendAccountControllerUrl\": \"\${c}\" \
+    \"friendAccountName\": \"{{a}}\", \
+    \"friendAccountApiKey\": \"{{k}}\", \
+    \"friendAccountControllerUrl\": \"{{c}}\" \
   }" "/controller/rest/federation/establishmutualfriendship" "$@"
 }
 

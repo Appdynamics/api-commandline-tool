@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "c5a55860-b5de-473c-a4c5-823f97a6fb00",
+		"name": "MyCollection1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Folder1",
+			"item": [
+				{
+					"name": "myRequest",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{{a}}\n]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{appid}}?a=${b}",
+							"host": [
+								"{{controller_host}}"
+							],
+							"path": [
+								"controller",
+								"rest",
+								"applications",
+								"{{appid}}"
+							],
+							"query": [
+								{
+									"key": "a",
+									"value": "${b}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "myRequest Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{{a}}\n]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{appid}}?a=${b}",
+							"host": [
+								"{{controller_host}}"
+							],
+							"path": [
+								"controller",
+								"rest",
+								"applications",
+								"{{appid}}"
+							],
+							"query": [
+								{
+									"key": "a",
+									"value": "${b}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Folder2",
+			"item": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{controller_password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{controller_user}}@{{controller_account}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e73a8506-4381-43fc-9aa4-abcf4a1f6bb5",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5a39b4ce-ae65-42d1-9efc-d8d7dd82063d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

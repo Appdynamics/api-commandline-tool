@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function bizjourney_enable {
-  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/enable' "$@"
+  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@"
 }
 
 register bizjourney_enable "Enable a valid business journey draft"

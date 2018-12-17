@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function tier_get {
-  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers/\{{t}}" "$@"
 }
 
 register tier_get Retrieve Tier Information by Tier Name

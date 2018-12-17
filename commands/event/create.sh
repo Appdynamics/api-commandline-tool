@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function event_create {
-  apiCall -X POST "/controller/rest/applications/\${a}/events?summary=\${s}&comment=\${c?}&eventtype=\${e}&severity=\${l}&bt=&\${b?}node=\${n?}&tier=\${t?}" "$@"
+  apiCall -X POST "/controller/rest/applications/\{{a}}/events?summary=\{{s}}&comment=\{{c?}}&eventtype=\{{e}}&severity=\{{l}}&bt=&\{{b?}}node=\{{n?}}&tier=\{{t?}}" "$@"
 }
 
 register event_create Create a custom event for a given application

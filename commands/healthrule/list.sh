@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function healthrule_list {
-  apiCall -X GET '/controller/healthrules/${a}/' "$@"
+  apiCall -X GET '/controller/healthrules/{{a}}/' "$@"
 }
 
 register healthrule_list List all healthrules

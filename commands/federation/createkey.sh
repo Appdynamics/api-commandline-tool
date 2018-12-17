@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function federation_createkey {
-  apiCall -X POST -d '{"apiKeyName": "${n}"}' "/controller/rest/federation/apikeyforfederation" "$@"
+  apiCall -X POST -d '{"apiKeyName": "{{n}}"}' "/controller/rest/federation/apikeyforfederation" "$@"
 }
 
 register federation_createkey Create API Key for Federation

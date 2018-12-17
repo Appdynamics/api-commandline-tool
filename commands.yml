@@ -6,7 +6,7 @@ application:
     description: Provide application id or name as parameter (-a).
     example: -a 15
     method: GET
-    endpoint: /controller/rest/applications/\${a}
+    endpoint: /controller/rest/applications/{{a}}
   list:
     title: List all applications available on the controller
     description: This command requires no further arguments.
@@ -18,21 +18,21 @@ application:
     description: Provide a name and a type (APM or WEB) as parameter.
     example: -t APM -n MyNewApplication
     method: POST
-    endpoint: /controller/restui/allApplications/createApplication?applicationType=\${t}
-    payload: {\"name\": \"\${n}\", \"description\": \"\"}
+    endpoint: /controller/restui/allApplications/createApplication?applicationType={{t}}
+    payload: {\"name\": \"{{n}}\", \"description\": \"\"}
   delete:
     title: Delete an application.
     description: Provide an application id as parameter (-a)
     example: -a 29
     method: POST
     endpoint: /controller/restui/allApplications/deleteApplication
-    payload: \${a}
+    payload: {{a}}
   export:
     title: Export an application from the controller.
     description: Provide an application id as parameter (-a)
     example: -a 29
     method: GET
-    endpoint: /controller/ConfigObjectImportExportServlet?applicationId=\${a}
+    endpoint: /controller/ConfigObjectImportExportServlet?applicationId={{a}}
 bt:
   title: Business Transactions in a Business Application
   description: Retrieve information about business transactions within a given business application
@@ -41,31 +41,31 @@ bt:
     description: Provide as parameters bt id (-b) and application id (-a).
     example: -a 29 -b 13
     method: GET
-    endpoint: /controller/rest/applications/\${a}/business-transactions/\${b}
+    endpoint: /controller/rest/applications/{{a}}/business-transactions/{{b}}
   list:
     title: List all BTs for a given application.
     description: Provide the application id as parameter (-a)
     example: -a 29
     method: GET
-    endpoint: /controller/rest/applications/\${a}/business-transactions
+    endpoint: /controller/rest/applications/{{a}}/business-transactions
   delete:
     title: Delete a business transaction.
     description: Provide the bt id as parameter (-b)
     example: -b 13
     method: POST
     endpoint: /controller/restui/bt/deleteBTs
-    payload: [\${b}]
+    payload: [{{b}}]
   rename:
     title: Rename a business transaction.
     description: Provide the bt id (-b) and the new name (-n) as parameters
     example: -b 13 -n Checkout
     method: POST
-    endpoint: /controller/restui/bt/renameBT?id=\${b}
-    payload: \${n}
+    endpoint: /controller/restui/bt/renameBT?id={{b}}
+    payload: {{n}}
   creategroup:
     title: Create a business transactions group.
     description: Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)
     example: -b 13,14 -n MyGroup
     method: POST
-    endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId=\${a}&groupName=\${n}
-    payload: [\${b}]
+    endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}
+    payload: [{{b}}]

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function dbmon_get {
-  apiCall '/controller/rest/databases/collectors/${c}' "$@"
+  apiCall '/controller/rest/databases/collectors/{{c}}' "$@"
 }
 
 register dbmon_get Retrieve information about a specific database collector

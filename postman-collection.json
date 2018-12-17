@@ -1,7 +1,242 @@
-{
-  "info": {
-    "name": "AppDynamics API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [{"name": "application","item": []},{"name": "bt","item": []}]
+{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]},"item": [{"name": "application","item": [{
+					"name": "Create a new application.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"{{n}}\", \"description\": \"\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/allApplications/createApplication?applicationType={{t}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","allApplications","createApplication"],
+              "query": [{"key": "applicationType","value": "{{t}}"}]
+						}
+					}
+				},{
+					"name": "Delete an application.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{a}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/allApplications/deleteApplication",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","allApplications","deleteApplication"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Export an application from the controller.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/ConfigObjectImportExportServlet?applicationId={{a}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","ConfigObjectImportExportServlet"],
+              "query": [{"key": "applicationId","value": "{{a}}"}]
+						}
+					}
+				},{
+					"name": "Get an application.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all applications available on the controller",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications"],
+              "query": []
+						}
+					}
+				}]},{"name": "bt","item": [{
+					"name": "Create a business transactions group.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{b}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","bt","createBusinessTransactionGroup"],
+              "query": [{"key": "applicationId","value": "{{a}}"},{"key":"groupName","value": "{{n}}"}]
+						}
+					}
+				},{
+					"name": "Delete a business transaction.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{b}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/bt/deleteBTs",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","bt","deleteBTs"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Get a BT.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/business-transactions/{{b}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","business-transactions","{{b}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all BTs for a given application.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/business-transactions",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","business-transactions"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Rename a business transaction.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{n}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/bt/renameBT?id={{b}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","bt","renameBT"],
+              "query": [{"key": "id","value": "{{b}}"}]
+						}
+					}
+				}]}]
 }

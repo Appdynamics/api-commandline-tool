@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function tier_list {
-  apiCall -X GET "/controller/rest/applications/\${a}/tiers" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers" "$@"
 }
 
 register tier_list List all tiers for a given application

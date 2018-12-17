@@ -25,9 +25,9 @@ function apiCall {
   shift
 
   OLDIFS=$IFS
-  IFS="\$"
+  IFS="{{"
   for MATCH in $PAYLOAD ; do
-    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
       if [ "${BASH_REMATCH[2]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
@@ -37,7 +37,7 @@ function apiCall {
   done;
 
   for MATCH in $ENDPOINT ; do
-    if [[ $MATCH =~ \{([a-zA-Z])(\??)\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
       if [ "${BASH_REMATCH[2]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
@@ -57,10 +57,10 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \$\{$opt\??\} ]] ; do
+      while [[ $PAYLOAD =~ \{\{$opt\??\}\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \$\{$opt\??\} ]] ; do
+      while [[ $ENDPOINT =~ \{\{$opt\??\}\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done
@@ -68,11 +68,11 @@ function apiCall {
     shift $SHIFTS
   fi
 
-  while [[ $PAYLOAD =~ \$\{([a-zA-Z])(\??)\} ]] ; do
+  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
         error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
         return;
@@ -82,11 +82,11 @@ function apiCall {
     shift
   done
 
-  while [[ $ENDPOINT =~ \$\{([a-zA-Z])(\??)\} ]] ; do
+  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        ENDPOINT=${ENDPOINT//'${a}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
         error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
         return;
@@ -102,6 +102,7 @@ function apiCall {
 
   if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
     CONTROLLER_ARGS+=("-B")
+    debug "Using basic http authentication"
   fi;
 
   if [ -n "$PAYLOAD" ] ; then
@@ -118,7 +119,7 @@ function apiCall {
     fi
   fi;
 
-  CONTROLLER_ARGS=("-X" "${METHOD}" "${ENDPOINT}")
+  CONTROLLER_ARGS+=("-X" "${METHOD}" "${ENDPOINT}")
 
   debug "Call Controller with ${CONTROLLER_ARGS[*]}"
   controller_call "${CONTROLLER_ARGS[@]}"
