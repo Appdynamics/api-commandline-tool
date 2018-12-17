@@ -1,4 +1,4 @@
-{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]},"item": [{"name": "application","item": [{
+{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "application","item": [{
 					"name": "Create a new application.",
 					"request": {
 						"method": "POST",
@@ -6,6 +6,11 @@
               {
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
 								"type": "text"
 							}
             ],
@@ -31,6 +36,11 @@
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
 								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
 							}
             ],
 						"body": {
@@ -54,6 +64,11 @@
               {
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
 								"type": "text"
 							}
             ],
@@ -79,6 +94,11 @@
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
 								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
 							}
             ],
 						"body": {
@@ -102,6 +122,11 @@
               {
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
 								"type": "text"
 							}
             ],
@@ -127,6 +152,11 @@
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
 								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
 							}
             ],
 						"body": {
@@ -150,6 +180,11 @@
               {
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
 								"type": "text"
 							}
             ],
@@ -175,6 +210,11 @@
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
 								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
 							}
             ],
 						"body": {
@@ -198,6 +238,11 @@
               {
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
 								"type": "text"
 							}
             ],
@@ -223,6 +268,11 @@
 								"key": "Content-Type",
 								"value": "application/json;charset=UTF-8",
 								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
 							}
             ],
 						"body": {
@@ -236,6 +286,35 @@
 							],
 							"path": ["controller","restui","bt","renameBT"],
               "query": [{"key": "id","value": "{{b}}"}]
+						}
+					}
+				}]},{"name": "controller","item": [{
+					"name": "Authenticate",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/auth?action=login",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","auth"],
+              "query": [{"key": "action","value": "login"}]
 						}
 					}
 				}]}]

@@ -6,7 +6,7 @@ function from_yaml {
   YSH_LIB=1;source ./ysh
   eval "$(YSH_parse commands.yml)"
   NAMESPACES=`set | grep "^y_" | awk -F"_" '{ print $2; }' | sort -u`
-  POSTMAN='{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]},"item": ['
+  POSTMAN='{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": ['
   for NS in ${NAMESPACES}; do
     COMMANDS=`set | grep "^y_${NS}"  | awk -F"_" '{ print $3; }'| grep -v "=" | sort -u`
     echo -e "Building ${NS}"
@@ -52,6 +52,11 @@ ASDF
               {
 								\"key\": \"Content-Type\",
 								\"value\": \"application/json;charset=UTF-8\",
+								\"type\": \"text\"
+							},
+              {
+								\"key\": \"X-CSRF-TOKEN\",
+								\"value\": \"{{X-CSRF-TOKEN}}\",
 								\"type\": \"text\"
 							}
             ],

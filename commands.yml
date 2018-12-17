@@ -69,3 +69,12 @@ bt:
     method: POST
     endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}
     payload: [{{b}}]
+controller:
+  title: Controller Calls
+  description: Basic calls against an AppDynamics controller.
+  auth:
+    title: Authenticate
+    description: Authenticate with an AppDynamics controller
+    example:
+    method: GET
+    endpoint: /controller/auth?action=login

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="786f67a86d9f7ed7e2663a31b3cbb24f8e363e88"
+ACT_LAST_COMMIT="2552f1fb18d9c714f3aeb8c51342eff87ddd418d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -84,11 +84,16 @@ function bt_list { apiCall '/controller/rest/applications/{{a}}/business-transac
 rde bt_list "List all BTs for a given application." "Provide the application id as parameter (-a)" "-a 29"
 function bt_rename { apiCall -X POST -d '{{n}}' '/controller/restui/bt/renameBT?id={{b}}' "$@" ; }
 rde bt_rename "Rename a business transaction." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
+rde controller_auth "Authenticate" "Authenticate with an AppDynamics controller" ""
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
 function dbmon_get {
-  apiCall '/controller/rest/databases/collectors/${c}' "$@"
+  apiCall '/controller/rest/databases/collectors/{{c}}' "$@"
 }
 register dbmon_get Retrieve information about a specific database collector
 describe dbmon_get << EOF
@@ -98,7 +103,7 @@ example dbmon_get << EOF
 -c 17
 EOF
 function dbmon_delete {
-    apiCall -X DELETE '/controller/rest/databases/collectors/${c}' "$@"
+    apiCall -X DELETE '/controller/rest/databases/collectors/{{c}}' "$@"
 }
 register dbmon_delete Delete a database collector
 describe dbmon_delete << EOF
@@ -126,11 +131,11 @@ dbmon.json
 EOF
 function dbmon_create {
   apiCall -X POST -d "{ \
-                      \"name\": \"\${i}\",\
-                      \"username\": \"\${u}\",\
-                      \"hostname\": \"\${h}\",\
-                      \"agentName\": \"\${a}\",\
-                      \"type\": \"\${t}\",\
+                      \"name\": \"{{i}}\",\
+                      \"username\": \"{{u}}\",\
+                      \"hostname\": \"{{h}}\",\
+                      \"agentName\": \"{{a}}\",\
+                      \"type\": \"{{t}}\",\
                       \"orapkiSslEnabled\": false,\
                       \"orasslTruststoreLoc\": null,\
                       \"orasslTruststoreType\": null,\
@@ -139,9 +144,9 @@ function dbmon_create {
                       \"orasslKeystoreLoc\": null,\
                       \"orasslKeystoreType\": null,\
                       \"orasslKeystorePassword\": null,\
-                      \"databaseName\": \"\${n}\",\
-                      \"port\": \"\${p}\",\
-                      \"password\": \"\${s}\",\
+                      \"databaseName\": \"{{n}}\",\
+                      \"port\": \"{{p}}\",\
+                      \"password\": \"{{s}}\",\
                       \"excludedSchemas\": [],\
                       \"enabled\": true\
                     }" /controller/rest/databases/collectors/create "$@"
@@ -176,21 +181,21 @@ example dbmon_events << EOF
 -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
 EOF
 function snapshot_list {
-  apiCall '/controller/rest/applications/${a}/request-snapshots?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}' "$@"
+  apiCall '/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}' "$@"
 }
 register snapshot_list Retrieve a list of snapshots for a specific application
 describe snapshot_list << EOF
 Retrieve a list of snapshots for a specific application.
 EOF
 function configuration_set {
-  apiCall -X POST '/controller/rest/configuration?name=${n}&value=${v}' "$@"
+  apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@"
 }
 register configuration_set Set a Controller setting to a specified value.
 describe configuration_set << EOF
 Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters
 EOF
 function configuration_get {
-  apiCall -X GET '/controller/rest/configuration?name=${n}' "$@"
+  apiCall -X GET '/controller/rest/configuration?name={{n}}' "$@"
 }
 register configuration_get Retrieve a Controller Setting by Name
 describe configuration_get << EOF
@@ -477,7 +482,7 @@ function controller_call {
     debug "Endpoint: $ENDPOINT"
     local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
     local HTTP_CLIENT_RESULT=""
-    local HTTP_CALL=("-v")
+    local HTTP_CALL=("-s")
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL+=("--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
@@ -589,7 +594,7 @@ Delete a specific dashboard
 EOF
 #
 function dashboard_update {
-  apiCall -X POST -d @\$\{f\} /controller/restui/dashboards/updateDashboard "$@"
+  apiCall -X POST -d '@{{f}}' '/controller/restui/dashboards/updateDashboard' "$@"
 }
 register dashboard_update Update a specific dashboard
 describe dashboard_update << EOF
@@ -635,7 +640,7 @@ into another. Please note that the export is a list of templates and the import
 expects a single object, so you need to split the json inbetween.
 EOF
 function actiontemplate_createmediatype {
-  apiCall -X POST -d '{"name":"${n}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@"
+  apiCall -X POST -d '{"name":"{{n}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@"
 }
 register actiontemplate_createmediatype "Create a custom media type"
 describe actiontemplate_createmediatype << EOF
@@ -673,7 +678,7 @@ example actiontemplate_import << EOF
 template.json
 EOF
 function actiontemplate_export {
-  apiCall -X GET '/controller/actiontemplate/${t}/ ' "$@"
+  apiCall -X GET '/controller/actiontemplate/{{t}}/ ' "$@"
 }
 register actiontemplate_export "Export all templates of a given type (-t email or httprequest)"
 describe actiontemplate_export << EOF
@@ -729,7 +734,7 @@ describe federation_setup << EOF
 Setup a controller federation: Generates a key and establishes the mutal friendship.
 EOF
 function federation_createkey {
-  apiCall -X POST -d '{"apiKeyName": "${n}"}' "/controller/rest/federation/apikeyforfederation" "$@"
+  apiCall -X POST -d '{"apiKeyName": "{{n}}"}' "/controller/rest/federation/apikeyforfederation" "$@"
 }
 register federation_createkey Create API Key for Federation
 describe federation_createkey << EOF
@@ -742,9 +747,9 @@ function federation_establish {
   apiCall -X POST -d "{ \
     \"accountName\": \"${ACCOUNT}\", \
     \"controllerUrl\": \"${CONFIG_CONTROLLER_HOST}\", \
-    \"friendAccountName\": \"\${a}\", \
-    \"friendAccountApiKey\": \"\${k}\", \
-    \"friendAccountControllerUrl\": \"\${c}\" \
+    \"friendAccountName\": \"{{a}}\", \
+    \"friendAccountApiKey\": \"{{k}}\", \
+    \"friendAccountControllerUrl\": \"{{c}}\" \
   }" "/controller/rest/federation/establishmutualfriendship" "$@"
 }
 register federation_establish Establish Mutual Friendship
@@ -977,6 +982,7 @@ example environment_list << EOF
 EOF
 function environment_export {
   environment_source "${1}";
+  local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"
   read -r -d '' COMMAND_RESULT << EOF
   {
   	"name": "${1:-default}",
@@ -988,8 +994,20 @@ function environment_export {
   			"enabled": true
   		},
   		{
-  			"key": "controller_credentials",
-  			"value": "${CONFIG_CONTROLLER_CREDENTIALS}",
+  			"key": "controller_user",
+  			"value": "${USER_AND_ACCOUNT%%@*}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_account",
+  			"value": "${USER_AND_ACCOUNT##*@}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_password",
+  			"value": "${CONFIG_CONTROLLER_CREDENTIALS#*:}",
   			"description": "",
   			"enabled": true
   		}
@@ -1024,21 +1042,21 @@ EOF
 example _version << EOF
 EOF
 function node_markhistorical {
-  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids=${n}' "$@"
+  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@"
 }
 register node_markhistorical Mark Nodes as Historical
 describe node_markhistorical << EOF
 Mark Nodes as Historical. Provide a comma separated list of node ids.
 EOF
 function node_get {
-  apiCall -X GET "/controller/rest/applications/\${a}/nodes/\${n}" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/nodes/\{{n}}" "$@"
 }
 register node_get Retrieve Node Information by Node Name
 describe node_get << EOF
 Retrieve Node Information by Node Name. Provide the application and the node as parameters
 EOF
 function node_list {
-  apiCall -X GET "/controller/rest/applications/\${a}/nodes" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/nodes" "$@"
 }
 register node_list Retrieve Node Information for All Nodes in a Business Application
 describe node_list << EOF
@@ -1222,14 +1240,14 @@ describe healthrule_import << EOF
 Import a health rule.
 EOF
 function healthrule_list {
-  apiCall -X GET '/controller/healthrules/${a}/' "$@"
+  apiCall -X GET '/controller/healthrules/{{a}}/' "$@"
 }
 register healthrule_list List all healthrules
 describe healthrule_list << EOF
 List all health rules. Provide parameter a for the application and parameter.
 EOF
 function healthrule_export {
-  apiCall -X GET '/controller/healthrules/${a}/?name=${n?}' "$@"
+  apiCall -X GET '/controller/healthrules/{{a}}/?name={{n?}}' "$@"
 }
 register healthrule_export Export a health rule
 describe healthrule_export << EOF
@@ -1272,7 +1290,7 @@ Copy healthrules from one application to another. Provide the source application
 If you provide ("-n") only the named health rule will be copied.
 EOF
 function event_create {
-  apiCall -X POST "/controller/rest/applications/\${a}/events?summary=\${s}&comment=\${c?}&eventtype=\${e}&severity=\${l}&bt=&\${b?}node=\${n?}&tier=\${t?}" "$@"
+  apiCall -X POST "/controller/rest/applications/\{{a}}/events?summary=\{{s}}&comment=\{{c?}}&eventtype=\{{e}}&severity=\{{l}}&bt=&\{{b?}}node=\{{n?}}&tier=\{{t?}}" "$@"
 }
 register event_create Create a custom event for a given application
 describe event_create << EOF
@@ -1293,7 +1311,7 @@ function event_list {
     PREV="${ARG}"
     ARGS+=("${ARG}")
   done;
-  apiCall '/controller/rest/applications/${a}/events?time-range-type=${t}&duration-in-mins=${d?}&start-time=${b?}&end-time=${f?}&event-types=${e}&severities=${s}' "${ARGS[@]}"
+  apiCall '/controller/rest/applications/{{a}}/events?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}&event-types={{e}}&severities={{s}}' "${ARGS[@]}"
 }
 register event_list List all events for a given time range.
 describe event_list << EOF
@@ -1306,7 +1324,7 @@ doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF
 function analyticssearch_get {
-  apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/${i}' "$@"
+  apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}' "$@"
 }
 register analyticssearch_get Get an analytics search by id.
 describe analyticssearch_get << EOF
@@ -1352,21 +1370,21 @@ EOF
 example analyticssearch_list << EOF
 EOF
 function bizjourney_disable {
-  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/userDisable' "$@"
+  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable' "$@"
 }
 register bizjourney_disable "Disable a valid business journey draft"
 describe bizjourney_disable << EOF
 Disable a valid business journey draft. Provide the journey id (-i) as parameter
 EOF
 function bizjourney_enable {
-  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/${i}/actions/enable' "$@"
+  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@"
 }
 register bizjourney_enable "Enable a valid business journey draft"
 describe bizjourney_enable << EOF
 Enable a valid business journey draft. Provide the journey id (-i) as parameter
 EOF
 function bizjourney_import {
-  apiCall -X POST -d '${d}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
+  apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
 }
 register bizjourney_import Import a business journey
 describe bizjourney_import << EOF
@@ -1380,21 +1398,21 @@ describe bizjourney_list << EOF
 List all business journeys. This command requires no further arguments.
 EOF
 function tier_nodes {
-  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}/nodes" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers/\{{t}}/nodes" "$@"
 }
 register tier_nodes" Retrieve Node Information for All Nodes in a Tier"
 describe tier_nodes << EOF
 Retrieve Node Information for All Nodes in a Tier. Provide the application and the tier as parameters
 EOF
 function tier_get {
-  apiCall -X GET "/controller/rest/applications/\${a}/tiers/\${t}" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers/\{{t}}" "$@"
 }
 register tier_get Retrieve Tier Information by Tier Name
 describe tier_get << EOF
 Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters
 EOF
 function tier_list {
-  apiCall -X GET "/controller/rest/applications/\${a}/tiers" "$@"
+  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers" "$@"
 }
 register tier_list List all tiers for a given application
 describe tier_list << EOF

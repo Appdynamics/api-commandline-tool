@@ -47,7 +47,7 @@ function controller_call {
 
     local HTTP_CLIENT_RESULT=""
 
-    local HTTP_CALL=("-v")
+    local HTTP_CALL=("-s")
 
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL+=("--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")

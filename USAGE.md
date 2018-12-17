@@ -103,8 +103,11 @@ Retrieve information about business transactions within a given business applica
 
 ## controller
 
+Basic calls against an AppDynamics controller.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| auth | Authenticate Authenticate with an AppDynamics controller | `act.sh controller auth ` |
 | isup | This command will pause until the controller is up. Use this to get notified after the controller is booted successfully. |  |
 | call | Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d. | `act.sh controller call /controller/rest/serverstatus` |
 | login | Check if the login with your appdynamics controller works properly."<br>"/If the login fails, use doc controller ping to check if the controller is running and check your credentials if they are correct. |  |

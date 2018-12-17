@@ -3,6 +3,7 @@
 function environment_export {
   environment_source "${1}";
 
+  local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"
 
   read -r -d '' COMMAND_RESULT << EOF
   {
@@ -15,8 +16,20 @@ function environment_export {
   			"enabled": true
   		},
   		{
-  			"key": "controller_credentials",
-  			"value": "${CONFIG_CONTROLLER_CREDENTIALS}",
+  			"key": "controller_user",
+  			"value": "${USER_AND_ACCOUNT%%@*}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_account",
+  			"value": "${USER_AND_ACCOUNT##*@}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_password",
+  			"value": "${CONFIG_CONTROLLER_CREDENTIALS#*:}",
   			"description": "",
   			"enabled": true
   		}
