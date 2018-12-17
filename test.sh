@@ -84,10 +84,13 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   APPLICATION_ID=${BASH_REMATCH[1]}
 
   ##### List different entities #####
-  assert_contains_substring "<applications>" "`${ACT} application list`"
-  assert_contains_substring "<tiers>" "`${ACT} tier list -a $APPLICATION_ID`"
-  assert_contains_substring "<business-transactions>" "`${ACT} bt list -a $APPLICATION_ID`"
-  assert_contains_substring "<nodes>" "`${ACT} node list -a $APPLICATION_ID`"
+  assert_contains_substring "<applications>" "`${ACT} application list`" "List Applications"
+  assert_contains_substring "<tiers>" "`${ACT} tier list -a $APPLICATION_ID`" "List Tiers"
+  assert_contains_substring "<business-transactions>" "`${ACT} bt list -a $APPLICATION_ID`" "List BTs"
+  assert_contains_substring "<nodes>" "`${ACT} node list -a $APPLICATION_ID`" "List Nodes"
+
+  ##### Run exports #####
+  assert_contains_substring "<rule" "`${ACT} application export -a $APPLICATION_ID`" "Export Application"
 
   ##### Database Collector Create, List, Get, Delete #####
   DBMON_NAME="act_test_collector_$RANDOM"

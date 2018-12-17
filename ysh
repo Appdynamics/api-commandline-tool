@@ -1,4 +1,5 @@
 #! /bin/bash
+# YSH from https://github.com/azohra/yaml.sh
 YSH_version='0.1.4'
 # Modified version of YSH. join_stack uses _ instead of . and adds y_ as a prefix to every line.
 YAML_AWK_PARSER='

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="2552f1fb18d9c714f3aeb8c51342eff87ddd418d"
+ACT_LAST_COMMIT="765cefbe0ecc88542b08cc2ec8f02fc69846aa2c"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1049,14 +1049,14 @@ describe node_markhistorical << EOF
 Mark Nodes as Historical. Provide a comma separated list of node ids.
 EOF
 function node_get {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/nodes/\{{n}}" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/nodes/{{n}}' "$@"
 }
 register node_get Retrieve Node Information by Node Name
 describe node_get << EOF
 Retrieve Node Information by Node Name. Provide the application and the node as parameters
 EOF
 function node_list {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/nodes" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/nodes' "$@"
 }
 register node_list Retrieve Node Information for All Nodes in a Business Application
 describe node_list << EOF
@@ -1290,7 +1290,7 @@ Copy healthrules from one application to another. Provide the source application
 If you provide ("-n") only the named health rule will be copied.
 EOF
 function event_create {
-  apiCall -X POST "/controller/rest/applications/\{{a}}/events?summary=\{{s}}&comment=\{{c?}}&eventtype=\{{e}}&severity=\{{l}}&bt=&\{{b?}}node=\{{n?}}&tier=\{{t?}}" "$@"
+  apiCall -X POST "/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}" "$@"
 }
 register event_create Create a custom event for a given application
 describe event_create << EOF
@@ -1398,21 +1398,21 @@ describe bizjourney_list << EOF
 List all business journeys. This command requires no further arguments.
 EOF
 function tier_nodes {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers/\{{t}}/nodes" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@"
 }
 register tier_nodes" Retrieve Node Information for All Nodes in a Tier"
 describe tier_nodes << EOF
 Retrieve Node Information for All Nodes in a Tier. Provide the application and the tier as parameters
 EOF
 function tier_get {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers/\{{t}}" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/tiers/{{t}}' "$@"
 }
 register tier_get Retrieve Tier Information by Tier Name
 describe tier_get << EOF
 Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters
 EOF
 function tier_list {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/tiers" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/tiers' "$@"
 }
 register tier_list List all tiers for a given application
 describe tier_list << EOF

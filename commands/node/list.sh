@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function node_list {
-  apiCall -X GET "/controller/rest/applications/\{{a}}/nodes" "$@"
+  apiCall -X GET '/controller/rest/applications/{{a}}/nodes' "$@"
 }
 
 register node_list Retrieve Node Information for All Nodes in a Business Application
