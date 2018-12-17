@@ -87,6 +87,7 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_contains_substring "<applications>" "`${ACT} application list`"
   assert_contains_substring "<tiers>" "`${ACT} tier list -a $APPLICATION_ID`"
   assert_contains_substring "<business-transactions>" "`${ACT} bt list -a $APPLICATION_ID`"
+  assert_contains_substring "<nodes>" "`${ACT} node list -a $APPLICATION_ID`"
 
   ##### Database Collector Create, List, Get, Delete #####
   DBMON_NAME="act_test_collector_$RANDOM"

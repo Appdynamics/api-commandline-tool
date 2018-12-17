@@ -62,11 +62,11 @@ The applications API lets you retrieve information about the monitored environme
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| create | Create a new application. Provide a name and a type (APM or WEB) as parameter. |  |
-| delete | Delete an application. Provide an application id as parameter (-a) |  |
-| export | Export a application from the controller. Provide an application id as parameter (-a) |  |
-| get | Get an application. Provide application id or name as parameter (-a). |  |
-| list | List all applications available on the controller. This command requires no further arguments. |  |
+| create | Create a new application. Provide a name and a type (APM or WEB) as parameter. | `act.sh application create -t APM -n MyNewApplication` |
+| delete | Delete an application. Provide an application id as parameter (-a) | `act.sh application delete -a 29` |
+| export | Export an application from the controller. Provide an application id as parameter (-a) | `act.sh application export -a 29` |
+| get | Get an application. Provide application id or name as parameter (-a). | `act.sh application get -a 15` |
+| list | List all applications available on the controller This command requires no further arguments. | `act.sh application list ` |
 
 
 ## bizjourney
@@ -85,11 +85,11 @@ Retrieve information about business transactions within a given business applica
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| creategroup | Create a business transactions group. Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b) |  |
-| delete | Delete a business transaction. Provide the bt id as parameter (-b) |  |
-| get | Get a BT. Provide as parameters bt id (-b) and application id (-a). |  |
-| list | List all BTs for a given application. Provide the application id as parameter (-a) |  |
-| rename | Rename a business transaction. Provide the bt id (-b) and the new name (-n) as parameters |  |
+| creategroup | Create a business transactions group. Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b) | `act.sh bt creategroup -b 13,14 -n MyGroup` |
+| delete | Delete a business transaction. Provide the bt id as parameter (-b) | `act.sh bt delete -b 13` |
+| get | Get a BT. Provide as parameters bt id (-b) and application id (-a). | `act.sh bt get -a 29 -b 13` |
+| list | List all BTs for a given application. Provide the application id as parameter (-a) | `act.sh bt list -a 29` |
+| rename | Rename a business transaction. Provide the bt id (-b) and the new name (-n) as parameters | `act.sh bt rename -b 13 -n Checkout` |
 
 
 ## configuration
@@ -134,7 +134,7 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 | delete | Delete a database collector. Provide the collector id as parameter (-c). | `act.sh dbmon delete -c 17` |
 | import | Create a new database collector. Provide a valid json file as parameter. | `act.sh dbmon import dbmon.json` |
 | create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password | `act.sh dbmon create -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password` |
-| list | List all database collectors | `act.sh dbmon list ` |
+| list | List all database collectors. No further arguments required. | `act.sh dbmon list ` |
 | events | List all database agent events. This is an alias for `act.sh event list -a '_dbmon'`, so you can use the same parameters for querying the events. | `act.sh dbmon events -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT` |
 
 

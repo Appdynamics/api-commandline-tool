@@ -60,6 +60,16 @@ function doc {
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
 
+function rde {
+  register "${1}" "${2}"
+  describe "${1}" <<RRREOF
+${2} ${3}
+RRREOF
+  example "${1}" <<RRREOF
+${4}
+RRREOF
+}
+
 #script_placeholder
 
 if [ -f "${GLOBAL_CONFIG}" ]; then

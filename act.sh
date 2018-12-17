@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="1a4fc019e529196e5a41be592e69e6f796f53d7b"
+ACT_LAST_COMMIT="c6028841e1a368102bb68272840c1a89548326c3"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -49,111 +49,41 @@ function doc {
   GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
+function rde {
+  register "${1}" "${2}"
+  describe "${1}" <<RRREOF
+${2} ${3}
+RRREOF
+  example "${1}" <<RRREOF
+${4}
+RRREOF
+}
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
-function application_create {
-  apiCall -X POST -d '{name: ${n}, description: }' '/controller/restui/allApplications/createApplication?applicationType=${t}' "$@"
-}
-register application_create "Create a new application"
-describe application_create << EOF
-Create a new application. Provide a name and a type (APM or WEB) as parameter.
-EOF
-example << EOF
--t APM -n MyNewApplication
-EOF
-function application_delete {
-  apiCall -X POST -d '${a}' '/controller/restui/allApplications/deleteApplication' "$@"
-}
-register application_delete "Delete an application"
-describe application_delete << EOF
-Delete an application. Provide an application id as parameter (-a)
-EOF
-example << EOF
--a 29
-EOF
-function application_export {
-  apiCall '/controller/ConfigObjectImportExportServlet?applicationId=${a}' "$@"
-}
-register application_export "Export an application from the controller"
-describe application_export << EOF
-Export a application from the controller. Provide an application id as parameter (-a)
-EOF
-example << EOF
--a 29
-EOF
-function application_get {
-  apiCall '/controller/rest/applications/${a}' "$@"
-}
-register application_get "Get an application"
-describe application_get << EOF
-Get an application. Provide application id or name as parameter (-a).
-EOF
-example << EOF
--a 15
-EOF
-function application_list {
-  apiCall '/controller/rest/applications' "$@"
-}
-register application_list "List all applications available on the controller"
-describe application_list << EOF
-List all applications available on the controller. This command requires no further arguments.
-EOF
-example << EOF
-EOF
+function application_create { apiCall -X POST -d '{"name": "${n}", "description": ""}' '/controller/restui/allApplications/createApplication?applicationType=${t}' "$@" ; }
+rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
+function application_delete { apiCall -X POST -d '${a}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
+function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId=${a}' "$@" ; }
+rde application_export "Export an application from the controller." "Provide an application id as parameter (-a)" "-a 29"
+function application_get { apiCall '/controller/rest/applications/${a}' "$@" ; }
+rde application_get "Get an application." "Provide application id or name as parameter (-a)." "-a 15"
+function application_list { apiCall '/controller/rest/applications' "$@" ; }
+rde application_list "List all applications available on the controller" "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
-function bt_creategroup {
-  apiCall -X POST -d '[${b}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId=${a}&groupName=${n}' "$@"
-}
-register bt_creategroup "Create a business transactions group."
-describe bt_creategroup << EOF
-Create a business transactions group. Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)
-EOF
-example << EOF
--b 13,14 -n MyGroup
-EOF
-function bt_delete {
-  apiCall -X POST -d '[${b}]' '/controller/restui/bt/deleteBTs' "$@"
-}
-register bt_delete "Delete a business transaction"
-describe bt_delete << EOF
-Delete a business transaction. Provide the bt id as parameter (-b)
-EOF
-example << EOF
--b 13
-EOF
-function bt_get {
-  apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@"
-}
-register bt_get "Get a BT"
-describe bt_get << EOF
-Get a BT. Provide as parameters bt id (-b) and application id (-a).
-EOF
-example << EOF
--a 29 -b 13
-EOF
-function bt_list {
-  apiCall '/controller/rest/applications/${a}/business-transactions' "$@"
-}
-register bt_list "List all BTs for a given application"
-describe bt_list << EOF
-List all BTs for a given application. Provide the application id as parameter (-a)
-EOF
-example << EOF
--a 29
-EOF
-function bt_rename {
-  apiCall -X POST -d '${n}' '/controller/restui/bt/renameBT?id=${b}' "$@"
-}
-register bt_rename "Rename a business transaction"
-describe bt_rename << EOF
-Rename a business transaction. Provide the bt id (-b) and the new name (-n) as parameters
-EOF
-example << EOF
--b 13 -n Checkout
-EOF
+function bt_creategroup { apiCall -X POST -d '[${b}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId=${a}&groupName=${n}' "$@" ; }
+rde bt_creategroup "Create a business transactions group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
+function bt_delete { apiCall -X POST -d '[${b}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+rde bt_delete "Delete a business transaction." "Provide the bt id as parameter (-b)" "-b 13"
+function bt_get { apiCall '/controller/rest/applications/${a}/business-transactions/${b}' "$@" ; }
+rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
+function bt_list { apiCall '/controller/rest/applications/${a}/business-transactions' "$@" ; }
+rde bt_list "List all BTs for a given application." "Provide the application id as parameter (-a)" "-a 29"
+function bt_rename { apiCall -X POST -d '${n}' '/controller/restui/bt/renameBT?id=${b}' "$@" ; }
+rde bt_rename "Rename a business transaction." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
@@ -234,12 +164,7 @@ EOF
 function dbmon_list {
   controller_call /controller/rest/databases/collectors
 }
-register dbmon_list List all database collectors
-describe dbmon_list << EOF
-List all database collectors
-EOF
-example dbmon_list << EOF
-EOF
+rde dbmon_list "List all database collectors." "No further arguments required." ""
 function dbmon_events {
   event_list -a '_dbmon' "$@"
 }
@@ -556,7 +481,7 @@ function controller_call {
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL=("-s" "--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
-      HTTP_CALL=("-v" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
+      HTTP_CALL=("-s" "-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     fi
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
