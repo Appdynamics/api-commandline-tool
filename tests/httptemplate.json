@@ -1,0 +1,32 @@
+[ {
+  "actionPlanType" : "httprequest",
+  "name" : "MyCustomHTTPTemplate",
+  "oneRequestPerEvent" : false,
+  "eventClampLimit" : -1,
+  "defaultCustomProperties" : [ ],
+  "method" : "GET",
+  "scheme" : "HTTP",
+  "host" : "http",
+  "port" : 0,
+  "path" : "//demo.appdynamics.com//controller/rest/applications/${latestEvent.application.name}/nodes/${latestEvent.node.name}",
+  "query" : "",
+  "urlCharset" : "UTF_8",
+  "authType" : "BASIC",
+  "authUsername" : "user1",
+  "authPassword" : "secret",
+  "headers" : [ ],
+  "payloadTemplate" : {
+    "httpRequestActionMediaType" : "text/plain",
+    "charset" : "UTF_8",
+    "formDataPairs" : [ ],
+    "payload" : ""
+  },
+  "connectTimeoutInMillis" : 5000,
+  "socketTimeoutInMillis" : 15000,
+  "maxFollowRedirects" : 0,
+  "responseMatchCriteriaAnyTemplate" : [ ],
+  "responseMatchCriteriaNoneTemplate" : [ ],
+  "testLogLevel" : "DEBUG",
+  "testPropertiesPairs" : [ ],
+  "eventTypeCountPairs" : [ ]
+} ]

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="765cefbe0ecc88542b08cc2ec8f02fc69846aa2c"
+ACT_LAST_COMMIT="2bc68bc15114f7ea411eb2ef799fd5a6c5b3342e"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -58,6 +58,13 @@ RRREOF
 ${4}
 RRREOF
 }
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+function actiontemplate_createmediatype { apiCall -X POST -d '{name:{{n}},builtIn:false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
+function actiontemplate_export { apiCall '/controller/actiontemplate/{{t}}/' "$@" ; }
+rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
@@ -84,6 +91,15 @@ function bt_list { apiCall '/controller/rest/applications/{{a}}/business-transac
 rde bt_list "List all BTs for a given application." "Provide the application id as parameter (-a)" "-a 29"
 function bt_rename { apiCall -X POST -d '{{n}}' '/controller/restui/bt/renameBT?id={{b}}' "$@" ; }
 rde bt_rename "Rename a business transaction." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+function configuration_get { apiCall '/controller/rest/configuration?name={{n}}' "$@" ; }
+rde configuration_get "Retrieve a Controller Setting by Name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
+function configuration_list { apiCall '/controller/rest/configuration' "$@" ; }
+rde configuration_list "Retrieve All Controller Settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
+function configuration_set { apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@" ; }
+rde configuration_set "Set a Controller setting to a specified value." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
 doc controller << EOF
 Basic calls against an AppDynamics controller.
 EOF
@@ -186,27 +202,6 @@ function snapshot_list {
 register snapshot_list Retrieve a list of snapshots for a specific application
 describe snapshot_list << EOF
 Retrieve a list of snapshots for a specific application.
-EOF
-function configuration_set {
-  apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@"
-}
-register configuration_set Set a Controller setting to a specified value.
-describe configuration_set << EOF
-Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters
-EOF
-function configuration_get {
-  apiCall -X GET '/controller/rest/configuration?name={{n}}' "$@"
-}
-register configuration_get Retrieve a Controller Setting by Name
-describe configuration_get << EOF
-Retrieve a Controller Setting by Name. Provide a name (-n) as parameter
-EOF
-function configuration_list {
-  apiCall -X GET "/controller/rest/configuration" "$@"
-}
-register configuration_list Retrieve All Controller Settings
-describe configuration_list << EOF
-Retrieve All Controller Settings
 EOF
 PORTAL_LOGIN_STATUS=0
 function portal_login {
@@ -483,6 +478,9 @@ function controller_call {
     local SEPERATOR="==========act-stats: ${RANDOM}-${RANDOM}-${RANDOM}-${RANDOM}"
     local HTTP_CLIENT_RESULT=""
     local HTTP_CALL=("-s")
+    if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
+      HTTP_CALL=("-v")
+    fi
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL+=("--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else
@@ -633,21 +631,37 @@ register dashboard_export Export a specific dashboard
 describe dashboard_export << EOF
 Export a specific dashboard
 EOF
-doc actiontemplate << EOF
-These commands allow you to import and export email/http action templates.
-A common use pattern is exporting the commands from one controller and importing
-into another. Please note that the export is a list of templates and the import
-expects a single object, so you need to split the json inbetween.
-EOF
-function actiontemplate_createmediatype {
-  apiCall -X POST -d '{"name":"{{n}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@"
+function actiontemplate_delete {
+  local TYPE="httprequest"
+  local ID=0
+  while getopts "t:i:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+      i)
+        ID=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ "${ID}" -eq 0 ] ; then
+    error "actiontemplate id is not set"
+    COMMAND_RESULT=""
+  elif [ "$TYPE" == "httprequest" ] ; then
+    controller_call -X POST -d "${ID}" '/controller/restui/httpaction/deleteHttpRequestActionPlan' "$@"
+  else
+    controller_call -X POST -d "${ID}" '/controller/restui/emailaction/deleteCustomEmailActionPlan' "$@"
+  fi;
 }
-register actiontemplate_createmediatype "Create a custom media type"
-describe actiontemplate_createmediatype << EOF
-Create a custom media type. Provide the name of the media type as parameter (-n)
+register actiontemplate_delete "Delete an action template"
+describe actiontemplate_delete << EOF
+Delete an action template. Provide an id (-i) and a type (-t) as parameters.
 EOF
-example actiontemplate_createmediatype << EOF
--n 'application/vnd.appd.events+json'
+example actiontemplate_export << EOF
+-t httprequest
 EOF
 function actiontemplate_import {
   local FILE=""
@@ -677,12 +691,27 @@ EOF
 example actiontemplate_import << EOF
 template.json
 EOF
-function actiontemplate_export {
-  apiCall -X GET '/controller/actiontemplate/{{t}}/ ' "$@"
+function actiontemplate_list {
+  local TYPE="httprequest"
+  while getopts "t:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ "$TYPE" == "httprequest" ] ; then
+    controller_call '/controller/restui/httpaction/getHttpRequestActionPlanList'
+  else
+    controller_call 'controller/restui/emailaction/getCustomEmailActionPlanList'
+  fi;
 }
-register actiontemplate_export "Export all templates of a given type (-t email or httprequest)"
-describe actiontemplate_export << EOF
-Export all templates of a given type (-t email or httprequest)
+register actiontemplate_list "List all actiontemplates."
+describe actiontemplate_list << EOF
+List all actiontemplates. Provide a type (-t) as parameter.
 EOF
 example actiontemplate_export << EOF
 -t httprequest
@@ -727,7 +756,6 @@ function federation_setup {
     COMMAND_RESULT=""
     error "Federation setup failed. Error from $FRIEND_CONTROLLER_HOST: ${FRIEND_RESULT}"
   fi
-  rm /tmp/appdynamics-federation-cookie.txt
 }
 register federation_setup Setup a controller federation: Generates a key and establishes the mutal friendship.
 describe federation_setup << EOF

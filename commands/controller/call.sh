@@ -49,6 +49,10 @@ function controller_call {
 
     local HTTP_CALL=("-s")
 
+    if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
+      HTTP_CALL=("-v")
+    fi
+
     if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
       HTTP_CALL+=("--user" "${CONFIG_CONTROLLER_CREDENTIALS}" "-X" "${METHOD}")
     else

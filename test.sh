@@ -14,6 +14,10 @@ FRIEND_CONTROLLER_HOST="http://controller.local:8090"
 FRIEND_CONTROLLER_CREDENTIALS="admin@customer1:appdynamics123"
 FRIEND_COOKIE_PATH="/tmp/act-test-friend-cookie"
 
+ADMIN_CONTROLLER_HOST="http://controller.local:8090"
+ADMIN_CONTROLLER_CREDENTIALS="root@system:appdynamics123"
+ADMIN_COOKIE_PATH="/tmp/act-test-admin-cookie"
+
 echo "Sourcing user config for controller host and credentials..."
 source "$HOME/.appdynamics/act/config.sh"
 echo "Will use the following controller for testing: $CONFIG_CONTROLLER_HOST"
@@ -67,6 +71,7 @@ function assert_regex {
 }
 
 ACT="./act.sh -N -H $CONFIG_CONTROLLER_HOST -C $CONFIG_CONTROLLER_CREDENTIALS -J $COOKIE_PATH"
+ACT_ADMIN="./act.sh -N -H $ADMIN_CONTROLLER_HOST -C $ADMIN_CONTROLLER_CREDENTIALS -J $ADMIN_COOKIE_PATH"
 ACT_FRIEND="./act.sh -N -H $FRIEND_CONTROLLER_HOST -C $FRIEND_CONTROLLER_CREDENTIALS -J $FRIEND_COOKIE_PATH"
 #### BEGIN TESTS ####
 
@@ -89,31 +94,43 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_contains_substring "<business-transactions>" "`${ACT} bt list -a $APPLICATION_ID`" "List BTs"
   assert_contains_substring "<nodes>" "`${ACT} node list -a $APPLICATION_ID`" "List Nodes"
 
-  ##### Run exports #####
+  ##### Export the given application #####
   assert_contains_substring "<rule" "`${ACT} application export -a $APPLICATION_ID`" "Export Application"
 
   ##### Database Collector Create, List, Get, Delete #####
-  DBMON_NAME="act_test_collector_$RANDOM"
-  CREATE_DBMON="`${ACT} dbmon create -i ${DBMON_NAME} -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
-  assert_contains_substring "HTTP Status: 201" "${CREATE_DBMON}" "Create Database Collector"
-  sleep 10
-  assert_contains_substring "\"name\":\"${DBMON_NAME}\"," "`${ACT} dbmon list`" "List Database Collectors"
-  echo $CREATE_DBMON
-  if [[ $CREATE_DBMON =~ \"id\"\:([0-9]+) ]] ; then
-    COLLECTOR_ID=${BASH_REMATCH[1]}
-    assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon get -c $COLLECTOR_ID`"
-    assert_contains_substring '"status" : "SUCCESS",' "`${ACT} dbmon delete -c $COLLECTOR_ID`"
-  else
-    SKIP_COUNTER=$SKIP_COUNTER+2
-    echo -en "\033[0;33m!!\033[0m"
-  fi
+  #DBMON_NAME="act_test_collector_$RANDOM"
+  #CREATE_DBMON="`${ACT} dbmon create -i ${DBMON_NAME} -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password`"
+  #assert_contains_substring "HTTP Status: 201" "${CREATE_DBMON}" "Create Database Collector"
+  #sleep 10
+  #assert_contains_substring "\"name\":\"${DBMON_NAME}\"," "`${ACT} dbmon list`" "List Database Collectors"
+  #echo $CREATE_DBMON
+  #if [[ $CREATE_DBMON =~ \"id\"\:([0-9]+) ]] ; then
+  #  COLLECTOR_ID=${BASH_REMATCH[1]}
+  #  assert_contains_substring "\"name\" : \"${DBMON_NAME}\"," "`${ACT} dbmon get -c $COLLECTOR_ID`"
+  #  assert_contains_substring '"status" : "SUCCESS",' "`${ACT} dbmon delete -c $COLLECTOR_ID`"
+  #else
+  #  SKIP_COUNTER=$SKIP_COUNTER+2
+  #  echo -en "\033[0;33m!!\033[0m"
+  #fi
 
   ##### Events #####
   assert_contains_substring "Successfully created the event id:" "`${ACT} event create -a ${APPLICATION_ID} -s "Test" -l INFO -e CUSTOM`" "Create custom event"
   assert_contains_substring "Successfully created the event id:" "`${ACT} event create -a ${APPLICATION_ID} -s "Test" -l INFO -e APPLICATION_DEPLOYMENT`" "Create application deployment"
   assert_contains_substring "Successfully created the event id:" "`${ACT} event create -a ${APPLICATION_ID} -s "Urlencoding Test" -c "With Comment" -l INFO -e APPLICATION_DEPLOYMENT`" "Create application deployment"
   # It takes the controller several seconds to update the list of events, so we (currently) skip checking the existence of the ids above
-  assert_contains_substring "<events></events>" "`${ACT} event list -a ${APPLICATION_ID} -t BEFORE_NOW -d 60 -e APPLICATION_DEPLOYMENT -s INFO`"
+  assert_contains_substring "<events>" "`${ACT} event list -a ${APPLICATION_ID} -t BEFORE_NOW -d 60 -e APPLICATION_DEPLOYMENT -s INFO`"
+
+  ##### Action Templates #####
+  assert_contains_substring '"success":true' "`${ACT} actiontemplate import -t httprequest tests/httptemplate.json`" "Import action template"
+  LIST_ACTION_TEMPLATES=`${ACT} actiontemplate list -t httprequest`
+  assert_contains_substring '"name" : "MyCustomHTTPTemplate",' "${LIST_ACTION_TEMPLATES}" "List action templates"
+  if [[ $LIST_ACTION_TEMPLATES =~ \"id\"\ :\ ([0-9]+) ]] ; then
+    TEMPLATE_ID=${BASH_REMATCH[1]}
+    assert_contains_substring "HTTP Status: 204" "`${ACT} actiontemplate delete -i ${TEMPLATE_ID}`" "Delete action template"
+  else
+    SKIP_COUNTER+=1
+    echo -en "\033[0;33m!\033[0m"
+  fi
 
   ##### Federation #####
   FRIEND_LOGIN="`${ACT_FRIEND} controller login`"
@@ -125,6 +142,13 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
     SKIP_COUNTER=$SKIP_COUNTER+2
     echo -en "\033[0;33m!!\033[0m"
   fi
+
+  ##### Configurations #####
+  assert_contains_substring "sim.docker.container.node.maxCacheSize" "`${ACT_ADMIN} configuration list`" "Configuration List"
+  assert_contains_substring "sim.docker.container.node.maxCacheSize" "`${ACT_ADMIN} configuration get -n sim.docker.container.node.maxCacheSize`" "Configuration List"
+  CONFIG_VALUE=${RANDOM}
+  assert_contains_substring "${CONFIG_VALUE}" "`${ACT_ADMIN} configuration set -n sim.docker.container.node.maxCacheSize -v ${CONFIG_VALUE}`" "Configuration List"
+
   ##### Error handling #####
   assert_equals "Error" "`env CONFIG_HTTP_TIMEOUT=1 ./act.sh -H 127.0.0.2:8009 controller ping`"
   assert_equals "ERROR: Please provide an argument for paramater -a" "`${ACT} event create`" "Missing required argument"
@@ -146,7 +170,7 @@ else
   echo -e "\033[0;31m"
 fi
 
-rm $COOKIE_PATH
+rm $COOKIE_PATH $FRIEND_COOKIE_PATH $ADMIN_COOKIE_PATH
 END=`date +%s`
 
 echo -e "\n$SUCCESS_COUNTER/$TEST_COUNTER ($PERCENTAGE%) tests completed in $((END-START))s.\033[0m"

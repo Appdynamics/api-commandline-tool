@@ -33,16 +33,15 @@ The following commands in the global namespace can be called directly.
 
 ## actiontemplate
 
-These commands allow you to import and export email/http action templates.
-A common use pattern is exporting the commands from one controller and importing
-into another. Please note that the export is a list of templates and the import
-expects a single object, so you need to split the json inbetween.
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | createmediatype | Create a custom media type. Provide the name of the media type as parameter (-n) | `act.sh actiontemplate createmediatype -n 'application/vnd.appd.events+json'` |
+| export | Export all templates of a given type. Provide the type (-t email or httprequest) as parameter. | `act.sh actiontemplate export -t httprequest` |
+| delete | Delete an action template. Provide an id (-i) and a type (-t) as parameters. |  |
 | import | Import an action template of a given type (email, httprequest) | `act.sh actiontemplate import template.json` |
-| export | Export all templates of a given type (-t email or httprequest) | `act.sh actiontemplate export -t httprequest` |
+| list | List all actiontemplates. Provide a type (-t) as parameter. |  |
 
 
 ## analyticssearch
@@ -94,11 +93,13 @@ Retrieve information about business transactions within a given business applica
 
 ## configuration
 
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| set | Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters |  |
-| get | Retrieve a Controller Setting by Name. Provide a name (-n) as parameter |  |
-| list | Retrieve All Controller Settings |  |
+| get | Retrieve a Controller Setting by Name. Provide a name (-n) as parameter. | `act.sh configuration get -n metrics.min.retention.period` |
+| list | Retrieve All Controller Settings The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console. | `act.sh configuration list ` |
+| set | Set a Controller setting to a specified value. Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters | `act.sh configuration set -n metrics.min.retention.period -v 550` |
 
 
 ## controller

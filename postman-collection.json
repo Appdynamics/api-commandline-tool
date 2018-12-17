@@ -1,4 +1,62 @@
-{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "application","item": [{
+{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "actiontemplate","item": [{
+					"name": "Create a custom media type.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{name:{{n}},builtIn:false}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/httpaction/createHttpRequestActionMediaType",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","httpaction","createHttpRequestActionMediaType"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Export all templates of a given type.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/actiontemplate/{{t}}/",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","actiontemplate","{{t}}",""],
+              "query": []
+						}
+					}
+				}]},{"name": "application","item": [{
 					"name": "Create a new application.",
 					"request": {
 						"method": "POST",
@@ -286,6 +344,93 @@
 							],
 							"path": ["controller","restui","bt","renameBT"],
               "query": [{"key": "id","value": "{{b}}"}]
+						}
+					}
+				}]},{"name": "configuration","item": [{
+					"name": "Retrieve a Controller Setting by Name.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/configuration?name={{n}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","configuration"],
+              "query": [{"key": "name","value": "{{n}}"}]
+						}
+					}
+				},{
+					"name": "Retrieve All Controller Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/configuration",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","configuration"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Set a Controller setting to a specified value.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/configuration?name={{n}}&value={{v}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","configuration"],
+              "query": [{"key": "name","value": "{{n}}"},{"key":"value","value": "{{v}}"}]
 						}
 					}
 				}]},{"name": "controller","item": [{

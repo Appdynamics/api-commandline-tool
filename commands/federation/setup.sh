@@ -45,9 +45,6 @@ function federation_setup {
     COMMAND_RESULT=""
     error "Federation setup failed. Error from $FRIEND_CONTROLLER_HOST: ${FRIEND_RESULT}"
   fi
-
-
-  rm /tmp/appdynamics-federation-cookie.txt
 }
 
 register federation_setup Setup a controller federation: Generates a key and establishes the mutal friendship.
