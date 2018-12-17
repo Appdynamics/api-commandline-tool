@@ -115,3 +115,33 @@ controller:
     example:
     method: GET
     endpoint: /controller/auth?action=login
+snapshot:
+  title: Snapshot API
+  description: Retrieve APM snapshots
+  list:
+    title: Retrieve a list of snapshots
+    description: Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
+    example: -a 29 -t BEFORE_NOW -d 120
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}
+tier:
+  title: Tiers
+  description: Retrieve tiers within a business application
+  list:
+    title: List all tiers for a given application.
+    description: Provide the application id as parameter (-a).
+    example: -a 29
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/tiers
+  get:
+    title: Retrieve Tier Information by Tier Name
+    description: Provide the application (-a) and the tier (-t) as parameters
+    example: -a 29 -t 45
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}
+  nodes:
+    title: Retrieve Node Information for All Nodes in a Tier
+    description: Provide the application (-a) and the tier (-t) as parameters
+    example: -a 29 -t 45
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}/nodes

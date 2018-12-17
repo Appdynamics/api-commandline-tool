@@ -28,7 +28,6 @@ The following commands in the global namespace can be called directly.
 | ------- | ----------- | ------- |
 | config | Initialize the default environment. This is an alias for `act.sh environment add -d` | `act.sh  config ` |
 | version | Print the current version of act.sh | `act.sh  version ` |
-| export | Export to postman | `act.sh  export > postman.json` |
 
 
 ## actiontemplate
@@ -227,18 +226,22 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 
 ## snapshot
 
+Retrieve APM snapshots
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | Retrieve a list of snapshots for a specific application. |  |
+| list | Retrieve a list of snapshots Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f) | `act.sh snapshot list -a 29 -t BEFORE_NOW -d 120` |
 
 
 ## tier
 
+Retrieve tiers within a business application
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| nodes | Retrieve Node Information for All Nodes in a Tier. Provide the application and the tier as parameters |  |
-| get | Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters |  |
-| list | List all tiers for a given application. Provide the application id as parameter. |  |
+| get | Retrieve Tier Information by Tier Name Provide the application (-a) and the tier (-t) as parameters | `act.sh tier get -a 29 -t 45` |
+| list | List all tiers for a given application. Provide the application id as parameter (-a). | `act.sh tier list -a 29` |
+| nodes | Retrieve Node Information for All Nodes in a Tier Provide the application (-a) and the tier (-t) as parameters | `act.sh tier nodes -a 29 -t 45` |
 
 
 ## timerange

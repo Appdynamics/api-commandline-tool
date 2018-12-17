@@ -462,5 +462,121 @@
               "query": [{"key": "action","value": "login"}]
 						}
 					}
+				}]},{"name": "snapshot","item": [{
+					"name": "Retrieve a list of snapshots",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","request-snapshots"],
+              "query": [{"key": "}}"}]
+						}
+					}
+				}]},{"name": "tier","item": [{
+					"name": "Retrieve Tier Information by Tier Name",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers/{{t}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","tiers","{{t}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all tiers for a given application.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","tiers"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Retrieve Node Information for All Nodes in a Tier",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers/{{t}}/nodes",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","tiers","{{t}}","nodes"],
+              "query": []
+						}
+					}
 				}]}]
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="2bc68bc15114f7ea411eb2ef799fd5a6c5b3342e"
+ACT_LAST_COMMIT="6aa519b9ad319f8e6aa940e2695537ddf6c0f979"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -105,6 +105,20 @@ Basic calls against an AppDynamics controller.
 EOF
 function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
 rde controller_auth "Authenticate" "Authenticate with an AppDynamics controller" ""
+doc snapshot << EOF
+Retrieve APM snapshots
+EOF
+function snapshot_list { apiCall '/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}' "$@" ; }
+rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc tier << EOF
+Retrieve tiers within a business application
+EOF
+function tier_get { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}' "$@" ; }
+rde tier_get "Retrieve Tier Information by Tier Name" "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+function tier_list { apiCall '/controller/rest/applications/{{a}}/tiers' "$@" ; }
+rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
+function tier_nodes { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@" ; }
+rde tier_nodes "Retrieve Node Information for All Nodes in a Tier" "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
@@ -195,13 +209,6 @@ List all database agent events. This is an alias for \`${SCRIPTNAME} event list 
 EOF
 example dbmon_events << EOF
 -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
-EOF
-function snapshot_list {
-  apiCall '/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}' "$@"
-}
-register snapshot_list Retrieve a list of snapshots for a specific application
-describe snapshot_list << EOF
-Retrieve a list of snapshots for a specific application.
 EOF
 PORTAL_LOGIN_STATUS=0
 function portal_login {
@@ -1203,45 +1210,6 @@ register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
 EOF
-function _export {
-  local WITH_ENVIRONMENTS="1"
-  while getopts "e" opt "$@";
-  do
-    case "${opt}" in
-      e)
-        WITH_ENVIRONMENTS="0"
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  local ENVIRONMENTS=""
-  local COLLECTIONS=""
-  if [ "${WITH_ENVIRONMENTS}" -eq "1" ] ; then
-    environment_list
-    for ENVIRONMENT in ${COMMAND_RESULT} ; do
-      environment_export ${ENVIRONMENT/(default)/}
-      ENVIRONMENTS+="${COMMAND_RESULT},"
-    done;
-    ENVIRONMENTS=${ENVIRONMENTS%,}
-  fi
-  read -r -d '' COMMAND_RESULT << EOF
-  {
-  	"version": 1,
-  	"collections": [${COLLECTIONS}],
-  	"environments": [
-    ${ENVIRONMENTS}
-    ]
-  }
-EOF
-}
-register _export "Export to postman"
-describe _export << EOF
-Export to postman
-EOF
-example _export << EOF
-> postman.json
-EOF
 function healthrule_import {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local FILE=""
@@ -1424,27 +1392,6 @@ function bizjourney_list {
 register bizjourney_list List all business journeys
 describe bizjourney_list << EOF
 List all business journeys. This command requires no further arguments.
-EOF
-function tier_nodes {
-  apiCall -X GET '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@"
-}
-register tier_nodes" Retrieve Node Information for All Nodes in a Tier"
-describe tier_nodes << EOF
-Retrieve Node Information for All Nodes in a Tier. Provide the application and the tier as parameters
-EOF
-function tier_get {
-  apiCall -X GET '/controller/rest/applications/{{a}}/tiers/{{t}}' "$@"
-}
-register tier_get Retrieve Tier Information by Tier Name
-describe tier_get << EOF
-Retrieve Tier Information by Tier Name. Provide the application and the tier as parameters
-EOF
-function tier_list {
-  apiCall -X GET '/controller/rest/applications/{{a}}/tiers' "$@"
-}
-register tier_list List all tiers for a given application
-describe tier_list << EOF
-List all tiers for a given application. Provide the application id as parameter.
 EOF
 function recursiveSource {
   if [ -d "$*" ]; then
