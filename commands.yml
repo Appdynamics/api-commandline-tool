@@ -119,8 +119,8 @@ controller:
   title: Controller Calls
   description: Basic calls against an AppDynamics controller.
   auth:
-    title: Authenticate
-    description: Authenticate with an AppDynamics controller
+    title: Authenticate with an AppDynamics controller.
+    description: 
     example:
     method: GET
     endpoint: /controller/auth?action=login

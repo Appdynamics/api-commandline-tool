@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="1d52da53fd916bd702e05e5085ea7d879566fadb"
+ACT_LAST_COMMIT="d0043fe97a30ae68ab350b57210cb92115df7a09"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -109,7 +109,7 @@ doc controller << EOF
 Basic calls against an AppDynamics controller.
 EOF
 function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
-rde controller_auth "Authenticate" "Authenticate with an AppDynamics controller" ""
+rde controller_auth "Authenticate with an AppDynamics controller." "" ""
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
@@ -577,8 +577,7 @@ function controller_login {
 }
 register controller_login Login to your controller
 describe controller_login << EOF
-Check if the login with your appdynamics controller works properly.
-If the login fails, use $1 controller ping to check if the controller is running and check your credentials if they are correct.
+Check if the login with your appdynamics controller works properly. If the login fails, use \`${SCRIPTNAME} controller ping\` to check if the controller is running and check your credentials if they are correct.
 EOF
 function controller_ping {
   debug "Ping $CONFIG_CONTROLLER_HOST"

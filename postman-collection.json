@@ -463,7 +463,7 @@
 						}
 					}
 				}]},{"name": "controller","item": [{
-					"name": "Authenticate",
+					"name": "Authenticate with an AppDynamics controller.",
 					"request": {
 						"method": "GET",
 						"header": [
