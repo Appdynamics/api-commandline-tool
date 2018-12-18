@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="d0043fe97a30ae68ab350b57210cb92115df7a09"
+ACT_LAST_COMMIT="c8f705c93c8d09e7adc90ab93b88f919af5edc31"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -470,6 +470,9 @@ register controller_isup Pause until controller is up
 describe controller_isup << EOF
 This command will pause until the controller is up. Use this to get notified after the controller is booted successfully.
 EOF
+example controller_isup << EOF
+; ${SCRIPTNAME} applications list
+EOF
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
@@ -579,6 +582,8 @@ register controller_login Login to your controller
 describe controller_login << EOF
 Check if the login with your appdynamics controller works properly. If the login fails, use \`${SCRIPTNAME} controller ping\` to check if the controller is running and check your credentials if they are correct.
 EOF
+example controller_login << EOF
+EOF
 function controller_ping {
   debug "Ping $CONFIG_CONTROLLER_HOST"
   local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
@@ -594,12 +599,16 @@ register controller_ping Check the availability of an appdynamics controller
 describe controller_ping << EOF
 Check the availability of an appdynamics controller. On success the response time will be provided.
 EOF
+example controller_ping << EOF
+EOF
 function controller_status {
   controller_call -X GET /controller/rest/serverstatus
 }
 register controller_status Get server status from controller
 describe controller_status << EOF
 This command will return a XML containing status information about the controller.
+EOF
+example controller_status << EOF
 EOF
 function controller_version {
   controller_call -X GET /controller/rest/serverstatus
@@ -608,6 +617,8 @@ function controller_version {
 register controller_version Get installed version from controller
 describe controller_version << EOF
 Get installed version from controller
+EOF
+example controller_version << EOF
 EOF
 function dashboard_delete {
   local DASHBOARD_ID=$*
