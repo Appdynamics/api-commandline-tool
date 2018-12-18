@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="b8dfdf67fab0c47b0d45352b6f261948efd87b86"
+ACT_LAST_COMMIT="1d52da53fd916bd702e05e5085ea7d879566fadb"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -138,6 +138,13 @@ function tier_list { apiCall '/controller/rest/applications/{{a}}/tiers' "$@" ; 
 rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
 function tier_nodes { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@" ; }
 rde tier_nodes "Retrieve Node Information for All Nodes in a Tier" "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+function user_create { apiCall -X POST '/controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
+rde user_create "Create a new user" "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." ""
+function user_update { apiCall -X POST '/controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
+rde user_update "Update an existing user" "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." ""
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF

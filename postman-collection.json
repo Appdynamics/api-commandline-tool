@@ -723,5 +723,63 @@
               "query": []
 						}
 					}
+				}]},{"name": "user","item": [{
+					"name": "Create a new user",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","users"],
+              "query": [{"key": "}}"}]
+						}
+					}
+				},{
+					"name": "Update an existing user",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","users"],
+              "query": [{"key": "}}"}]
+						}
+					}
 				}]}]
 }

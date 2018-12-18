@@ -273,3 +273,13 @@ Retrieve tiers within a business application
 | create | Create a custom time range |  |
 | list | List all custom timeranges available on the controller |  |
 
+
+## user
+
+Create and Modify AppDynamics Users.
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| create | Create a new user Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters. | `act.sh user create ` |
+| update | Update an existing user Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters. | `act.sh user update ` |
+

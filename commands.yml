@@ -184,3 +184,18 @@ tier:
     example: -a 29 -t 45
     method: GET
     endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}/nodes
+user:
+  title: Users
+  description: Create and Modify AppDynamics Users.
+  create:
+    title: Create a new user
+    description: Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
+    example: -n myadmin -d Administrator -r "Account Owner,Administrator" -p ******** -m admin@localhost
+    method: POST
+    endpoint: /controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}
+  update:
+    title: Update an existing user
+    description: Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
+    example: -n myadmin -d Administrator -r "Account Owner,Administrator" -p ******** -m admin@localhost
+    method: POST
+    endpoint: /controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}
