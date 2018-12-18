@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="c8f705c93c8d09e7adc90ab93b88f919af5edc31"
+ACT_LAST_COMMIT="d9d1d692abb70afb20c1275ee6177aafd79afa55"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -65,6 +65,13 @@ function actiontemplate_createmediatype { apiCall -X POST -d '{name:{{n}},builtI
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
 function actiontemplate_export { apiCall '/controller/actiontemplate/{{t}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+function analyticssearch_get { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}' "$@" ; }
+rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)" "-i 6"
+function analyticssearch_list { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
+rde analyticssearch_list "List all analytics searches on the controller." "This command requires no further arguments" ""
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
@@ -83,6 +90,22 @@ he Controller audit history is a record of the configuration and user activities
 EOF
 function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}' "$@" ; }
 rde audit_get "Retrieve Controller Audit History." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+function backend_list { apiCall '/controller/rest/applications/{{a}}/backends' "$@" ; }
+rde backend_list "List all backends for a given application." "Provide the application id as parameter (-a)" "-a 29"
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+function bizjourney_disable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable' "$@" ; }
+rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
+function bizjourney_enable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@" ; }
+rde bizjourney_enable "Enable a valid business journey draft." "Provide the journey id (-i) as parameter." "-i 6"
+function bizjourney_import { apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
+rde bizjourney_import "Import a business journey draft" "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
+function bizjourney_list { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
+rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
@@ -110,6 +133,19 @@ Basic calls against an AppDynamics controller.
 EOF
 function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
 rde controller_auth "Authenticate with an AppDynamics controller." "" ""
+function controller_status { apiCall '/controller/rest/serverstatus' "$@" ; }
+rde controller_status "Get the server status from the controller." "This command will return a XML containing status information about the controller." ""
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+function dashboard_delete { apiCall -X POST -d '[{{i}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
+rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i}}' "$@" ; }
+rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
+rde dashboard_list "List all dashboards available on the controller." "This command requires no further arguments." ""
+function dashboard_update { apiCall -X POST -d '{{f}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-i 2"
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
@@ -119,6 +155,15 @@ function healthrule_list { apiCall '/controller/healthrules/{{a}}/' "$@" ; }
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
 function healthrule_violations { apiCall '/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}' "$@" ; }
 rde healthrule_violations "Get healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+function node_get { apiCall '/controller/rest/applications/{{a}}/nodes/{{n}}' "$@" ; }
+rde node_get "Retrieve Node Information by Node Name." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
+function node_list { apiCall '/controller/rest/applications/{{a}}/nodes' "$@" ; }
+rde node_list "List all nodes for a given application." "Provide the application id as parameter (-a)." "-a 29"
+function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@" ; }
+rde node_markhistorical "Mark Nodes as Historical." "Provide a comma separated list of node ids." "-n 45,46"
 doc policies << EOF
 Import and export policies
 EOF
@@ -471,7 +516,7 @@ describe controller_isup << EOF
 This command will pause until the controller is up. Use this to get notified after the controller is booted successfully.
 EOF
 example controller_isup << EOF
-; ${SCRIPTNAME} applications list
+; ${SCRIPTNAME} application list
 EOF
 function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
@@ -601,15 +646,6 @@ Check the availability of an appdynamics controller. On success the response tim
 EOF
 example controller_ping << EOF
 EOF
-function controller_status {
-  controller_call -X GET /controller/rest/serverstatus
-}
-register controller_status Get server status from controller
-describe controller_status << EOF
-This command will return a XML containing status information about the controller.
-EOF
-example controller_status << EOF
-EOF
 function controller_version {
   controller_call -X GET /controller/rest/serverstatus
   COMMAND_RESULT=`echo -e $COMMAND_RESULT | sed -n -e 's/.*Controller v\(.*\) Build.*/\1/p'`
@@ -619,27 +655,6 @@ describe controller_version << EOF
 Get installed version from controller
 EOF
 example controller_version << EOF
-EOF
-function dashboard_delete {
-  local DASHBOARD_ID=$*
-  if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X POST -d "[$DASHBOARD_ID]" /controller/restui/dashboards/deleteDashboards
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$DASHBOARD_ID'"
-  fi
-}
-register dashboard_delete Delete a specific dashboard
-describe dashboard_delete << EOF
-Delete a specific dashboard
-EOF
-#
-function dashboard_update {
-  apiCall -X POST -d '@{{f}}' '/controller/restui/dashboards/updateDashboard' "$@"
-}
-register dashboard_update Update a specific dashboard
-describe dashboard_update << EOF
-Update a specific dashboard. Please not that the json you need to provide is not compatible with the export format!
 EOF
 function dashboard_import {
   FILE="$*"
@@ -653,26 +668,6 @@ function dashboard_import {
 register dashboard_import Import a dashboard
 describe dashboard_import << EOF
 Import a dashboard from a given file
-EOF
-function dashboard_list {
-  controller_call -X GET /controller/restui/dashboards/getAllDashboardsByType/false
-}
-register dashboard_list List all dashboards available on the controller
-describe dashboard_list << EOF
-List all dashboards available on the controller
-EOF
-function dashboard_export {
-  local DASHBOARD_ID=$*
-  if [[ $DASHBOARD_ID =~ ^[0-9]+$ ]]; then
-    controller_call -X GET /controller/CustomDashboardImportExportServlet?dashboardId=$DASHBOARD_ID
-  else
-    COMMAND_RESULT=""
-    error "This is not a number: '$DASHBOARD_ID'"
-  fi
-}
-register dashboard_export Export a specific dashboard
-describe dashboard_export << EOF
-Export a specific dashboard
 EOF
 function actiontemplate_delete {
   local TYPE="httprequest"
@@ -1112,27 +1107,6 @@ Print the current version of $SCRIPTNAME
 EOF
 example _version << EOF
 EOF
-function node_markhistorical {
-  apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@"
-}
-register node_markhistorical Mark Nodes as Historical
-describe node_markhistorical << EOF
-Mark Nodes as Historical. Provide a comma separated list of node ids.
-EOF
-function node_get {
-  apiCall -X GET '/controller/rest/applications/{{a}}/nodes/{{n}}' "$@"
-}
-register node_get Retrieve Node Information by Node Name
-describe node_get << EOF
-Retrieve Node Information by Node Name. Provide the application and the node as parameters
-EOF
-function node_list {
-  apiCall -X GET '/controller/rest/applications/{{a}}/nodes' "$@"
-}
-register node_list Retrieve Node Information for All Nodes in a Business Application
-describe node_list << EOF
-Retrieve Node Information for All Nodes in a Business Application. Provide the application as parameter.
-EOF
 function metric_get {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
@@ -1338,19 +1312,6 @@ EOF
 example event_list << EOF
 -a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
 EOF
-doc analyticssearch << EOF
-These commands allow you to import and export email/http saved analytics searches.
-EOF
-function analyticssearch_get {
-  apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}' "$@"
-}
-register analyticssearch_get Get an analytics search by id.
-describe analyticssearch_get << EOF
-Get an analytics search by id. Provide the id as parameter (-i)
-EOF
-example analyticssearch_get << EOF
--i 6
-EOF
 function analyticssearch_import {
   FILE="$*"
   if [ -r "${FILE}" ] ; then
@@ -1377,43 +1338,6 @@ Import an analytics search. Provide a json file as parameter.
 EOF
 example analyticssearch_import << EOF
 search.json
-EOF
-function analyticssearch_list {
-  apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@"
-}
-register analyticssearch_list List all analytics searches on the controller.
-describe analyticssearch_list << EOF
-List all analytics searches available on the controller. This command requires no further arguments.
-EOF
-example analyticssearch_list << EOF
-EOF
-function bizjourney_disable {
-  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable' "$@"
-}
-register bizjourney_disable "Disable a valid business journey draft"
-describe bizjourney_disable << EOF
-Disable a valid business journey draft. Provide the journey id (-i) as parameter
-EOF
-function bizjourney_enable {
-  apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@"
-}
-register bizjourney_enable "Enable a valid business journey draft"
-describe bizjourney_enable << EOF
-Enable a valid business journey draft. Provide the journey id (-i) as parameter
-EOF
-function bizjourney_import {
-  apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@"
-}
-register bizjourney_import Import a business journey
-describe bizjourney_import << EOF
-Import a business journey. Provide a json string or a file (with @ as prefix) as paramater (-d)
-EOF
-function bizjourney_list {
-  controller_call '/controller/restui/analytics/biz_outcome/definitions/summary'
-}
-register bizjourney_list List all business journeys
-describe bizjourney_list << EOF
-List all business journeys. This command requires no further arguments.
 EOF
 function recursiveSource {
   if [ -d "$*" ]; then

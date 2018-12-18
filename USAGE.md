@@ -50,8 +50,8 @@ These commands allow you to import and export email/http saved analytics searche
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | get | Get an analytics search by id. Provide the id as parameter (-i) | `act.sh analyticssearch get -i 6` |
+| list | List all analytics searches on the controller. This command requires no further arguments | `act.sh analyticssearch list ` |
 | import | Import an analytics search. Provide a json file as parameter. | `act.sh analyticssearch import search.json` |
-| list | List all analytics searches available on the controller. This command requires no further arguments. | `act.sh analyticssearch list ` |
 
 
 ## application
@@ -76,14 +76,25 @@ he Controller audit history is a record of the configuration and user activities
 | get | Retrieve Controller Audit History. Provide a start time (-b) and an end time (-f) as parameter. | `act.sh audit get -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700` |
 
 
-## bizjourney
+## backend
+
+Retrieve information about backends within a given business application
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| disable | Disable a valid business journey draft. Provide the journey id (-i) as parameter |  |
-| enable | Enable a valid business journey draft. Provide the journey id (-i) as parameter |  |
-| import | Import a business journey. Provide a json string or a file (with @ as prefix) as paramater (-d) |  |
-| list | List all business journeys. This command requires no further arguments. |  |
+| list | List all backends for a given application. Provide the application id as parameter (-a) | `act.sh backend list -a 29` |
+
+
+## bizjourney
+
+Manage business journeys in AppDynamics Analytics
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| disable | Disable a business journey. Provide the journey id (-i) as parameter. | `act.sh bizjourney disable -i 6` |
+| enable | Enable a valid business journey draft. Provide the journey id (-i) as parameter. | `act.sh bizjourney enable -i 6` |
+| import | Import a business journey draft Provide a json string or a file (with @ as prefix) as parameter (-d) | `act.sh bizjourney import -d @journey.json` |
+| list | List all business journeys. This command requires no further arguments. | `act.sh bizjourney list ` |
 
 
 ## bt
@@ -117,23 +128,25 @@ Basic calls against an AppDynamics controller.
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | auth | Authenticate with an AppDynamics controller. | `act.sh controller auth ` |
-| isup | This command will pause until the controller is up. Use this to get notified after the controller is booted successfully. | `act.sh controller isup ; act.sh applications list` |
+| status | Get the server status from the controller. This command will return a XML containing status information about the controller. | `act.sh controller status ` |
+| isup | This command will pause until the controller is up. Use this to get notified after the controller is booted successfully. | `act.sh controller isup ; act.sh application list` |
 | call | Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d. | `act.sh controller call /controller/rest/serverstatus` |
 | login | Check if the login with your appdynamics controller works properly. If the login fails, use `act.sh controller ping` to check if the controller is running and check your credentials if they are correct. | `act.sh controller login ` |
 | ping | Check the availability of an appdynamics controller. On success the response time will be provided. | `act.sh controller ping ` |
-| status | This command will return a XML containing status information about the controller. | `act.sh controller status ` |
 | version | Get installed version from controller | `act.sh controller version ` |
 
 
 ## dashboard
 
+Import and export custom dashboards in the AppDynamics controller
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| delete | Delete a specific dashboard |  |
-| update | Update a specific dashboard. Please not that the json you need to provide is not compatible with the export format! |  |
+| delete | Delete a dashboard. Provide a dashboard id (-i) as parameter | `act.sh dashboard delete -i 2` |
+| export | Export a dashboard. Provide a dashboard id (-i) as parameter | `act.sh dashboard export -i 2` |
+| list | List all dashboards available on the controller. This command requires no further arguments. | `act.sh dashboard list ` |
+| update | Update a dashboard. Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format. | `act.sh dashboard update -i 2` |
 | import | Import a dashboard from a given file |  |
-| list | List all dashboards available on the controller |  |
-| export | Export a specific dashboard |  |
 
 
 ## dbmon
@@ -214,11 +227,13 @@ Configure and retrieve health rules and their violates.
 
 ## node
 
+Retrieve nodes within a business application
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| markhistorical | Mark Nodes as Historical. Provide a comma separated list of node ids. |  |
-| get | Retrieve Node Information by Node Name. Provide the application and the node as parameters |  |
-| list | Retrieve Node Information for All Nodes in a Business Application. Provide the application as parameter. |  |
+| get | Retrieve Node Information by Node Name. Provide the application (-a) and the node (-n) as parameters | `act.sh node get -a 29 -n 45` |
+| list | List all nodes for a given application. Provide the application id as parameter (-a). | `act.sh node list -a 29` |
+| markhistorical | Mark Nodes as Historical. Provide a comma separated list of node ids. | `act.sh node markhistorical -n 45,46` |
 
 
 ## policies

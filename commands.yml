@@ -49,6 +49,21 @@ actiontemplate:
     example: -t httprequest
     method: GET
     endpoint: /controller/actiontemplate/{{t}}/
+analyticssearch:
+  title: Saved Analytics Search
+  description: These commands allow you to import and export email/http saved analytics searches.
+  get:
+    title: Get an analytics search by id.
+    description: Provide the id as parameter (-i)
+    example: -i 6
+    method: GET
+    endpoint: /controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}
+  list:
+    title: List all analytics searches on the controller.
+    description: This command requires no further arguments
+    example:
+    method: GET
+    endpoint: /controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches
 audit:
   title: Controller Audit History
   description: he Controller audit history is a record of the configuration and user activities in the Controller configuration.
@@ -58,6 +73,43 @@ audit:
     example: -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700
     method: GET
     endpoint: /controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}
+backend:
+  title: Backends in a Business Application
+  description: Retrieve information about backends within a given business application
+  list:
+    title: List all backends for a given application.
+    description: Provide the application id as parameter (-a)
+    example: -a 29
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/backends
+bizjourney:
+  title: Business Journeyes
+  description: Manage business journeys in AppDynamics Analytics
+  list:
+    title: List all business journeys.
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/summary
+  enable:
+    title: Enable a valid business journey draft.
+    description: Provide the journey id (-i) as parameter.
+    example: -i 6
+    method: PUT
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable
+  disable:
+    title: Disable a business journey.
+    description: Provide the journey id (-i) as parameter.
+    example: -i 6
+    method: PUT
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable
+  import:
+    title: Import a business journey draft
+    description: Provide a json string or a file (with @ as prefix) as parameter (-d)
+    example: -d @journey.json
+    method: POST
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft
+    payload: {{d}}
 bt:
   title: Business Transactions in a Business Application
   description: Retrieve information about business transactions within a given business application
@@ -120,10 +172,45 @@ controller:
   description: Basic calls against an AppDynamics controller.
   auth:
     title: Authenticate with an AppDynamics controller.
-    description: 
+    description:
     example:
     method: GET
     endpoint: /controller/auth?action=login
+  status:
+    title: Get the server status from the controller.
+    description: This command will return a XML containing status information about the controller.
+    example:
+    method: GET
+    endpoint: /controller/rest/serverstatus
+dashboard:
+  title: Custom Dashboards
+  description: Import and export custom dashboards in the AppDynamics controller
+  list:
+    title: List all dashboards available on the controller.
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/restui/dashboards/getAllDashboardsByType/false
+  export:
+    title: Export a dashboard.
+    description: Provide a dashboard id (-i) as parameter
+    example: -i 2
+    method: GET
+    endpoint: /controller/CustomDashboardImportExportServlet?dashboardId={{i}}
+  delete:
+    title: Delete a dashboard.
+    description: Provide a dashboard id (-i) as parameter
+    example: -i 2
+    method: POST
+    endpoint: /controller/restui/dashboards/deleteDashboards
+    payload: [{{i}}]
+  update:
+    title: Update a dashboard.
+    description: Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format.
+    example: -i 2
+    method: POST
+    endpoint: /controller/restui/dashboards/updateDashboard
+    payload: {{f}}
 healthrule:
   title: Health Rules
   description: Configure and retrieve health rules and their violates.
@@ -145,6 +232,27 @@ healthrule:
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
     endpoint: /controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}
+node:
+  title: Nodes
+  description: Retrieve nodes within a business application
+  list:
+    title: List all nodes for a given application.
+    description: Provide the application id as parameter (-a).
+    example: -a 29
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/nodes
+  get:
+    title: Retrieve Node Information by Node Name.
+    description: Provide the application (-a) and the node (-n) as parameters
+    example: -a 29 -n 45
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/nodes/{{n}}
+  markhistorical:
+    title: Mark Nodes as Historical.
+    description: Provide a comma separated list of node ids.
+    example: -n 45,46
+    method: POST
+    endpoint: /controller/rest/mark-nodes-historical?application-component-node-ids={{n}}
 policies:
   title: Policies API
   description: Import and export policies

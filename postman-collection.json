@@ -56,6 +56,64 @@
               "query": []
 						}
 					}
+				}]},{"name": "analyticssearch","item": [{
+					"name": "Get an analytics search by id.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analyticsSavedSearches","getAnalyticsSavedSearchById","{{i}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all analytics searches on the controller.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analyticsSavedSearches","getAllAnalyticsSavedSearches"],
+              "query": []
+						}
+					}
 				}]},{"name": "application","item": [{
 					"name": "Create a new application.",
 					"request": {
@@ -228,6 +286,151 @@
 							],
 							"path": ["controller","ControllerAuditHistory"],
               "query": [{"key": "startTime","value": "{{b}}"},{"key":"endTime","value": "{{f}}"}]
+						}
+					}
+				}]},{"name": "backend","item": [{
+					"name": "List all backends for a given application.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/backends",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","backends"],
+              "query": []
+						}
+					}
+				}]},{"name": "bizjourney","item": [{
+					"name": "Disable a business journey.",
+					"request": {
+						"method": "PUT",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","{{i}}","actions","userDisable"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Enable a valid business journey draft.",
+					"request": {
+						"method": "PUT",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","{{i}}","actions","enable"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Import a business journey draft",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{d}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","saveAsValidDraft"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all business journeys.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/summary",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","summary"],
+              "query": []
 						}
 					}
 				}]},{"name": "bt","item": [{
@@ -491,6 +694,151 @@
               "query": [{"key": "action","value": "login"}]
 						}
 					}
+				},{
+					"name": "Get the server status from the controller.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/serverstatus",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","serverstatus"],
+              "query": []
+						}
+					}
+				}]},{"name": "dashboard","item": [{
+					"name": "Delete a dashboard.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{i}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/dashboards/deleteDashboards",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","dashboards","deleteDashboards"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Export a dashboard.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/CustomDashboardImportExportServlet?dashboardId={{i}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","CustomDashboardImportExportServlet"],
+              "query": [{"key": "dashboardId","value": "{{i}}"}]
+						}
+					}
+				},{
+					"name": "List all dashboards available on the controller.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/dashboards/getAllDashboardsByType/false",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","dashboards","getAllDashboardsByType","false"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Update a dashboard.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{f}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/dashboards/updateDashboard",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","dashboards","updateDashboard"],
+              "query": []
+						}
+					}
 				}]},{"name": "healthrule","item": [{
 					"name": "Get a specifc healthrule.",
 					"request": {
@@ -576,6 +924,93 @@
 							],
 							"path": ["controller","rest","applications","{{a}}","problems","healthrule-violations"],
               "query": [{"key": "}}"}]
+						}
+					}
+				}]},{"name": "node","item": [{
+					"name": "Retrieve Node Information by Node Name.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/nodes/{{n}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","nodes","{{n}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all nodes for a given application.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/nodes",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","nodes"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Mark Nodes as Historical.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","mark-nodes-historical"],
+              "query": [{"key": "application-component-node-ids","value": "{{n}}"}]
 						}
 					}
 				}]},{"name": "policies","item": [{
