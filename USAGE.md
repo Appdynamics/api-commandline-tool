@@ -67,6 +67,15 @@ The applications API lets you retrieve information about the monitored environme
 | list | List all applications available on the controller This command requires no further arguments. | `act.sh application list ` |
 
 
+## audit
+
+he Controller audit history is a record of the configuration and user activities in the Controller configuration.
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| get | Retrieve Controller Audit History. Provide a start time (-b) and an end time (-f) as parameter. | `act.sh audit get -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700` |
+
+
 ## bizjourney
 
 | Command | Description | Example |
@@ -183,12 +192,15 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 
 ## healthrule
 
+Configure and retrieve health rules and their violates.
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| get | Get a specifc healthrule. Provide an application (-a) and a health rule name (-n) as parameters. | `act.sh healthrule get -a 29` |
+| list | List all healthrules. Provide an application (-a) as parameter | `act.sh healthrule list -a 29` |
+| violations | Get healthrule violations. Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f) | `act.sh healthrule violations -a 29 -t BEFORE_NOW -d 120` |
 | import | Import a health rule. |  |
-| list | List all health rules. Provide parameter a for the application and parameter. |  |
-| export | Export a health rule. Provide parameter a for the application and parameter n for the name of the health rule. If you want to export all healthrules use the "list" command |  |
-| list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. |  |
+| list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. | `act.sh healthrule list -a 29` |
 
 
 ## metric
@@ -207,6 +219,15 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 | markhistorical | Mark Nodes as Historical. Provide a comma separated list of node ids. |  |
 | get | Retrieve Node Information by Node Name. Provide the application and the node as parameters |  |
 | list | Retrieve Node Information for All Nodes in a Business Application. Provide the application as parameter. |  |
+
+
+## policies
+
+Import and export policies
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| list | List all policies. Provide an application (-a) as parameter. | `act.sh policies list -a 29` |
 
 
 ## portal

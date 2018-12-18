@@ -93,6 +93,7 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
   assert_contains_substring "<tiers>" "`${ACT} tier list -a $APPLICATION_ID`" "List Tiers"
   assert_contains_substring "<business-transactions>" "`${ACT} bt list -a $APPLICATION_ID`" "List BTs"
   assert_contains_substring "<nodes>" "`${ACT} node list -a $APPLICATION_ID`" "List Nodes"
+  assert_contains_substring "<policy-violations>" "`${ACT} healthrule violations -a $APPLICATION_ID -t BEFORE_NOW -d 1200`" "List health rule violations"
 
   ##### Export the given application #####
   assert_contains_substring "<rule" "`${ACT} application export -a $APPLICATION_ID`" "Export Application"

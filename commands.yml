@@ -49,6 +49,15 @@ actiontemplate:
     example: -t httprequest
     method: GET
     endpoint: /controller/actiontemplate/{{t}}/
+audit:
+  title: Controller Audit History
+  description: he Controller audit history is a record of the configuration and user activities in the Controller configuration.
+  get:
+    title: Retrieve Controller Audit History.
+    description: Provide a start time (-b) and an end time (-f) as parameter.
+    example: -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700
+    method: GET
+    endpoint: /controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}
 bt:
   title: Business Transactions in a Business Application
   description: Retrieve information about business transactions within a given business application
@@ -115,6 +124,36 @@ controller:
     example:
     method: GET
     endpoint: /controller/auth?action=login
+healthrule:
+  title: Health Rules
+  description: Configure and retrieve health rules and their violates.
+  list:
+    title: List all healthrules.
+    description: Provide an application (-a) as parameter
+    example: -a 29
+    method: GET
+    endpoint: /controller/healthrules/{{a}}/
+  get:
+    title: Get a specifc healthrule.
+    description: Provide an application (-a) and a health rule name (-n) as parameters.
+    example: -a 29
+    method: GET
+    endpoint: /controller/healthrules/{{a}}/?name={{n?}}
+  violations:
+    title: Get healthrule violations.
+    description: Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)
+    example: -a 29 -t BEFORE_NOW -d 120
+    method: GET
+    endpoint: /controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}
+policies:
+  title: Policies API
+  description: Import and export policies
+  list:
+    title: List all policies.
+    description: Provide an application (-a) as parameter.
+    example: -a 29
+    method: GET
+    endpoint: /controller/policies/{{a}}
 snapshot:
   title: Snapshot API
   description: Retrieve APM snapshots

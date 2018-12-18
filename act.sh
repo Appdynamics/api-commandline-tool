@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="6aa519b9ad319f8e6aa940e2695537ddf6c0f979"
+ACT_LAST_COMMIT="b8dfdf67fab0c47b0d45352b6f261948efd87b86"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -78,6 +78,11 @@ function application_get { apiCall '/controller/rest/applications/{{a}}' "$@" ; 
 rde application_get "Get an application." "Provide application id or name as parameter (-a)." "-a 15"
 function application_list { apiCall '/controller/rest/applications' "$@" ; }
 rde application_list "List all applications available on the controller" "This command requires no further arguments." ""
+doc audit << EOF
+he Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}' "$@" ; }
+rde audit_get "Retrieve Controller Audit History." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
@@ -105,6 +110,20 @@ Basic calls against an AppDynamics controller.
 EOF
 function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
 rde controller_auth "Authenticate" "Authenticate with an AppDynamics controller" ""
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+function healthrule_get { apiCall '/controller/healthrules/{{a}}/?name={{n?}}' "$@" ; }
+rde healthrule_get "Get a specifc healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
+function healthrule_list { apiCall '/controller/healthrules/{{a}}/' "$@" ; }
+rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
+function healthrule_violations { apiCall '/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}' "$@" ; }
+rde healthrule_violations "Get healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc policies << EOF
+Import and export policies
+EOF
+function policies_list { apiCall '/controller/policies/{{a}}' "$@" ; }
+rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
 doc snapshot << EOF
 Retrieve APM snapshots
 EOF
@@ -1234,20 +1253,6 @@ function healthrule_import {
 register healthrule_import Import a health rule
 describe healthrule_import << EOF
 Import a health rule.
-EOF
-function healthrule_list {
-  apiCall -X GET '/controller/healthrules/{{a}}/' "$@"
-}
-register healthrule_list List all healthrules
-describe healthrule_list << EOF
-List all health rules. Provide parameter a for the application and parameter.
-EOF
-function healthrule_export {
-  apiCall -X GET '/controller/healthrules/{{a}}/?name={{n?}}' "$@"
-}
-register healthrule_export Export a health rule
-describe healthrule_export << EOF
-Export a health rule. Provide parameter a for the application and parameter n for the name of the health rule. If you want to export all healthrules use the "list" command
 EOF
 function healthrule_copy {
   local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}

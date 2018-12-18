@@ -201,6 +201,35 @@
               "query": []
 						}
 					}
+				}]},{"name": "audit","item": [{
+					"name": "Retrieve Controller Audit History.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","ControllerAuditHistory"],
+              "query": [{"key": "startTime","value": "{{b}}"},{"key":"endTime","value": "{{f}}"}]
+						}
+					}
 				}]},{"name": "bt","item": [{
 					"name": "Create a business transactions group.",
 					"request": {
@@ -460,6 +489,122 @@
 							],
 							"path": ["controller","auth"],
               "query": [{"key": "action","value": "login"}]
+						}
+					}
+				}]},{"name": "healthrule","item": [{
+					"name": "Get a specifc healthrule.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/healthrules/{{a}}/?name={{n?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","healthrules","{{a}}",""],
+              "query": [{"key": "}}"}]
+						}
+					}
+				},{
+					"name": "List all healthrules.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/healthrules/{{a}}/",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","healthrules","{{a}}",""],
+              "query": []
+						}
+					}
+				},{
+					"name": "Get healthrule violations.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","problems","healthrule-violations"],
+              "query": [{"key": "}}"}]
+						}
+					}
+				}]},{"name": "policies","item": [{
+					"name": "List all policies.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/policies/{{a}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","policies","{{a}}"],
+              "query": []
 						}
 					}
 				}]},{"name": "snapshot","item": [{
