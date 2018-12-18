@@ -9,3 +9,5 @@ register controller_version Get installed version from controller
 describe controller_version << EOF
 Get installed version from controller
 EOF
+example controller_version << EOF
+EOF

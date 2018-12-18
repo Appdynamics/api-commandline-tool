@@ -16,3 +16,5 @@ register controller_ping Check the availability of an appdynamics controller
 describe controller_ping << EOF
 Check the availability of an appdynamics controller. On success the response time will be provided.
 EOF
+example controller_ping << EOF
+EOF

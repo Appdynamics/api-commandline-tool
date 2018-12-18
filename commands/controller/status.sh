@@ -8,3 +8,5 @@ register controller_status Get server status from controller
 describe controller_status << EOF
 This command will return a XML containing status information about the controller.
 EOF
+example controller_status << EOF
+EOF
