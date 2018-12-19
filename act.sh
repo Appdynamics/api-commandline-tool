@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="65f869a4117da6e2d56b69e08c9f6d84df32facc"
+ACT_LAST_COMMIT="43c7334661f613e6efcc4344f6d55df0577237c6"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -162,7 +162,7 @@ rde dbmon_servers "List all servers." "No further arguments required." ""
 doc event << EOF
 Create and list events in your business applications.
 EOF
-function event_create { apiCall -X POST '/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}' "$@" ; }
+function event_create { apiCall -X POST '/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt={{b?}}&node={{n?}}&tier={{t?}}' "$@" ; }
 rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
 doc federation << EOF
 Establish a federation between two AppDynamics Controllers.

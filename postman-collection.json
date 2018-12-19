@@ -1005,12 +1005,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt={{b?}}&node={{n?}}&tier={{t?}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","applications","{{a}}","events"],
-              "query": [{"key": "summary","value": "{{s}}"},{"key":"comment","value": "{{c?}}"},{"key":"eventtype","value": "{{e}}"},{"key":"severity","value": "{{l}}"},{"key":"bt","value": ""},{"key":"{{b?}}node","value": "{{n?}}"},{"key":"tier","value": "{{t?}}"}]
+              "query": [{"key": "summary","value": "{{s}}"},{"key":"comment","value": "{{c?}}"},{"key":"eventtype","value": "{{e}}"},{"key":"severity","value": "{{l}}"},{"key":"bt","value": "{{b?}}"},{"key":"node","value": "{{n?}}"},{"key":"tier","value": "{{t?}}"}]
 						}
 					}
 				}]},{"name": "federation","item": [{
