@@ -38,7 +38,7 @@ ASDF
 
       P_QUERY=""
       if [[ ${!ENDPOINT} == *"?"* ]] ; then
-        P_QUERY=${!ENDPOINT##*\?}
+        P_QUERY=${!ENDPOINT#*\?}
         local REPLACEMENT="\"},{\"key\":\""
         P_QUERY=${P_QUERY//&/${REPLACEMENT}}
         P_QUERY="{\"key\": \"${P_QUERY//=/\",\"value\": \"}\"}"

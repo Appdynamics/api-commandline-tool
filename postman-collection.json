@@ -1010,7 +1010,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","applications","{{a}}","events"],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "summary","value": "{{s}}"},{"key":"comment","value": "{{c?}}"},{"key":"eventtype","value": "{{e}}"},{"key":"severity","value": "{{l}}"},{"key":"bt","value": ""},{"key":"{{b?}}node","value": "{{n?}}"},{"key":"tier","value": "{{t?}}"}]
 						}
 					}
 				}]},{"name": "federation","item": [{
@@ -1097,7 +1097,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","healthrules","{{a}}",""],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "name","value": "{{n?}}"}]
 						}
 					}
 				},{
@@ -1155,7 +1155,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","applications","{{a}}","problems","healthrule-violations"],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "time-range-type","value": "{{t}}"},{"key":"duration-in-mins","value": "{{d?}}"},{"key":"start-time","value": "{{b?}}"},{"key":"end-time","value": "{{e?}}"}]
 						}
 					}
 				}]},{"name": "node","item": [{
@@ -1300,7 +1300,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","applications","{{a}}","request-snapshots"],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "time-range-type","value": "{{t}}"},{"key":"duration-in-mins","value": "{{d?}}"},{"key":"start-time","value": "{{b?}}"},{"key":"end-time","value": "{{f?}}"}]
 						}
 					}
 				}]},{"name": "tier","item": [{
@@ -1416,7 +1416,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","users"],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "user-name","value": "{{n}}"},{"key":"user-display-name","value": "{{d}}"},{"key":"user-password","value": "{{p}}"},{"key":"user-email","value": "{{m}}"},{"key":"user-roles","value": "{{r?}}"}]
 						}
 					}
 				},{
@@ -1445,7 +1445,7 @@
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","users"],
-              "query": [{"key": "}}"}]
+              "query": [{"key": "user-id","value": "{{i}}"},{"key":"user-name","value": "{{n}}"},{"key":"user-display-name","value": "{{d}}"},{"key":"user-password","value": "{{p?}}"},{"key":"user-email","value": "{{m}}"},{"key":"user-roles","value": "{{r?}}"}]
 						}
 					}
 				}]}]
