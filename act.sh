@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="a1bcdcd7fa5eef93df2dade07197437b64f9e03a"
+ACT_LAST_COMMIT="d7340c2adabcfb4fbc952bf129cb082ca0118548"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -158,6 +158,8 @@ function dbmon_import { apiCall -X POST -d '{{d:database_collector_definition}}'
 rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
 function dbmon_list { apiCall '/controller/rest/databases/collectors' "$@" ; }
 rde dbmon_list "List all collectors." "No further arguments required." ""
+function dbmon_queries { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
+rde dbmon_queries "Get queries for a server." "Requires a server id (-s), a start time (-b) and an end time (-f) as parameters." "-s 2 -b 1545237000000 -f 1545238602"
 function dbmon_servers { apiCall '/controller/rest/databases/servers' "$@" ; }
 rde dbmon_servers "List all servers." "No further arguments required." ""
 doc event << EOF

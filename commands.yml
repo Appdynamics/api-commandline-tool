@@ -217,6 +217,13 @@ dbmon:
     example:
     method: GET
     endpoint: /controller/rest/databases/servers
+  queries:
+    title: Get queries for a server.
+    description: Requires a server id (-i), a start time (-b) and an end time (-f) as parameters.
+    example: -i 2 -b 1545237000000 -f 1545238602
+    method: POST
+    endpoint: /controller/databasesui/databases/queryListData
+    payload: {\"cluster\":false,\"serverId\":{{i:server_id}},\"field\":\"query-id\",\"size\":100,\"filterBy\":\"time\",\"startTime\":{{b:start_time}},\"endTime\":{{f:end_time}},\"waitStateIds\":[],\"useTimeBasedCorrelation\":false}
 dashboard:
   title: Custom Dashboards
   description: Import and export custom dashboards in the AppDynamics controller

@@ -989,6 +989,36 @@
             "description": "No further arguments required."
 					}
 				},{
+					"name": "Get queries for a server.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"cluster\":false,\"serverId\":{{server_id}},\"field\":\"query-id\",\"size\":100,\"filterBy\":\"time\",\"startTime\":{{start_time}},\"endTime\":{{end_time}},\"waitStateIds\":[],\"useTimeBasedCorrelation\":false}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/databasesui/databases/queryListData",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","databasesui","databases","queryListData"],
+              "query": []
+						},
+            "description": "Requires a server id (-s), a start time (-b) and an end time (-f) as parameters."
+					}
+				},{
 					"name": "List all servers.",
 					"request": {
 						"method": "GET",
