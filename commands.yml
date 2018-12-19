@@ -8,7 +8,7 @@ application:
     method: GET
     endpoint: /controller/rest/applications/{{a}}
   list:
-    title: List all applications available on the controller
+    title: List all applications.
     description: This command requires no further arguments.
     example:
     method: GET
@@ -28,7 +28,7 @@ application:
     endpoint: /controller/restui/allApplications/deleteApplication
     payload: {{a}}
   export:
-    title: Export an application from the controller.
+    title: Export an application.
     description: Provide an application id as parameter (-a)
     example: -a 29
     method: GET
@@ -42,7 +42,7 @@ actiontemplate:
     example: -n 'application/vnd.appd.events+json'
     method: POST
     endpoint: /controller/restui/httpaction/createHttpRequestActionMediaType
-    payload: {"name":"{{n}}","builtIn":false}
+    payload: {\"name\":\"{{n}}\",\"builtIn\":false}
   export:
     title: Export all templates of a given type.
     description: Provide the type (-t email or httprequest) as parameter.
@@ -59,16 +59,16 @@ analyticssearch:
     method: GET
     endpoint: /controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}
   list:
-    title: List all analytics searches on the controller.
+    title: List all analytics searches.
     description: This command requires no further arguments
     example:
     method: GET
     endpoint: /controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches
 audit:
   title: Controller Audit History
-  description: he Controller audit history is a record of the configuration and user activities in the Controller configuration.
+  description: The Controller audit history is a record of the configuration and user activities in the Controller configuration.
   get:
-    title: Retrieve Controller Audit History.
+    title: Get audit history.
     description: Provide a start time (-b) and an end time (-f) as parameter.
     example: -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700
     method: GET
@@ -77,7 +77,7 @@ backend:
   title: Backends in a Business Application
   description: Retrieve information about backends within a given business application
   list:
-    title: List all backends for a given application.
+    title: List all backends.
     description: Provide the application id as parameter (-a)
     example: -a 29
     method: GET
@@ -92,7 +92,7 @@ bizjourney:
     method: GET
     endpoint: /controller/restui/analytics/biz_outcome/definitions/summary
   enable:
-    title: Enable a valid business journey draft.
+    title: Enable a business journey.
     description: Provide the journey id (-i) as parameter.
     example: -i 6
     method: PUT
@@ -104,7 +104,7 @@ bizjourney:
     method: PUT
     endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable
   import:
-    title: Import a business journey draft
+    title: Import a business journey.
     description: Provide a json string or a file (with @ as prefix) as parameter (-d)
     example: -d @journey.json
     method: POST
@@ -120,27 +120,27 @@ bt:
     method: GET
     endpoint: /controller/rest/applications/{{a}}/business-transactions/{{b}}
   list:
-    title: List all BTs for a given application.
+    title: List all BTs.
     description: Provide the application id as parameter (-a)
     example: -a 29
     method: GET
     endpoint: /controller/rest/applications/{{a}}/business-transactions
   delete:
-    title: Delete a business transaction.
+    title: Delete a BT.
     description: Provide the bt id as parameter (-b)
     example: -b 13
     method: POST
     endpoint: /controller/restui/bt/deleteBTs
     payload: [{{b}}]
   rename:
-    title: Rename a business transaction.
+    title: Rename a BT.
     description: Provide the bt id (-b) and the new name (-n) as parameters
     example: -b 13 -n Checkout
     method: POST
     endpoint: /controller/restui/bt/renameBT?id={{b}}
     payload: {{n}}
   creategroup:
-    title: Create a business transactions group.
+    title: Create a BT group.
     description: Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)
     example: -b 13,14 -n MyGroup
     method: POST
@@ -150,19 +150,19 @@ configuration:
   title: Configuration API
   description: The configuration API enables you read and modify selected Controller configuration settings programmatically.
   get:
-    title: Retrieve a Controller Setting by Name.
+    title: Get a controller setting by name.
     description: Provide a name (-n) as parameter.
     example: -n metrics.min.retention.period
     method: GET
     endpoint: /controller/rest/configuration?name={{n}}
   list:
-    title: Retrieve All Controller Settings
+    title: List all controller settings
     description: The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console.
     example:
     method: GET
     endpoint: /controller/rest/configuration
   set:
-    title: Set a Controller setting to a specified value.
+    title: Set a controller setting.
     description: Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters
     example: -n metrics.min.retention.period -v 550
     method: POST
@@ -171,22 +171,57 @@ controller:
   title: Controller Calls
   description: Basic calls against an AppDynamics controller.
   auth:
-    title: Authenticate with an AppDynamics controller.
+    title: Authenticate.
     description:
     example:
     method: GET
     endpoint: /controller/auth?action=login
   status:
-    title: Get the server status from the controller.
+    title: Get the server status.
     description: This command will return a XML containing status information about the controller.
     example:
     method: GET
     endpoint: /controller/rest/serverstatus
+dbmon:
+  title: Database Visibility API
+  description: Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+  list:
+    title: List all collectors.
+    description: No further arguments required.
+    example:
+    method: GET
+    endpoint: /controller/rest/databases/collectors
+  get:
+    title: Get a specifc collector.
+    description: Provide the collector id as parameter (-c).
+    example: -c 17
+    method: GET
+    endpoint: /controller/rest/databases/collectors/{{c}}
+  delete:
+    title: Delete multiple collectors.
+    description: Provide a comma seperated list of collector analyticsSavedSearches
+    example: -c 17,18
+    method: POST
+    endpoint: /controller/rest/databases/collectors/batchDelete
+    payload: [{{c}}]
+  import:
+    title: Import a collector.
+    description: Provide a json string or a @file (-d) as parameter.
+    example: -d @collector.json
+    method: POST
+    endpoint: /controller/rest/databases/collectors/create
+    payload: {{d}}
+  servers:
+    title: List all servers.
+    description: No further arguments required.
+    example:
+    method: GET
+    endpoint: /controller/rest/databases/servers
 dashboard:
   title: Custom Dashboards
   description: Import and export custom dashboards in the AppDynamics controller
   list:
-    title: List all dashboards available on the controller.
+    title: List all dashboards.
     description: This command requires no further arguments.
     example:
     method: GET
@@ -211,6 +246,32 @@ dashboard:
     method: POST
     endpoint: /controller/restui/dashboards/updateDashboard
     payload: {{f}}
+event:
+  title: Events
+  description: Create and list events in your business applications.
+  create:
+    title: Create an event.
+    description: Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)
+    example: -l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'
+    method: POST
+    endpoint: /controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}
+federation:
+  title: Federation
+  description: Establish a federation between two AppDynamics Controllers.
+  createkey:
+    title: Create a key.
+    description: Provide a name for the api key (-n) as parameter.
+    example: -n saas2onprem
+    method: POST
+    endpoint: /controller/rest/federation/apikeyforfederation
+    payload: {\"apiKeyName\": \"{{n}}\"}
+  establish:
+    title: Establish a federation
+    description: Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account.
+    example: -a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090
+    method: POST
+    endpoint: /controller/rest/federation/establishmutualfriendship
+    payload: {\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{a}}\", \"friendAccountApiKey\": \"{{k}}\", \"friendAccountControllerUrl\": \"{{c}}\"}
 healthrule:
   title: Health Rules
   description: Configure and retrieve health rules and their violates.
@@ -221,13 +282,13 @@ healthrule:
     method: GET
     endpoint: /controller/healthrules/{{a}}/
   get:
-    title: Get a specifc healthrule.
+    title: Get a healthrule.
     description: Provide an application (-a) and a health rule name (-n) as parameters.
     example: -a 29
     method: GET
     endpoint: /controller/healthrules/{{a}}/?name={{n?}}
   violations:
-    title: Get healthrule violations.
+    title: Get all healthrule violations.
     description: Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
@@ -236,19 +297,19 @@ node:
   title: Nodes
   description: Retrieve nodes within a business application
   list:
-    title: List all nodes for a given application.
+    title: List all nodes.
     description: Provide the application id as parameter (-a).
     example: -a 29
     method: GET
     endpoint: /controller/rest/applications/{{a}}/nodes
   get:
-    title: Retrieve Node Information by Node Name.
+    title: Get a node.
     description: Provide the application (-a) and the node (-n) as parameters
     example: -a 29 -n 45
     method: GET
     endpoint: /controller/rest/applications/{{a}}/nodes/{{n}}
   markhistorical:
-    title: Mark Nodes as Historical.
+    title: Mark nodes as historical.
     description: Provide a comma separated list of node ids.
     example: -n 45,46
     method: POST
@@ -264,7 +325,7 @@ policies:
     endpoint: /controller/policies/{{a}}
 snapshot:
   title: Snapshot API
-  description: Retrieve APM snapshots
+  description: List APM snapshots.
   list:
     title: Retrieve a list of snapshots
     description: Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
@@ -273,7 +334,7 @@ snapshot:
     endpoint: /controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}
 tier:
   title: Tiers
-  description: Retrieve tiers within a business application
+  description: List all tiers.
   list:
     title: List all tiers for a given application.
     description: Provide the application id as parameter (-a).
@@ -281,13 +342,13 @@ tier:
     method: GET
     endpoint: /controller/rest/applications/{{a}}/tiers
   get:
-    title: Retrieve Tier Information by Tier Name
+    title: Get a tier.
     description: Provide the application (-a) and the tier (-t) as parameters
     example: -a 29 -t 45
     method: GET
     endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}
   nodes:
-    title: Retrieve Node Information for All Nodes in a Tier
+    title: List nodes for a tier.
     description: Provide the application (-a) and the tier (-t) as parameters
     example: -a 29 -t 45
     method: GET
@@ -296,14 +357,14 @@ user:
   title: Users
   description: Create and Modify AppDynamics Users.
   create:
-    title: Create a new user
+    title: Create a new user.
     description: Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
-    example: -n myadmin -d Administrator -r "Account Owner,Administrator" -p ******** -m admin@localhost
+    example: -n myadmin -d Administrator -r \"Account Administrator,Administrator\" -p ******** -m admin@localhost
     method: POST
     endpoint: /controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}
   update:
-    title: Update an existing user
+    title: Update an existing user.
     description: Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
-    example: -n myadmin -d Administrator -r "Account Owner,Administrator" -p ******** -m admin@localhost
+    example: -n myadmin -d Administrator -r \"Account Administrator,Administrator\" -p ******** -m admin@localhost
     method: POST
     endpoint: /controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}

@@ -24,6 +24,16 @@ function apiCall {
   debug "Unparsed payload is $PAYLOAD"
   shift
 
+  ## Special replacements for {{controller_account}} and {{controller_url}}
+  ## (This is currently used by federation_establish)
+  local ACCOUNT=${CONFIG_CONTROLLER_CREDENTIALS##*@}
+  ACCOUNT=${ACCOUNT%%:*}
+  local ACCOUNT_PATTERN="{{controller_account}}"
+  local CONTROLLER_URL_PATTERN="{{controller_url}}"
+  PAYLOAD=${PAYLOAD//${ACCOUNT_PATTERN}/${ACCOUNT}}
+  PAYLOAD=${PAYLOAD//${CONTROLLER_URL_PATTERN}/${CONFIG_CONTROLLER_HOST}}
+
+
   OLDIFS=$IFS
   IFS="{{"
   for MATCH in $PAYLOAD ; do

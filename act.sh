@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="d9d1d692abb70afb20c1275ee6177aafd79afa55"
+ACT_LAST_COMMIT="b1d90134225a79c67ca9f9634f0f4182463b27fd"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -61,7 +61,7 @@ RRREOF
 doc actiontemplate << EOF
 These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
 EOF
-function actiontemplate_createmediatype { apiCall -X POST -d '{name:{{n}},builtIn:false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+function actiontemplate_createmediatype { apiCall -X POST -d '{"name":"{{n}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
 function actiontemplate_export { apiCall '/controller/actiontemplate/{{t}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
@@ -71,7 +71,7 @@ EOF
 function analyticssearch_get { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}' "$@" ; }
 rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)" "-i 6"
 function analyticssearch_list { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
-rde analyticssearch_list "List all analytics searches on the controller." "This command requires no further arguments" ""
+rde analyticssearch_list "List all analytics searches." "This command requires no further arguments" ""
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
@@ -80,61 +80,61 @@ rde application_create "Create a new application." "Provide a name and a type (A
 function application_delete { apiCall -X POST -d '{{a}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
 rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
 function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a}}' "$@" ; }
-rde application_export "Export an application from the controller." "Provide an application id as parameter (-a)" "-a 29"
+rde application_export "Export an application." "Provide an application id as parameter (-a)" "-a 29"
 function application_get { apiCall '/controller/rest/applications/{{a}}' "$@" ; }
 rde application_get "Get an application." "Provide application id or name as parameter (-a)." "-a 15"
 function application_list { apiCall '/controller/rest/applications' "$@" ; }
-rde application_list "List all applications available on the controller" "This command requires no further arguments." ""
+rde application_list "List all applications." "This command requires no further arguments." ""
 doc audit << EOF
-he Controller audit history is a record of the configuration and user activities in the Controller configuration.
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
 EOF
 function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}' "$@" ; }
-rde audit_get "Retrieve Controller Audit History." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
+rde audit_get "Get audit history." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
 doc backend << EOF
 Retrieve information about backends within a given business application
 EOF
 function backend_list { apiCall '/controller/rest/applications/{{a}}/backends' "$@" ; }
-rde backend_list "List all backends for a given application." "Provide the application id as parameter (-a)" "-a 29"
+rde backend_list "List all backends." "Provide the application id as parameter (-a)" "-a 29"
 doc bizjourney << EOF
 Manage business journeys in AppDynamics Analytics
 EOF
 function bizjourney_disable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable' "$@" ; }
 rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
 function bizjourney_enable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@" ; }
-rde bizjourney_enable "Enable a valid business journey draft." "Provide the journey id (-i) as parameter." "-i 6"
+rde bizjourney_enable "Enable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
 function bizjourney_import { apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
-rde bizjourney_import "Import a business journey draft" "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
+rde bizjourney_import "Import a business journey." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
 function bizjourney_list { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
 rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
 function bt_creategroup { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}' "$@" ; }
-rde bt_creategroup "Create a business transactions group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
+rde bt_creategroup "Create a BT group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
 function bt_delete { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
-rde bt_delete "Delete a business transaction." "Provide the bt id as parameter (-b)" "-b 13"
+rde bt_delete "Delete a BT." "Provide the bt id as parameter (-b)" "-b 13"
 function bt_get { apiCall '/controller/rest/applications/{{a}}/business-transactions/{{b}}' "$@" ; }
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
 function bt_list { apiCall '/controller/rest/applications/{{a}}/business-transactions' "$@" ; }
-rde bt_list "List all BTs for a given application." "Provide the application id as parameter (-a)" "-a 29"
+rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
 function bt_rename { apiCall -X POST -d '{{n}}' '/controller/restui/bt/renameBT?id={{b}}' "$@" ; }
-rde bt_rename "Rename a business transaction." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
+rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc configuration << EOF
 The configuration API enables you read and modify selected Controller configuration settings programmatically.
 EOF
 function configuration_get { apiCall '/controller/rest/configuration?name={{n}}' "$@" ; }
-rde configuration_get "Retrieve a Controller Setting by Name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
+rde configuration_get "Get a controller setting by name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
 function configuration_list { apiCall '/controller/rest/configuration' "$@" ; }
-rde configuration_list "Retrieve All Controller Settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
+rde configuration_list "List all controller settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
 function configuration_set { apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@" ; }
-rde configuration_set "Set a Controller setting to a specified value." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
+rde configuration_set "Set a controller setting." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
 doc controller << EOF
 Basic calls against an AppDynamics controller.
 EOF
 function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
-rde controller_auth "Authenticate with an AppDynamics controller." "" ""
+rde controller_auth "Authenticate." "" ""
 function controller_status { apiCall '/controller/rest/serverstatus' "$@" ; }
-rde controller_status "Get the server status from the controller." "This command will return a XML containing status information about the controller." ""
+rde controller_status "Get the server status." "This command will return a XML containing status information about the controller." ""
 doc dashboard << EOF
 Import and export custom dashboards in the AppDynamics controller
 EOF
@@ -143,93 +143,78 @@ rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as param
 function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i}}' "$@" ; }
 rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
 function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
-rde dashboard_list "List all dashboards available on the controller." "This command requires no further arguments." ""
+rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
 function dashboard_update { apiCall -X POST -d '{{f}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
 rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-i 2"
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+function dbmon_delete { apiCall -X POST -d '[{{c}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
+rde dbmon_delete "Delete multiple collectors." "Provide a comma seperated list of collector analyticsSavedSearches" "-c 17,18"
+function dbmon_get { apiCall '/controller/rest/databases/collectors/{{c}}' "$@" ; }
+rde dbmon_get "Get a specifc collector." "Provide the collector id as parameter (-c)." "-c 17"
+function dbmon_import { apiCall -X POST -d '{{d}}' '/controller/rest/databases/collectors/create' "$@" ; }
+rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+function dbmon_list { apiCall '/controller/rest/databases/collectors' "$@" ; }
+rde dbmon_list "List all collectors." "No further arguments required." ""
+function dbmon_servers { apiCall '/controller/rest/databases/servers' "$@" ; }
+rde dbmon_servers "List all servers." "No further arguments required." ""
+doc event << EOF
+Create and list events in your business applications.
+EOF
+function event_create { apiCall -X POST '/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}' "$@" ; }
+rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+function federation_createkey { apiCall -X POST -d '{"apiKeyName": "{{n}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
+rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
+function federation_establish { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a}}", "friendAccountApiKey": "{{k}}", "friendAccountControllerUrl": "{{c}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
+rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
 function healthrule_get { apiCall '/controller/healthrules/{{a}}/?name={{n?}}' "$@" ; }
-rde healthrule_get "Get a specifc healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
+rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
 function healthrule_list { apiCall '/controller/healthrules/{{a}}/' "$@" ; }
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
 function healthrule_violations { apiCall '/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}' "$@" ; }
-rde healthrule_violations "Get healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc node << EOF
 Retrieve nodes within a business application
 EOF
 function node_get { apiCall '/controller/rest/applications/{{a}}/nodes/{{n}}' "$@" ; }
-rde node_get "Retrieve Node Information by Node Name." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
+rde node_get "Get a node." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
 function node_list { apiCall '/controller/rest/applications/{{a}}/nodes' "$@" ; }
-rde node_list "List all nodes for a given application." "Provide the application id as parameter (-a)." "-a 29"
+rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
 function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@" ; }
-rde node_markhistorical "Mark Nodes as Historical." "Provide a comma separated list of node ids." "-n 45,46"
+rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
 doc policies << EOF
 Import and export policies
 EOF
 function policies_list { apiCall '/controller/policies/{{a}}' "$@" ; }
 rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
 doc snapshot << EOF
-Retrieve APM snapshots
+List APM snapshots.
 EOF
 function snapshot_list { apiCall '/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}' "$@" ; }
 rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc tier << EOF
-Retrieve tiers within a business application
+List all tiers.
 EOF
 function tier_get { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}' "$@" ; }
-rde tier_get "Retrieve Tier Information by Tier Name" "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+rde tier_get "Get a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
 function tier_list { apiCall '/controller/rest/applications/{{a}}/tiers' "$@" ; }
 rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
 function tier_nodes { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@" ; }
-rde tier_nodes "Retrieve Node Information for All Nodes in a Tier" "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
 doc user << EOF
 Create and Modify AppDynamics Users.
 EOF
 function user_create { apiCall -X POST '/controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
-rde user_create "Create a new user" "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." ""
+rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
 function user_update { apiCall -X POST '/controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
-rde user_update "Update an existing user" "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." ""
-doc dbmon << EOF
-Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
-EOF
-function dbmon_get {
-  apiCall '/controller/rest/databases/collectors/{{c}}' "$@"
-}
-register dbmon_get Retrieve information about a specific database collector
-describe dbmon_get << EOF
-Retrieve information about a specific database collector. Provide the collector id as parameter (-c).
-EOF
-example dbmon_get << EOF
--c 17
-EOF
-function dbmon_delete {
-    apiCall -X DELETE '/controller/rest/databases/collectors/{{c}}' "$@"
-}
-register dbmon_delete Delete a database collector
-describe dbmon_delete << EOF
-Delete a database collector. Provide the collector id as parameter (-c).
-EOF
-example dbmon_delete << EOF
--c 17
-EOF
-function dbmon_import {
-  local FILE="$*"
-  if [ -r "${FILE}" ] ; then
-    DATA="$(<${FILE})"
-    controller_call -X POST -d "${DATA}" '/controller/rest/databases/collectors/create'
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register dbmon_import Import a database collector from a json file.
-describe dbmon_import << EOF
-Create a new database collector. Provide a valid json file as parameter.
-EOF
-example dbmon_import << EOF
-dbmon.json
-EOF
+rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
 function dbmon_create {
   apiCall -X POST -d "{ \
                       \"name\": \"{{i}}\",\
@@ -267,10 +252,6 @@ EOF
 example dbmon_create << EOF
 -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
 EOF
-function dbmon_list {
-  controller_call /controller/rest/databases/collectors
-}
-rde dbmon_list "List all database collectors." "No further arguments required." ""
 function dbmon_events {
   event_list -a '_dbmon' "$@"
 }
@@ -799,29 +780,6 @@ register federation_setup Setup a controller federation: Generates a key and est
 describe federation_setup << EOF
 Setup a controller federation: Generates a key and establishes the mutal friendship.
 EOF
-function federation_createkey {
-  apiCall -X POST -d '{"apiKeyName": "{{n}}"}' "/controller/rest/federation/apikeyforfederation" "$@"
-}
-register federation_createkey Create API Key for Federation
-describe federation_createkey << EOF
-Create API Key for Federation.
-EOF
-function federation_establish {
-  local ACCOUNT=${CONFIG_CONTROLLER_CREDENTIALS##*@}
-  ACCOUNT=${ACCOUNT%%:*}
-  info "Establishing friendship..."
-  apiCall -X POST -d "{ \
-    \"accountName\": \"${ACCOUNT}\", \
-    \"controllerUrl\": \"${CONFIG_CONTROLLER_HOST}\", \
-    \"friendAccountName\": \"{{a}}\", \
-    \"friendAccountApiKey\": \"{{k}}\", \
-    \"friendAccountControllerUrl\": \"{{c}}\" \
-  }" "/controller/rest/federation/establishmutualfriendship" "$@"
-}
-register federation_establish Establish Mutual Friendship
-describe federation_establish << EOF
-Establish Mutual Friendship
-EOF
 function eum_getapps {
   apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
 }
@@ -847,7 +805,7 @@ function timerange_create {
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
   local TYPE="BETWEEN_TIMES"
-  while getopts "s:e:b:" opt "$@";
+  while getopts "s:e:d:" opt "$@";
   do
     case "${opt}" in
       s)
@@ -1281,13 +1239,6 @@ describe healthrule_list << EOF
 Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
 If you provide ("-n") only the named health rule will be copied.
 EOF
-function event_create {
-  apiCall -X POST "/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}" "$@"
-}
-register event_create Create a custom event for a given application
-describe event_create << EOF
-Create a custom event for a given application. Application, summary, event type and severity are required parameters.
-EOF
 function event_list {
   # Add some "ALL" magic
   local PREV=""
@@ -1373,6 +1324,14 @@ function apiCall {
   debug "Unparsed endpoint is $ENDPOINT"
   debug "Unparsed payload is $PAYLOAD"
   shift
+  ## Special replacements for {{controller_account}} and {{controller_url}}
+  ## (This is currently used by federation_establish)
+  local ACCOUNT=${CONFIG_CONTROLLER_CREDENTIALS##*@}
+  ACCOUNT=${ACCOUNT%%:*}
+  local ACCOUNT_PATTERN="{{controller_account}}"
+  local CONTROLLER_URL_PATTERN="{{controller_url}}"
+  PAYLOAD=${PAYLOAD//${ACCOUNT_PATTERN}/${ACCOUNT}}
+  PAYLOAD=${PAYLOAD//${CONTROLLER_URL_PATTERN}/${CONFIG_CONTROLLER_HOST}}
   OLDIFS=$IFS
   IFS="{{"
   for MATCH in $PAYLOAD ; do

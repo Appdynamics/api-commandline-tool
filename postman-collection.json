@@ -16,7 +16,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{name:{{n}},builtIn:false}"
+							"raw": "{\"name\":\"{{n}}\",\"builtIn\":false}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/httpaction/createHttpRequestActionMediaType",
@@ -86,7 +86,7 @@
 						}
 					}
 				},{
-					"name": "List all analytics searches on the controller.",
+					"name": "List all analytics searches.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -173,7 +173,7 @@
 						}
 					}
 				},{
-					"name": "Export an application from the controller.",
+					"name": "Export an application.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -231,7 +231,7 @@
 						}
 					}
 				},{
-					"name": "List all applications available on the controller",
+					"name": "List all applications.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -260,7 +260,7 @@
 						}
 					}
 				}]},{"name": "audit","item": [{
-					"name": "Retrieve Controller Audit History.",
+					"name": "Get audit history.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -289,7 +289,7 @@
 						}
 					}
 				}]},{"name": "backend","item": [{
-					"name": "List all backends for a given application.",
+					"name": "List all backends.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -347,7 +347,7 @@
 						}
 					}
 				},{
-					"name": "Enable a valid business journey draft.",
+					"name": "Enable a business journey.",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -376,7 +376,7 @@
 						}
 					}
 				},{
-					"name": "Import a business journey draft",
+					"name": "Import a business journey.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -434,7 +434,7 @@
 						}
 					}
 				}]},{"name": "bt","item": [{
-					"name": "Create a business transactions group.",
+					"name": "Create a BT group.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -463,7 +463,7 @@
 						}
 					}
 				},{
-					"name": "Delete a business transaction.",
+					"name": "Delete a BT.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -521,7 +521,7 @@
 						}
 					}
 				},{
-					"name": "List all BTs for a given application.",
+					"name": "List all BTs.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -550,7 +550,7 @@
 						}
 					}
 				},{
-					"name": "Rename a business transaction.",
+					"name": "Rename a BT.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -579,7 +579,7 @@
 						}
 					}
 				}]},{"name": "configuration","item": [{
-					"name": "Retrieve a Controller Setting by Name.",
+					"name": "Get a controller setting by name.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -608,7 +608,7 @@
 						}
 					}
 				},{
-					"name": "Retrieve All Controller Settings",
+					"name": "List all controller settings",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -637,7 +637,7 @@
 						}
 					}
 				},{
-					"name": "Set a Controller setting to a specified value.",
+					"name": "Set a controller setting.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -666,7 +666,7 @@
 						}
 					}
 				}]},{"name": "controller","item": [{
-					"name": "Authenticate with an AppDynamics controller.",
+					"name": "Authenticate.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -695,7 +695,7 @@
 						}
 					}
 				},{
-					"name": "Get the server status from the controller.",
+					"name": "Get the server status.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -782,7 +782,7 @@
 						}
 					}
 				},{
-					"name": "List all dashboards available on the controller.",
+					"name": "List all dashboards.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -839,8 +839,240 @@
               "query": []
 						}
 					}
+				}]},{"name": "dbmon","item": [{
+					"name": "Delete multiple collectors.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{c}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/collectors/batchDelete",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","collectors","batchDelete"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Get a specifc collector.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/collectors/{{c}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","collectors","{{c}}"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Import a collector.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{d}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/collectors/create",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","collectors","create"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all collectors.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/collectors",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","collectors"],
+              "query": []
+						}
+					}
+				},{
+					"name": "List all servers.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/servers",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","servers"],
+              "query": []
+						}
+					}
+				}]},{"name": "event","item": [{
+					"name": "Create an event.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt=&{{b?}}node={{n?}}&tier={{t?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","applications","{{a}}","events"],
+              "query": [{"key": "}}"}]
+						}
+					}
+				}]},{"name": "federation","item": [{
+					"name": "Create a key.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"apiKeyName\": \"{{n}}\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/federation/apikeyforfederation",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","federation","apikeyforfederation"],
+              "query": []
+						}
+					}
+				},{
+					"name": "Establish a federation",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{a}}\", \"friendAccountApiKey\": \"{{k}}\", \"friendAccountControllerUrl\": \"{{c}}\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/federation/establishmutualfriendship",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","federation","establishmutualfriendship"],
+              "query": []
+						}
+					}
 				}]},{"name": "healthrule","item": [{
-					"name": "Get a specifc healthrule.",
+					"name": "Get a healthrule.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -898,7 +1130,7 @@
 						}
 					}
 				},{
-					"name": "Get healthrule violations.",
+					"name": "Get all healthrule violations.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -927,7 +1159,7 @@
 						}
 					}
 				}]},{"name": "node","item": [{
-					"name": "Retrieve Node Information by Node Name.",
+					"name": "Get a node.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -956,7 +1188,7 @@
 						}
 					}
 				},{
-					"name": "List all nodes for a given application.",
+					"name": "List all nodes.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -985,7 +1217,7 @@
 						}
 					}
 				},{
-					"name": "Mark Nodes as Historical.",
+					"name": "Mark nodes as historical.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1072,7 +1304,7 @@
 						}
 					}
 				}]},{"name": "tier","item": [{
-					"name": "Retrieve Tier Information by Tier Name",
+					"name": "Get a tier.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1130,7 +1362,7 @@
 						}
 					}
 				},{
-					"name": "Retrieve Node Information for All Nodes in a Tier",
+					"name": "List nodes for a tier.",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1159,7 +1391,7 @@
 						}
 					}
 				}]},{"name": "user","item": [{
-					"name": "Create a new user",
+					"name": "Create a new user.",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1188,7 +1420,7 @@
 						}
 					}
 				},{
-					"name": "Update an existing user",
+					"name": "Update an existing user.",
 					"request": {
 						"method": "POST",
 						"header": [
