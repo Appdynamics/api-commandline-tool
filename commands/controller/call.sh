@@ -8,7 +8,6 @@ function controller_call {
   debug "$@"
   while getopts "X:d:F:B" opt "$@";
   do
-    debug "${opt}"
     case "${opt}" in
       X)
 	METHOD=${OPTARG}
@@ -22,10 +21,11 @@ function controller_call {
       B)
         USE_BASIC_AUTH=1
       ;;
+      *)
+        debug "Invalid flag ${OPTARG} for controller_call"
+      ;;
     esac
   done
-
-  debug "ASDF"
 
   shiftOptInd
   shift $SHIFTS

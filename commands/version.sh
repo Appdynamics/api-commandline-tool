@@ -1,7 +1,8 @@
 #!/bin/bash
 
 function _version {
-  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
+  # shellcheck disable=SC2034
+  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
 }
 
 register _version Print the current version of $SCRIPTNAME

@@ -3,7 +3,7 @@
 function _help {
   if [ "$1" = "" ] ; then
     read -r -d '' COMMAND_RESULT <<- EOM
-Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n
+Usage: ${USAGE_DESCRIPTION}\n
 
 You can use the following options on a global level:\n
 
@@ -54,4 +54,4 @@ EOM
   fi
 }
 
-register _help Display the global usage information
+register _help Display the global help.

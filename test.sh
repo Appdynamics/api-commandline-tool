@@ -152,7 +152,7 @@ if [[ $CREATE_APPLICATION =~ \"id\"\ \:\ ([0-9]+) ]] ; then
 
   ##### Error handling #####
   assert_equals "Error" "`env CONFIG_HTTP_TIMEOUT=1 ./act.sh -H 127.0.0.2:8009 controller ping`"
-  assert_equals "ERROR: Please provide an argument for paramater -a" "`${ACT} event create`" "Missing required argument"
+  assert_equals "ERROR: Missing application: Please provide an argument for parameter -a" "`${ACT} event create`" "Missing required argument"
 
   ##### Delete the test application
   assert_contains_substring "HTTP Status: 204" "`${ACT} application delete $APPLICATION_ID`"

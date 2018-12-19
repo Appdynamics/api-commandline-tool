@@ -27,7 +27,7 @@ COLOR_RESET="\033[0m"
 
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
-GLOBAL_LONG_HELP_COUNTER=0
+declare -i GLOBAL_COMMANDS_COUNTER=0
 declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
 declare -a GLOBAL_EXAMPLE_COMMANDS
@@ -41,6 +41,7 @@ declare -i VERBOSITY_COUNTER
 
 # register namespace_command help
 function register {
+  GLOBAL_COMMANDS_COUNTER+=1
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
   GLOBAL_HELP="$GLOBAL_HELP\n$*"
 }
@@ -88,6 +89,7 @@ else
 fi
 
 # Parse global options
+USAGE_DESCRIPTION="$SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-E <environment>] [-J <cookie-location>] [-P <plugin-directory>] [-F <controller-info-xml>] [-A <application-name>] [-O] [-v[vv]] <namespace> <command>"
 read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-H <controller-host>          |specify the host of the controller you want to connect to|
 |-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
@@ -191,17 +193,21 @@ debug "CONFIG_USER_PLUGIN_DIRECTORY=$CONFIG_USER_PLUGIN_DIRECTORY"
 
 recursiveSource "${CONFIG_USER_PLUGIN_DIRECTORY}"
 
+
+
 NAMESPACE=$1
 
 COMMAND_RESULT=""
 
+if [ "$#" -eq 0 ] ; then
+  _usage
 # Check if the namespace is used
-if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
+elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
   debug "${NAMESPACE} has commands"
   COMMAND=$2
-  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ]; then
+  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ] ; then
     debug "Will display help for $NAMESPACE"
-    _help ${NAMESPACE}
+    echo _help ${NAMESPACE}
   elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2

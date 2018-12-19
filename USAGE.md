@@ -172,12 +172,13 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| source | Load environment variables |  |
+| source | Load environment variables | `act.sh environment source myaccount` |
 | get | Retrieve an environment. Provide the name of the environment as parameter. | `act.sh environment get myaccount` |
 | delete | Delete an environment. Provide the name of the environment as parameter. | `act.sh environment delete myaccount` |
 | add | Add a new environment. To change the default environment, run with `-d` | `act.sh environment add -d` |
 | list | List all your environments | `act.sh environment list ` |
 | export | Export an environment into a postman environment | `act.sh environment export > output.json` |
+| edit |  | `act.sh environment edit myaccount` |
 
 
 ## eum

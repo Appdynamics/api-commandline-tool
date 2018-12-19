@@ -6,7 +6,7 @@ application:
     description: Provide application id or name as parameter (-a).
     example: -a 15
     method: GET
-    endpoint: /controller/rest/applications/{{a}}
+    endpoint: /controller/rest/applications/{{a:application}}
   list:
     title: List all applications.
     description: This command requires no further arguments.
@@ -18,21 +18,21 @@ application:
     description: Provide a name and a type (APM or WEB) as parameter.
     example: -t APM -n MyNewApplication
     method: POST
-    endpoint: /controller/restui/allApplications/createApplication?applicationType={{t}}
-    payload: {\"name\": \"{{n}}\", \"description\": \"\"}
+    endpoint: /controller/restui/allApplications/createApplication?applicationType={{t:application_type}}
+    payload: {\"name\": \"{{n:application_name}}\", \"description\": \"{{d:application_description?}}\"}
   delete:
     title: Delete an application.
     description: Provide an application id as parameter (-a)
     example: -a 29
     method: POST
     endpoint: /controller/restui/allApplications/deleteApplication
-    payload: {{a}}
+    payload: {{a:application}}
   export:
     title: Export an application.
     description: Provide an application id as parameter (-a)
     example: -a 29
     method: GET
-    endpoint: /controller/ConfigObjectImportExportServlet?applicationId={{a}}
+    endpoint: /controller/ConfigObjectImportExportServlet?applicationId={{a:application}}
 actiontemplate:
   title: Action Templates
   description: These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
@@ -42,13 +42,13 @@ actiontemplate:
     example: -n 'application/vnd.appd.events+json'
     method: POST
     endpoint: /controller/restui/httpaction/createHttpRequestActionMediaType
-    payload: {\"name\":\"{{n}}\",\"builtIn\":false}
+    payload: {\"name\":\"{{n:media_type_name}}\",\"builtIn\":false}
   export:
     title: Export all templates of a given type.
     description: Provide the type (-t email or httprequest) as parameter.
     example: -t httprequest
     method: GET
-    endpoint: /controller/actiontemplate/{{t}}/
+    endpoint: /controller/actiontemplate/{{t:action_template_type}}/
 analyticssearch:
   title: Saved Analytics Search
   description: These commands allow you to import and export email/http saved analytics searches.
@@ -57,7 +57,7 @@ analyticssearch:
     description: Provide the id as parameter (-i)
     example: -i 6
     method: GET
-    endpoint: /controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}
+    endpoint: /controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}
   list:
     title: List all analytics searches.
     description: This command requires no further arguments
@@ -72,7 +72,7 @@ audit:
     description: Provide a start time (-b) and an end time (-f) as parameter.
     example: -b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700
     method: GET
-    endpoint: /controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}
+    endpoint: /controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}
 backend:
   title: Backends in a Business Application
   description: Retrieve information about backends within a given business application
@@ -81,7 +81,7 @@ backend:
     description: Provide the application id as parameter (-a)
     example: -a 29
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/backends
+    endpoint: /controller/rest/applications/{{a:application}}/backends
 bizjourney:
   title: Business Journeyes
   description: Manage business journeys in AppDynamics Analytics
@@ -96,20 +96,20 @@ bizjourney:
     description: Provide the journey id (-i) as parameter.
     example: -i 6
     method: PUT
-    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable
   disable:
     title: Disable a business journey.
     description: Provide the journey id (-i) as parameter.
     example: -i 6
     method: PUT
-    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable
+    endpoint: /controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable
   import:
     title: Import a business journey.
     description: Provide a json string or a file (with @ as prefix) as parameter (-d)
     example: -d @journey.json
     method: POST
     endpoint: /controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft
-    payload: {{d}}
+    payload: {{d:business_journey_draft}}
 bt:
   title: Business Transactions in a Business Application
   description: Retrieve information about business transactions within a given business application
@@ -118,34 +118,34 @@ bt:
     description: Provide as parameters bt id (-b) and application id (-a).
     example: -a 29 -b 13
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/business-transactions/{{b}}
+    endpoint: /controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}
   list:
     title: List all BTs.
     description: Provide the application id as parameter (-a)
     example: -a 29
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/business-transactions
+    endpoint: /controller/rest/applications/{{a:application}}/business-transactions
   delete:
     title: Delete a BT.
     description: Provide the bt id as parameter (-b)
     example: -b 13
     method: POST
     endpoint: /controller/restui/bt/deleteBTs
-    payload: [{{b}}]
+    payload: [{{b:business_transactions}}]
   rename:
     title: Rename a BT.
     description: Provide the bt id (-b) and the new name (-n) as parameters
     example: -b 13 -n Checkout
     method: POST
-    endpoint: /controller/restui/bt/renameBT?id={{b}}
-    payload: {{n}}
+    endpoint: /controller/restui/bt/renameBT?id={{b:business_transaction}}
+    payload: {{n:business_transaction_name}}
   creategroup:
     title: Create a BT group.
     description: Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)
     example: -b 13,14 -n MyGroup
     method: POST
-    endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}
-    payload: [{{b}}]
+    endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}
+    payload: [{{b:business_transactions}}]
 configuration:
   title: Configuration API
   description: The configuration API enables you read and modify selected Controller configuration settings programmatically.
@@ -154,7 +154,7 @@ configuration:
     description: Provide a name (-n) as parameter.
     example: -n metrics.min.retention.period
     method: GET
-    endpoint: /controller/rest/configuration?name={{n}}
+    endpoint: /controller/rest/configuration?name={{n:controller_setting_name}}
   list:
     title: List all controller settings
     description: The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console.
@@ -166,7 +166,7 @@ configuration:
     description: Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters
     example: -n metrics.min.retention.period -v 550
     method: POST
-    endpoint: /controller/rest/configuration?name={{n}}&value={{v}}
+    endpoint: /controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}
 controller:
   title: Controller Calls
   description: Basic calls against an AppDynamics controller.
@@ -196,21 +196,21 @@ dbmon:
     description: Provide the collector id as parameter (-c).
     example: -c 17
     method: GET
-    endpoint: /controller/rest/databases/collectors/{{c}}
+    endpoint: /controller/rest/databases/collectors/{{c:database_collector}}
   delete:
     title: Delete multiple collectors.
     description: Provide a comma seperated list of collector analyticsSavedSearches
     example: -c 17,18
     method: POST
     endpoint: /controller/rest/databases/collectors/batchDelete
-    payload: [{{c}}]
+    payload: [{{c:database_collectors}}]
   import:
     title: Import a collector.
     description: Provide a json string or a @file (-d) as parameter.
     example: -d @collector.json
     method: POST
     endpoint: /controller/rest/databases/collectors/create
-    payload: {{d}}
+    payload: {{d:database_collector_definition}}
   servers:
     title: List all servers.
     description: No further arguments required.
@@ -231,21 +231,21 @@ dashboard:
     description: Provide a dashboard id (-i) as parameter
     example: -i 2
     method: GET
-    endpoint: /controller/CustomDashboardImportExportServlet?dashboardId={{i}}
+    endpoint: /controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}
   delete:
     title: Delete a dashboard.
     description: Provide a dashboard id (-i) as parameter
     example: -i 2
     method: POST
     endpoint: /controller/restui/dashboards/deleteDashboards
-    payload: [{{i}}]
+    payload: [{{i:dashboard_id}}]
   update:
     title: Update a dashboard.
     description: Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format.
     example: -i 2
     method: POST
     endpoint: /controller/restui/dashboards/updateDashboard
-    payload: {{f}}
+    payload: {{f:dashboard_definition}}
 event:
   title: Events
   description: Create and list events in your business applications.
@@ -254,7 +254,7 @@ event:
     description: Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)
     example: -l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'
     method: POST
-    endpoint: /controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt={{b?}}&node={{n?}}&tier={{t?}}
+    endpoint: /controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}
 federation:
   title: Federation
   description: Establish a federation between two AppDynamics Controllers.
@@ -264,14 +264,14 @@ federation:
     example: -n saas2onprem
     method: POST
     endpoint: /controller/rest/federation/apikeyforfederation
-    payload: {\"apiKeyName\": \"{{n}}\"}
+    payload: {\"apiKeyName\": \"{{n:federation_api_key_name}}\"}
   establish:
     title: Establish a federation
     description: Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account.
     example: -a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090
     method: POST
     endpoint: /controller/rest/federation/establishmutualfriendship
-    payload: {\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{a}}\", \"friendAccountApiKey\": \"{{k}}\", \"friendAccountControllerUrl\": \"{{c}}\"}
+    payload: {\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{a:federation_friend_account}}\", \"friendAccountApiKey\": \"{{k:federation_friend_api_key}}\", \"friendAccountControllerUrl\": \"{{c:federation_friend_controller_url}}\"}
 healthrule:
   title: Health Rules
   description: Configure and retrieve health rules and their violates.
@@ -280,19 +280,19 @@ healthrule:
     description: Provide an application (-a) as parameter
     example: -a 29
     method: GET
-    endpoint: /controller/healthrules/{{a}}/
+    endpoint: /controller/healthrules/{{a:application}}/
   get:
     title: Get a healthrule.
     description: Provide an application (-a) and a health rule name (-n) as parameters.
     example: -a 29
     method: GET
-    endpoint: /controller/healthrules/{{a}}/?name={{n?}}
+    endpoint: /controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}
   violations:
     title: Get all healthrule violations.
     description: Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}
+    endpoint: /controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}
 node:
   title: Nodes
   description: Retrieve nodes within a business application
@@ -301,19 +301,19 @@ node:
     description: Provide the application id as parameter (-a).
     example: -a 29
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/nodes
+    endpoint: /controller/rest/applications/{{a:application}}/nodes
   get:
     title: Get a node.
     description: Provide the application (-a) and the node (-n) as parameters
     example: -a 29 -n 45
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/nodes/{{n}}
+    endpoint: /controller/rest/applications/{{a:application}}/nodes/{{n:node}}
   markhistorical:
     title: Mark nodes as historical.
     description: Provide a comma separated list of node ids.
     example: -n 45,46
     method: POST
-    endpoint: /controller/rest/mark-nodes-historical?application-component-node-ids={{n}}
+    endpoint: /controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}
 policies:
   title: Policies API
   description: Import and export policies
@@ -322,7 +322,7 @@ policies:
     description: Provide an application (-a) as parameter.
     example: -a 29
     method: GET
-    endpoint: /controller/policies/{{a}}
+    endpoint: /controller/policies/{{a:application}}
 snapshot:
   title: Snapshot API
   description: List APM snapshots.
@@ -331,7 +331,7 @@ snapshot:
     description: Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}
+    endpoint: /controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}
 tier:
   title: Tiers
   description: List all tiers.
@@ -340,19 +340,19 @@ tier:
     description: Provide the application id as parameter (-a).
     example: -a 29
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/tiers
+    endpoint: /controller/rest/applications/{{a:application}}/tiers
   get:
     title: Get a tier.
     description: Provide the application (-a) and the tier (-t) as parameters
     example: -a 29 -t 45
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}
+    endpoint: /controller/rest/applications/{{a:application}}/tiers/{{t:tier}}
   nodes:
     title: List nodes for a tier.
     description: Provide the application (-a) and the tier (-t) as parameters
     example: -a 29 -t 45
     method: GET
-    endpoint: /controller/rest/applications/{{a}}/tiers/{{t}}/nodes
+    endpoint: /controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes
 user:
   title: Users
   description: Create and Modify AppDynamics Users.
@@ -361,10 +361,10 @@ user:
     description: Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
     example: -n myadmin -d Administrator -r \"Account Administrator,Administrator\" -p ******** -m admin@localhost
     method: POST
-    endpoint: /controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}
+    endpoint: /controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}
   update:
     title: Update an existing user.
     description: Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters.
     example: -n myadmin -d Administrator -r \"Account Administrator,Administrator\" -p ******** -m admin@localhost
     method: POST
-    endpoint: /controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}
+    endpoint: /controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}

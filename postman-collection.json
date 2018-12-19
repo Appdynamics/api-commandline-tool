@@ -16,7 +16,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"name\":\"{{n}}\",\"builtIn\":false}"
+							"raw": "{\"name\":\"{{media_type_name}}\",\"builtIn\":false}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/httpaction/createHttpRequestActionMediaType",
@@ -25,7 +25,8 @@
 							],
 							"path": ["controller","restui","httpaction","createHttpRequestActionMediaType"],
               "query": []
-						}
+						},
+            "description": "Provide the name of the media type as parameter (-n)"
 					}
 				},{
 					"name": "Export all templates of a given type.",
@@ -48,13 +49,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/actiontemplate/{{t}}/",
+							"raw": "{{controller_host}}/controller/actiontemplate/{{t:action_template_type}}/",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","actiontemplate","{{t}}",""],
+							"path": ["controller","actiontemplate","{{action_template_type}}",""],
               "query": []
-						}
+						},
+            "description": "Provide the type (-t email or httprequest) as parameter."
 					}
 				}]},{"name": "analyticssearch","item": [{
 					"name": "Get an analytics search by id.",
@@ -77,13 +79,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}",
+							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","analyticsSavedSearches","getAnalyticsSavedSearchById","{{i}}"],
+							"path": ["controller","restui","analyticsSavedSearches","getAnalyticsSavedSearchById","{{analytics_search_id}}"],
               "query": []
-						}
+						},
+            "description": "Provide the id as parameter (-i)"
 					}
 				},{
 					"name": "List all analytics searches.",
@@ -112,7 +115,8 @@
 							],
 							"path": ["controller","restui","analyticsSavedSearches","getAllAnalyticsSavedSearches"],
               "query": []
-						}
+						},
+            "description": "This command requires no further arguments"
 					}
 				}]},{"name": "application","item": [{
 					"name": "Create a new application.",
@@ -132,16 +136,17 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"name\": \"{{n}}\", \"description\": \"\"}"
+							"raw": "{\"name\": \"{{application_name}}\", \"description\": \"{{application_description}}\"}"
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/allApplications/createApplication?applicationType={{t}}",
+							"raw": "{{controller_host}}/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","restui","allApplications","createApplication"],
-              "query": [{"key": "applicationType","value": "{{t}}"}]
-						}
+              "query": [{"key": "applicationType","value": "{{application_type}}"}]
+						},
+            "description": "Provide a name and a type (APM or WEB) as parameter."
 					}
 				},{
 					"name": "Delete an application.",
@@ -161,7 +166,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{{a}}"
+							"raw": "{{application}}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/allApplications/deleteApplication",
@@ -170,7 +175,8 @@
 							],
 							"path": ["controller","restui","allApplications","deleteApplication"],
               "query": []
-						}
+						},
+            "description": "Provide an application id as parameter (-a)"
 					}
 				},{
 					"name": "Export an application.",
@@ -193,13 +199,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/ConfigObjectImportExportServlet?applicationId={{a}}",
+							"raw": "{{controller_host}}/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","ConfigObjectImportExportServlet"],
-              "query": [{"key": "applicationId","value": "{{a}}"}]
-						}
+              "query": [{"key": "applicationId","value": "{{application}}"}]
+						},
+            "description": "Provide an application id as parameter (-a)"
 					}
 				},{
 					"name": "Get an application.",
@@ -222,13 +229,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}"],
+							"path": ["controller","rest","applications","{{application}}"],
               "query": []
-						}
+						},
+            "description": "Provide application id or name as parameter (-a)."
 					}
 				},{
 					"name": "List all applications.",
@@ -257,7 +265,8 @@
 							],
 							"path": ["controller","rest","applications"],
               "query": []
-						}
+						},
+            "description": "This command requires no further arguments."
 					}
 				}]},{"name": "audit","item": [{
 					"name": "Get audit history.",
@@ -280,13 +289,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}",
+							"raw": "{{controller_host}}/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","ControllerAuditHistory"],
-              "query": [{"key": "startTime","value": "{{b}}"},{"key":"endTime","value": "{{f}}"}]
-						}
+              "query": [{"key": "startTime","value": "{{start_time}}"},{"key":"endTime","value": "{{end_time}}"}]
+						},
+            "description": "Provide a start time (-b) and an end time (-f) as parameter."
 					}
 				}]},{"name": "backend","item": [{
 					"name": "List all backends.",
@@ -309,13 +319,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/backends",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/backends",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","backends"],
+							"path": ["controller","rest","applications","{{application}}","backends"],
               "query": []
-						}
+						},
+            "description": "Provide the application id as parameter (-a)"
 					}
 				}]},{"name": "bizjourney","item": [{
 					"name": "Disable a business journey.",
@@ -338,13 +349,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable",
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","analytics","biz_outcome","definitions","{{i}}","actions","userDisable"],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","{{business_journey_id}}","actions","userDisable"],
               "query": []
-						}
+						},
+            "description": "Provide the journey id (-i) as parameter."
 					}
 				},{
 					"name": "Enable a business journey.",
@@ -367,13 +379,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable",
+							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","analytics","biz_outcome","definitions","{{i}}","actions","enable"],
+							"path": ["controller","restui","analytics","biz_outcome","definitions","{{business_journey_id}}","actions","enable"],
               "query": []
-						}
+						},
+            "description": "Provide the journey id (-i) as parameter."
 					}
 				},{
 					"name": "Import a business journey.",
@@ -393,7 +406,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{{d}}"
+							"raw": "{{business_journey_draft}}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft",
@@ -402,7 +415,8 @@
 							],
 							"path": ["controller","restui","analytics","biz_outcome","definitions","saveAsValidDraft"],
               "query": []
-						}
+						},
+            "description": "Provide a json string or a file (with @ as prefix) as parameter (-d)"
 					}
 				},{
 					"name": "List all business journeys.",
@@ -431,7 +445,8 @@
 							],
 							"path": ["controller","restui","analytics","biz_outcome","definitions","summary"],
               "query": []
-						}
+						},
+            "description": "This command requires no further arguments."
 					}
 				}]},{"name": "bt","item": [{
 					"name": "Create a BT group.",
@@ -451,16 +466,17 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "[{{b}}]"
+							"raw": "[{{business_transactions}}]"
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}",
+							"raw": "{{controller_host}}/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","restui","bt","createBusinessTransactionGroup"],
-              "query": [{"key": "applicationId","value": "{{a}}"},{"key":"groupName","value": "{{n}}"}]
-						}
+              "query": [{"key": "applicationId","value": "{{application}}"},{"key":"groupName","value": "{{business_transaction_group_name}}"}]
+						},
+            "description": "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)"
 					}
 				},{
 					"name": "Delete a BT.",
@@ -480,7 +496,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "[{{b}}]"
+							"raw": "[{{business_transactions}}]"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/bt/deleteBTs",
@@ -489,7 +505,8 @@
 							],
 							"path": ["controller","restui","bt","deleteBTs"],
               "query": []
-						}
+						},
+            "description": "Provide the bt id as parameter (-b)"
 					}
 				},{
 					"name": "Get a BT.",
@@ -512,13 +529,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/business-transactions/{{b}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","business-transactions","{{b}}"],
+							"path": ["controller","rest","applications","{{application}}","business-transactions","{{business_transaction}}"],
               "query": []
-						}
+						},
+            "description": "Provide as parameters bt id (-b) and application id (-a)."
 					}
 				},{
 					"name": "List all BTs.",
@@ -541,13 +559,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/business-transactions",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/business-transactions",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","business-transactions"],
+							"path": ["controller","rest","applications","{{application}}","business-transactions"],
               "query": []
-						}
+						},
+            "description": "Provide the application id as parameter (-a)"
 					}
 				},{
 					"name": "Rename a BT.",
@@ -567,16 +586,17 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{{n}}"
+							"raw": "{{business_transaction_name}}"
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/bt/renameBT?id={{b}}",
+							"raw": "{{controller_host}}/controller/restui/bt/renameBT?id={{b:business_transaction}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","restui","bt","renameBT"],
-              "query": [{"key": "id","value": "{{b}}"}]
-						}
+              "query": [{"key": "id","value": "{{business_transaction}}"}]
+						},
+            "description": "Provide the bt id (-b) and the new name (-n) as parameters"
 					}
 				}]},{"name": "configuration","item": [{
 					"name": "Get a controller setting by name.",
@@ -599,13 +619,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/configuration?name={{n}}",
+							"raw": "{{controller_host}}/controller/rest/configuration?name={{n:controller_setting_name}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","configuration"],
-              "query": [{"key": "name","value": "{{n}}"}]
-						}
+              "query": [{"key": "name","value": "{{controller_setting_name}}"}]
+						},
+            "description": "Provide a name (-n) as parameter."
 					}
 				},{
 					"name": "List all controller settings",
@@ -634,7 +655,8 @@
 							],
 							"path": ["controller","rest","configuration"],
               "query": []
-						}
+						},
+            "description": "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console."
 					}
 				},{
 					"name": "Set a controller setting.",
@@ -657,13 +679,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/configuration?name={{n}}&value={{v}}",
+							"raw": "{{controller_host}}/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","configuration"],
-              "query": [{"key": "name","value": "{{n}}"},{"key":"value","value": "{{v}}"}]
-						}
+              "query": [{"key": "name","value": "{{controller_setting_name}}"},{"key":"value","value": "{{controller_setting_value}}"}]
+						},
+            "description": "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters"
 					}
 				}]},{"name": "controller","item": [{
 					"name": "Authenticate.",
@@ -692,7 +715,8 @@
 							],
 							"path": ["controller","auth"],
               "query": [{"key": "action","value": "login"}]
-						}
+						},
+            "description": ""
 					}
 				},{
 					"name": "Get the server status.",
@@ -721,7 +745,8 @@
 							],
 							"path": ["controller","rest","serverstatus"],
               "query": []
-						}
+						},
+            "description": "This command will return a XML containing status information about the controller."
 					}
 				}]},{"name": "dashboard","item": [{
 					"name": "Delete a dashboard.",
@@ -741,7 +766,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "[{{i}}]"
+							"raw": "[{{dashboard_id}}]"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/dashboards/deleteDashboards",
@@ -750,7 +775,8 @@
 							],
 							"path": ["controller","restui","dashboards","deleteDashboards"],
               "query": []
-						}
+						},
+            "description": "Provide a dashboard id (-i) as parameter"
 					}
 				},{
 					"name": "Export a dashboard.",
@@ -773,13 +799,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/CustomDashboardImportExportServlet?dashboardId={{i}}",
+							"raw": "{{controller_host}}/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","CustomDashboardImportExportServlet"],
-              "query": [{"key": "dashboardId","value": "{{i}}"}]
-						}
+              "query": [{"key": "dashboardId","value": "{{dashboard_id}}"}]
+						},
+            "description": "Provide a dashboard id (-i) as parameter"
 					}
 				},{
 					"name": "List all dashboards.",
@@ -808,7 +835,8 @@
 							],
 							"path": ["controller","restui","dashboards","getAllDashboardsByType","false"],
               "query": []
-						}
+						},
+            "description": "This command requires no further arguments."
 					}
 				},{
 					"name": "Update a dashboard.",
@@ -828,7 +856,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{{f}}"
+							"raw": "{{dashboard_definition}}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/restui/dashboards/updateDashboard",
@@ -837,7 +865,8 @@
 							],
 							"path": ["controller","restui","dashboards","updateDashboard"],
               "query": []
-						}
+						},
+            "description": "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format."
 					}
 				}]},{"name": "dbmon","item": [{
 					"name": "Delete multiple collectors.",
@@ -857,7 +886,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "[{{c}}]"
+							"raw": "[{{database_collectors}}]"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/rest/databases/collectors/batchDelete",
@@ -866,7 +895,8 @@
 							],
 							"path": ["controller","rest","databases","collectors","batchDelete"],
               "query": []
-						}
+						},
+            "description": "Provide a comma seperated list of collector analyticsSavedSearches"
 					}
 				},{
 					"name": "Get a specifc collector.",
@@ -889,13 +919,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/databases/collectors/{{c}}",
+							"raw": "{{controller_host}}/controller/rest/databases/collectors/{{c:database_collector}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","databases","collectors","{{c}}"],
+							"path": ["controller","rest","databases","collectors","{{database_collector}}"],
               "query": []
-						}
+						},
+            "description": "Provide the collector id as parameter (-c)."
 					}
 				},{
 					"name": "Import a collector.",
@@ -915,7 +946,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{{d}}"
+							"raw": "{{database_collector_definition}}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/rest/databases/collectors/create",
@@ -924,7 +955,8 @@
 							],
 							"path": ["controller","rest","databases","collectors","create"],
               "query": []
-						}
+						},
+            "description": "Provide a json string or a @file (-d) as parameter."
 					}
 				},{
 					"name": "List all collectors.",
@@ -953,7 +985,8 @@
 							],
 							"path": ["controller","rest","databases","collectors"],
               "query": []
-						}
+						},
+            "description": "No further arguments required."
 					}
 				},{
 					"name": "List all servers.",
@@ -982,7 +1015,8 @@
 							],
 							"path": ["controller","rest","databases","servers"],
               "query": []
-						}
+						},
+            "description": "No further arguments required."
 					}
 				}]},{"name": "event","item": [{
 					"name": "Create an event.",
@@ -1005,13 +1039,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt={{b?}}&node={{n?}}&tier={{t?}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","events"],
-              "query": [{"key": "summary","value": "{{s}}"},{"key":"comment","value": "{{c?}}"},{"key":"eventtype","value": "{{e}}"},{"key":"severity","value": "{{l}}"},{"key":"bt","value": "{{b?}}"},{"key":"node","value": "{{n?}}"},{"key":"tier","value": "{{t?}}"}]
-						}
+							"path": ["controller","rest","applications","{{application}}","events"],
+              "query": [{"key": "summary","value": "{{event_summary}}"},{"key":"comment","value": "{{event_comment}}"},{"key":"eventtype","value": "{{event_type}}"},{"key":"severity","value": "{{event_severity}}"},{"key":"bt","value": "{{business_transaction}}"},{"key":"node","value": "{{node}}"},{"key":"tier","value": "{{tier}}"}]
+						},
+            "description": "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)"
 					}
 				}]},{"name": "federation","item": [{
 					"name": "Create a key.",
@@ -1031,7 +1066,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"apiKeyName\": \"{{n}}\"}"
+							"raw": "{\"apiKeyName\": \"{{federation_api_key_name}}\"}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/rest/federation/apikeyforfederation",
@@ -1040,7 +1075,8 @@
 							],
 							"path": ["controller","rest","federation","apikeyforfederation"],
               "query": []
-						}
+						},
+            "description": "Provide a name for the api key (-n) as parameter."
 					}
 				},{
 					"name": "Establish a federation",
@@ -1060,7 +1096,7 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{a}}\", \"friendAccountApiKey\": \"{{k}}\", \"friendAccountControllerUrl\": \"{{c}}\"}"
+							"raw": "{\"accountName\": \"{{controller_account}}\",\"controllerUrl\": \"{{controller_url}}\",\"friendAccountName\": \"{{federation_friend_account}}\", \"friendAccountApiKey\": \"{{federation_friend_api_key}}\", \"friendAccountControllerUrl\": \"{{federation_friend_controller_url}}\"}"
 						},
 						"url": {
 							"raw": "{{controller_host}}/controller/rest/federation/establishmutualfriendship",
@@ -1069,7 +1105,8 @@
 							],
 							"path": ["controller","rest","federation","establishmutualfriendship"],
               "query": []
-						}
+						},
+            "description": "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account."
 					}
 				}]},{"name": "healthrule","item": [{
 					"name": "Get a healthrule.",
@@ -1092,13 +1129,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/healthrules/{{a}}/?name={{n?}}",
+							"raw": "{{controller_host}}/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","healthrules","{{a}}",""],
-              "query": [{"key": "name","value": "{{n?}}"}]
-						}
+							"path": ["controller","healthrules","{{application}}",""],
+              "query": [{"key": "name","value": "{{healthrule_name}}"}]
+						},
+            "description": "Provide an application (-a) and a health rule name (-n) as parameters."
 					}
 				},{
 					"name": "List all healthrules.",
@@ -1121,13 +1159,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/healthrules/{{a}}/",
+							"raw": "{{controller_host}}/controller/healthrules/{{a:application}}/",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","healthrules","{{a}}",""],
+							"path": ["controller","healthrules","{{application}}",""],
               "query": []
-						}
+						},
+            "description": "Provide an application (-a) as parameter"
 					}
 				},{
 					"name": "Get all healthrule violations.",
@@ -1150,13 +1189,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","problems","healthrule-violations"],
-              "query": [{"key": "time-range-type","value": "{{t}}"},{"key":"duration-in-mins","value": "{{d?}}"},{"key":"start-time","value": "{{b?}}"},{"key":"end-time","value": "{{e?}}"}]
-						}
+							"path": ["controller","rest","applications","{{application}}","problems","healthrule-violations"],
+              "query": [{"key": "time-range-type","value": "{{time_range_type}}"},{"key":"duration-in-mins","value": "{{duration_in_minutes}}"},{"key":"start-time","value": "{{start_time}}"},{"key":"end-time","value": "{{end_time}}"}]
+						},
+            "description": "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)"
 					}
 				}]},{"name": "node","item": [{
 					"name": "Get a node.",
@@ -1179,13 +1219,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/nodes/{{n}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/nodes/{{n:node}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","nodes","{{n}}"],
+							"path": ["controller","rest","applications","{{application}}","nodes","{{node}}"],
               "query": []
-						}
+						},
+            "description": "Provide the application (-a) and the node (-n) as parameters"
 					}
 				},{
 					"name": "List all nodes.",
@@ -1208,13 +1249,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/nodes",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/nodes",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","nodes"],
+							"path": ["controller","rest","applications","{{application}}","nodes"],
               "query": []
-						}
+						},
+            "description": "Provide the application id as parameter (-a)."
 					}
 				},{
 					"name": "Mark nodes as historical.",
@@ -1237,13 +1279,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}",
+							"raw": "{{controller_host}}/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","mark-nodes-historical"],
-              "query": [{"key": "application-component-node-ids","value": "{{n}}"}]
-						}
+              "query": [{"key": "application-component-node-ids","value": "{{nodes}}"}]
+						},
+            "description": "Provide a comma separated list of node ids."
 					}
 				}]},{"name": "policies","item": [{
 					"name": "List all policies.",
@@ -1266,13 +1309,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/policies/{{a}}",
+							"raw": "{{controller_host}}/controller/policies/{{a:application}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","policies","{{a}}"],
+							"path": ["controller","policies","{{application}}"],
               "query": []
-						}
+						},
+            "description": "Provide an application (-a) as parameter."
 					}
 				}]},{"name": "snapshot","item": [{
 					"name": "Retrieve a list of snapshots",
@@ -1295,13 +1339,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","request-snapshots"],
-              "query": [{"key": "time-range-type","value": "{{t}}"},{"key":"duration-in-mins","value": "{{d?}}"},{"key":"start-time","value": "{{b?}}"},{"key":"end-time","value": "{{f?}}"}]
-						}
+							"path": ["controller","rest","applications","{{application}}","request-snapshots"],
+              "query": [{"key": "time-range-type","value": "{{time_range_type}}"},{"key":"duration-in-mins","value": "{{duration_in_minutes}}"},{"key":"start-time","value": "{{start_time}}"},{"key":"end-time","value": "{{end_time}}"}]
+						},
+            "description": "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)"
 					}
 				}]},{"name": "tier","item": [{
 					"name": "Get a tier.",
@@ -1324,13 +1369,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers/{{t}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","tiers","{{t}}"],
+							"path": ["controller","rest","applications","{{application}}","tiers","{{tier}}"],
               "query": []
-						}
+						},
+            "description": "Provide the application (-a) and the tier (-t) as parameters"
 					}
 				},{
 					"name": "List all tiers for a given application.",
@@ -1353,13 +1399,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/tiers",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","tiers"],
+							"path": ["controller","rest","applications","{{application}}","tiers"],
               "query": []
-						}
+						},
+            "description": "Provide the application id as parameter (-a)."
 					}
 				},{
 					"name": "List nodes for a tier.",
@@ -1382,13 +1429,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a}}/tiers/{{t}}/nodes",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","rest","applications","{{a}}","tiers","{{t}}","nodes"],
+							"path": ["controller","rest","applications","{{application}}","tiers","{{tier}}","nodes"],
               "query": []
-						}
+						},
+            "description": "Provide the application (-a) and the tier (-t) as parameters"
 					}
 				}]},{"name": "user","item": [{
 					"name": "Create a new user.",
@@ -1411,13 +1459,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}",
+							"raw": "{{controller_host}}/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","users"],
-              "query": [{"key": "user-name","value": "{{n}}"},{"key":"user-display-name","value": "{{d}}"},{"key":"user-password","value": "{{p}}"},{"key":"user-email","value": "{{m}}"},{"key":"user-roles","value": "{{r?}}"}]
-						}
+              "query": [{"key": "user-name","value": "{{user_name}}"},{"key":"user-display-name","value": "{{user_display_name}}"},{"key":"user-password","value": "{{user_password}}"},{"key":"user-email","value": "{{user_mail}}"},{"key":"user-roles","value": "{{user_roles}}"}]
+						},
+            "description": "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters."
 					}
 				},{
 					"name": "Update an existing user.",
@@ -1440,13 +1489,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}",
+							"raw": "{{controller_host}}/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","users"],
-              "query": [{"key": "user-id","value": "{{i}}"},{"key":"user-name","value": "{{n}}"},{"key":"user-display-name","value": "{{d}}"},{"key":"user-password","value": "{{p?}}"},{"key":"user-email","value": "{{m}}"},{"key":"user-roles","value": "{{r?}}"}]
-						}
+              "query": [{"key": "user-id","value": "{{user_id}}"},{"key":"user-name","value": "{{user_name}}"},{"key":"user-display-name","value": "{{user_display_name}}"},{"key":"user-password","value": "{{user_password}}"},{"key":"user-email","value": "{{user_mail}}"},{"key":"user-roles","value": "{{user_roles}}"}]
+						},
+            "description": "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters."
 					}
 				}]}]
 }

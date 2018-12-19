@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="43c7334661f613e6efcc4344f6d55df0577237c6"
+ACT_LAST_COMMIT="a1bcdcd7fa5eef93df2dade07197437b64f9e03a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -22,7 +22,7 @@ COLOR_DEBUG="\033[0;35m"
 COLOR_RESET="\033[0m"
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
-GLOBAL_LONG_HELP_COUNTER=0
+declare -i GLOBAL_COMMANDS_COUNTER=0
 declare -a GLOBAL_LONG_HELP_STRINGS
 declare -a GLOBAL_LONG_HELP_COMMANDS
 declare -a GLOBAL_EXAMPLE_COMMANDS
@@ -34,6 +34,7 @@ VERBOSITY_COUNTER=0
 declare -i VERBOSITY_COUNTER
 # register namespace_command help
 function register {
+  GLOBAL_COMMANDS_COUNTER+=1
   GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
   GLOBAL_HELP="$GLOBAL_HELP\n$*"
 }
@@ -61,72 +62,72 @@ RRREOF
 doc actiontemplate << EOF
 These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
 EOF
-function actiontemplate_createmediatype { apiCall -X POST -d '{"name":"{{n}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+function actiontemplate_createmediatype { apiCall -X POST -d '{"name":"{{n:media_type_name}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
-function actiontemplate_export { apiCall '/controller/actiontemplate/{{t}}/' "$@" ; }
+function actiontemplate_export { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF
-function analyticssearch_get { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i}}' "$@" ; }
+function analyticssearch_get { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
 rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)" "-i 6"
 function analyticssearch_list { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
 rde analyticssearch_list "List all analytics searches." "This command requires no further arguments" ""
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
-function application_create { apiCall -X POST -d '{"name": "{{n}}", "description": ""}' '/controller/restui/allApplications/createApplication?applicationType={{t}}' "$@" ; }
+function application_create { apiCall -X POST -d '{"name": "{{n:application_name}}", "description": "{{d:application_description?}}"}' '/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}' "$@" ; }
 rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
-function application_delete { apiCall -X POST -d '{{a}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+function application_delete { apiCall -X POST -d '{{a:application}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
 rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
-function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a}}' "$@" ; }
+function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}' "$@" ; }
 rde application_export "Export an application." "Provide an application id as parameter (-a)" "-a 29"
-function application_get { apiCall '/controller/rest/applications/{{a}}' "$@" ; }
+function application_get { apiCall '/controller/rest/applications/{{a:application}}' "$@" ; }
 rde application_get "Get an application." "Provide application id or name as parameter (-a)." "-a 15"
 function application_list { apiCall '/controller/rest/applications' "$@" ; }
 rde application_list "List all applications." "This command requires no further arguments." ""
 doc audit << EOF
 The Controller audit history is a record of the configuration and user activities in the Controller configuration.
 EOF
-function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b}}&endTime={{f}}' "$@" ; }
+function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}' "$@" ; }
 rde audit_get "Get audit history." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
 doc backend << EOF
 Retrieve information about backends within a given business application
 EOF
-function backend_list { apiCall '/controller/rest/applications/{{a}}/backends' "$@" ; }
+function backend_list { apiCall '/controller/rest/applications/{{a:application}}/backends' "$@" ; }
 rde backend_list "List all backends." "Provide the application id as parameter (-a)" "-a 29"
 doc bizjourney << EOF
 Manage business journeys in AppDynamics Analytics
 EOF
-function bizjourney_disable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/userDisable' "$@" ; }
+function bizjourney_disable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable' "$@" ; }
 rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
-function bizjourney_enable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i}}/actions/enable' "$@" ; }
+function bizjourney_enable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable' "$@" ; }
 rde bizjourney_enable "Enable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
-function bizjourney_import { apiCall -X POST -d '{{d}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
+function bizjourney_import { apiCall -X POST -d '{{d:business_journey_draft}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
 rde bizjourney_import "Import a business journey." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
 function bizjourney_list { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
 rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
-function bt_creategroup { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a}}&groupName={{n}}' "$@" ; }
+function bt_creategroup { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}' "$@" ; }
 rde bt_creategroup "Create a BT group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
-function bt_delete { apiCall -X POST -d '[{{b}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+function bt_delete { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
 rde bt_delete "Delete a BT." "Provide the bt id as parameter (-b)" "-b 13"
-function bt_get { apiCall '/controller/rest/applications/{{a}}/business-transactions/{{b}}' "$@" ; }
+function bt_get { apiCall '/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}' "$@" ; }
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
-function bt_list { apiCall '/controller/rest/applications/{{a}}/business-transactions' "$@" ; }
+function bt_list { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
 rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
-function bt_rename { apiCall -X POST -d '{{n}}' '/controller/restui/bt/renameBT?id={{b}}' "$@" ; }
+function bt_rename { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
 rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc configuration << EOF
 The configuration API enables you read and modify selected Controller configuration settings programmatically.
 EOF
-function configuration_get { apiCall '/controller/rest/configuration?name={{n}}' "$@" ; }
+function configuration_get { apiCall '/controller/rest/configuration?name={{n:controller_setting_name}}' "$@" ; }
 rde configuration_get "Get a controller setting by name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
 function configuration_list { apiCall '/controller/rest/configuration' "$@" ; }
 rde configuration_list "List all controller settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
-function configuration_set { apiCall -X POST '/controller/rest/configuration?name={{n}}&value={{v}}' "$@" ; }
+function configuration_set { apiCall -X POST '/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}' "$@" ; }
 rde configuration_set "Set a controller setting." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
 doc controller << EOF
 Basic calls against an AppDynamics controller.
@@ -138,22 +139,22 @@ rde controller_status "Get the server status." "This command will return a XML c
 doc dashboard << EOF
 Import and export custom dashboards in the AppDynamics controller
 EOF
-function dashboard_delete { apiCall -X POST -d '[{{i}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
+function dashboard_delete { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
 rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
-function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i}}' "$@" ; }
+function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
 rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
 function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
 rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
-function dashboard_update { apiCall -X POST -d '{{f}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+function dashboard_update { apiCall -X POST -d '{{f:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
 rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-i 2"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
-function dbmon_delete { apiCall -X POST -d '[{{c}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
+function dbmon_delete { apiCall -X POST -d '[{{c:database_collectors}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
 rde dbmon_delete "Delete multiple collectors." "Provide a comma seperated list of collector analyticsSavedSearches" "-c 17,18"
-function dbmon_get { apiCall '/controller/rest/databases/collectors/{{c}}' "$@" ; }
+function dbmon_get { apiCall '/controller/rest/databases/collectors/{{c:database_collector}}' "$@" ; }
 rde dbmon_get "Get a specifc collector." "Provide the collector id as parameter (-c)." "-c 17"
-function dbmon_import { apiCall -X POST -d '{{d}}' '/controller/rest/databases/collectors/create' "$@" ; }
+function dbmon_import { apiCall -X POST -d '{{d:database_collector_definition}}' '/controller/rest/databases/collectors/create' "$@" ; }
 rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
 function dbmon_list { apiCall '/controller/rest/databases/collectors' "$@" ; }
 rde dbmon_list "List all collectors." "No further arguments required." ""
@@ -162,58 +163,58 @@ rde dbmon_servers "List all servers." "No further arguments required." ""
 doc event << EOF
 Create and list events in your business applications.
 EOF
-function event_create { apiCall -X POST '/controller/rest/applications/{{a}}/events?summary={{s}}&comment={{c?}}&eventtype={{e}}&severity={{l}}&bt={{b?}}&node={{n?}}&tier={{t?}}' "$@" ; }
+function event_create { apiCall -X POST '/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}' "$@" ; }
 rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
 doc federation << EOF
 Establish a federation between two AppDynamics Controllers.
 EOF
-function federation_createkey { apiCall -X POST -d '{"apiKeyName": "{{n}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
+function federation_createkey { apiCall -X POST -d '{"apiKeyName": "{{n:federation_api_key_name}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
 rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
-function federation_establish { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a}}", "friendAccountApiKey": "{{k}}", "friendAccountControllerUrl": "{{c}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
+function federation_establish { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
 rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
-function healthrule_get { apiCall '/controller/healthrules/{{a}}/?name={{n?}}' "$@" ; }
+function healthrule_get { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
 rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
-function healthrule_list { apiCall '/controller/healthrules/{{a}}/' "$@" ; }
+function healthrule_list { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; }
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
-function healthrule_violations { apiCall '/controller/rest/applications/{{a}}/problems/healthrule-violations?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{e?}}' "$@" ; }
+function healthrule_violations { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
 rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc node << EOF
 Retrieve nodes within a business application
 EOF
-function node_get { apiCall '/controller/rest/applications/{{a}}/nodes/{{n}}' "$@" ; }
+function node_get { apiCall '/controller/rest/applications/{{a:application}}/nodes/{{n:node}}' "$@" ; }
 rde node_get "Get a node." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
-function node_list { apiCall '/controller/rest/applications/{{a}}/nodes' "$@" ; }
+function node_list { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$@" ; }
 rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
-function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n}}' "$@" ; }
+function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
 doc policies << EOF
 Import and export policies
 EOF
-function policies_list { apiCall '/controller/policies/{{a}}' "$@" ; }
+function policies_list { apiCall '/controller/policies/{{a:application}}' "$@" ; }
 rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
 doc snapshot << EOF
 List APM snapshots.
 EOF
-function snapshot_list { apiCall '/controller/rest/applications/{{a}}/request-snapshots?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}' "$@" ; }
+function snapshot_list { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
 rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc tier << EOF
 List all tiers.
 EOF
-function tier_get { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}' "$@" ; }
+function tier_get { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}' "$@" ; }
 rde tier_get "Get a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
-function tier_list { apiCall '/controller/rest/applications/{{a}}/tiers' "$@" ; }
+function tier_list { apiCall '/controller/rest/applications/{{a:application}}/tiers' "$@" ; }
 rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
-function tier_nodes { apiCall '/controller/rest/applications/{{a}}/tiers/{{t}}/nodes' "$@" ; }
+function tier_nodes { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
 rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
 doc user << EOF
 Create and Modify AppDynamics Users.
 EOF
-function user_create { apiCall -X POST '/controller/rest/users?user-name={{n}}&user-display-name={{d}}&user-password={{p}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
+function user_create { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
 rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
-function user_update { apiCall -X POST '/controller/rest/users?user-id={{i}}&user-name={{n}}&user-display-name={{d}}&user-password={{p?}}&user-email={{m}}&user-roles={{r?}}' "$@" ; }
+function user_update { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
 rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
 function dbmon_create {
   apiCall -X POST -d "{ \
@@ -422,7 +423,7 @@ EOF
 function _help {
   if [ "$1" = "" ] ; then
     read -r -d '' COMMAND_RESULT <<- EOM
-Usage: $SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-P <plugin-directory>] [-A <application-name>] <namespace> <command>\n
+Usage: ${USAGE_DESCRIPTION}\n
 You can use the following options on a global level:\n
 ${AVAILABLE_GLOBAL_OPTIONS//|/}
 To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
@@ -469,7 +470,7 @@ EOM
     done
   fi
 }
-register _help Display the global usage information
+register _help Display the global help.
 function server_list {
   apiCall -X GET "/controller/sim/v2/user/machines" "$@"
 }
@@ -477,6 +478,15 @@ register server_list List all servers
 describe server_list << EOF
 List all servers
 EOF
+function _usage {
+    # shellcheck disable=SC2034
+    read -r -d '' COMMAND_RESULT <<- EOM
+Usage: ${USAGE_DESCRIPTION}\n
+'${SCRIPTNAME} help' will list available namespaces and subcommands.
+See '${SCRIPTNAME} help <namespace>' to read about a specific namespace and the available subcommands
+EOM
+}
+register _usage Display usage information.
 function controller_isup {
   local START
   local END
@@ -507,7 +517,6 @@ function controller_call {
   debug "$@"
   while getopts "X:d:F:B" opt "$@";
   do
-    debug "${opt}"
     case "${opt}" in
       X)
 	METHOD=${OPTARG}
@@ -521,9 +530,11 @@ function controller_call {
       B)
         USE_BASIC_AUTH=1
       ;;
+      *)
+        debug "Invalid flag ${OPTARG} for controller_call"
+      ;;
     esac
   done
-  debug "ASDF"
   shiftOptInd
   shift $SHIFTS
   ENDPOINT=$*
@@ -852,7 +863,7 @@ register environment_source Load environment variables
 describe environment_source << EOF
 Load environment variables
 EOF
-example environment_get << EOF
+example environment_source << EOF
 myaccount
 EOF
 function environment_get {
@@ -1047,6 +1058,19 @@ EOF
 example environment_export << EOF
 > output.json
 EOF
+function environment_edit {
+  if [ -x "${EDITOR}" ] || [ -x "`which "${EDITOR}"`" ] ; then
+    ${EDITOR} "${HOME}/.appdynamics/act/config.$1.sh"
+  else
+    error "No editor found. Please set \$EDITOR."
+  fi
+}
+register environment_edit Open an environment file in your editor
+describe environment_edit << EOF
+EOF
+example environment_edit << EOF
+myaccount
+EOF
 function _config {
   environment_add -d "$@"
 }
@@ -1057,7 +1081,8 @@ EOF
 example _config << EOF
 EOF
 function _version {
-  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT"
+  # shellcheck disable=SC2034
+  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
 }
 register _version Print the current version of $SCRIPTNAME
 describe _version << EOF
@@ -1306,6 +1331,7 @@ function recursiveSource {
 function apiCall {
   local OPTS
   local OPTIONAL_OPTIONS=""
+  local OPTS_TYPES=()
   local METHOD="GET"
   while getopts "X:d:" opt "$@";
   do
@@ -1335,18 +1361,20 @@ function apiCall {
   OLDIFS=$IFS
   IFS="{{"
   for MATCH in $PAYLOAD ; do
-    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
-      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+      OPTS_TYPES+=(${BASH_REMATCH[1]}${BASH_REMATCH[2]})
+      if [ "${BASH_REMATCH[3]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
       fi
       OPTS="${OPTS}${OPT}"
     fi
   done;
   for MATCH in $ENDPOINT ; do
-    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
-      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+      OPTS_TYPES+=(${BASH_REMATCH[1]}${BASH_REMATCH[2]})
+      if [ "${BASH_REMATCH[3]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
       fi
       OPTS="${OPTS}${OPT}"
@@ -1354,6 +1382,7 @@ function apiCall {
   done;
   IFS=$OLDIFS
   debug "Identified Options: ${OPTS}"
+  debug "Identified Types: ${OPTS_TYPES[*]}"
   debug "Optional Options: $OPTIONAL_OPTIONS"
   if [ -n "$OPTS" ] ; then
     while getopts ${OPTS} opt;
@@ -1362,17 +1391,17 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \{\{$opt\??\}\} ]] ; do
+      while [[ $PAYLOAD =~ \{\{$opt(:[a-zA-Z0-9_-]+)?\??\}\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \{\{$opt\??\}\} ]] ; do
+      while [[ $ENDPOINT =~ \{\{$opt(:[a-zA-Z0-9_-]+)?\??\}\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done
     shiftOptInd
     shift $SHIFTS
   fi
-  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
+  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
@@ -1385,13 +1414,22 @@ function apiCall {
     PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$1}
     shift
   done
-  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
+  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
+        debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
         ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
-        error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+        ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
+        for TYPE in "${OPTS_TYPES[@]}" ;
+        do
+          if [[ "${TYPE}" == ${MISSING}:* ]] ; then
+            TYPE=${TYPE//_/ }
+            ERROR_MESSAGE="Missing ${TYPE#*:}: ${ERROR_MESSAGE}"
+          fi
+        done;
+        error "${ERROR_MESSAGE}"
         return;
       fi
     fi
@@ -1493,6 +1531,7 @@ else
   warning "File ${USER_CONFIG} not found!"
 fi
 # Parse global options
+USAGE_DESCRIPTION="$SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-E <environment>] [-J <cookie-location>] [-P <plugin-directory>] [-F <controller-info-xml>] [-A <application-name>] [-O] [-v[vv]] <namespace> <command>"
 read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-H <controller-host>          |specify the host of the controller you want to connect to|
 |-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
@@ -1594,13 +1633,15 @@ debug "CONFIG_USER_PLUGIN_DIRECTORY=$CONFIG_USER_PLUGIN_DIRECTORY"
 recursiveSource "${CONFIG_USER_PLUGIN_DIRECTORY}"
 NAMESPACE=$1
 COMMAND_RESULT=""
+if [ "$#" -eq 0 ] ; then
+  _usage
 # Check if the namespace is used
-if [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
+elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
   debug "${NAMESPACE} has commands"
   COMMAND=$2
-  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ]; then
+  if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ] ; then
     debug "Will display help for $NAMESPACE"
-    _help ${NAMESPACE}
+    echo _help ${NAMESPACE}
   elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2

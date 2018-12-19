@@ -29,16 +29,33 @@ ASDF
       METHOD="y_${NS}_${CMD}_method"
       ENDPOINT="y_${NS}_${CMD}_endpoint"
       PAYLOAD="y_${NS}_${CMD}_payload"
-      echo -e "\t- ${CMD} (${!ENDPOINT})"
 
-      P_PATH=${!ENDPOINT%%\?*}
+      ENDPOINT=${!ENDPOINT}
+      PAYLOAD=${!PAYLOAD}
+
+      echo -e "\t- ${CMD} (${ENDPOINT})"
+
+      POSTMAN_ENDPOINT=${ENDPOINT}
+      POSTMAN_PAYLOAD=${PAYLOAD}
+
+      ARGUMENT_PATTERN="\{\{([a-zA-Z]):([a-zA-Z0-9_-]+)(\??)\}\}"
+      while [[ $POSTMAN_ENDPOINT =~ $ARGUMENT_PATTERN ]] ; do
+        REPLACEMENT="{{${BASH_REMATCH[2]}}}"
+        POSTMAN_ENDPOINT=${POSTMAN_ENDPOINT//${BASH_REMATCH[0]}/$REPLACEMENT}
+      done;
+      while [[ $POSTMAN_PAYLOAD =~ $ARGUMENT_PATTERN ]] ; do
+        REPLACEMENT="{{${BASH_REMATCH[2]}}}"
+        POSTMAN_PAYLOAD=${POSTMAN_PAYLOAD//${BASH_REMATCH[0]}/$REPLACEMENT}
+      done;
+
+      P_PATH=${POSTMAN_ENDPOINT%%\?*}
 
       P_PATH=${P_PATH//\//\",\"}
 
 
       P_QUERY=""
-      if [[ ${!ENDPOINT} == *"?"* ]] ; then
-        P_QUERY=${!ENDPOINT#*\?}
+      if [[ ${POSTMAN_ENDPOINT} == *"?"* ]] ; then
+        P_QUERY=${POSTMAN_ENDPOINT#*\?}
         local REPLACEMENT="\"},{\"key\":\""
         P_QUERY=${P_QUERY//&/${REPLACEMENT}}
         P_QUERY="{\"key\": \"${P_QUERY//=/\",\"value\": \"}\"}"
@@ -62,21 +79,22 @@ ASDF
             ],
 						\"body\": {
 							\"mode\": \"raw\",
-							\"raw\": \"${!PAYLOAD//\"/\\\"}\"
+							\"raw\": \"${POSTMAN_PAYLOAD//\"/\\\"}\"
 						},
 						\"url\": {
-							\"raw\": \"{{controller_host}}${!ENDPOINT}\",
+							\"raw\": \"{{controller_host}}${ENDPOINT}\",
               \"host\": [
 								\"{{controller_host}}\"
 							],
 							\"path\": [${P_PATH#\",}\"],
               \"query\": [${P_QUERY}]
-						}
+						},
+            \"description\": \"${!DESCRIPTION}\"
 					}
 				},"
 
-        if [ -n "${!PAYLOAD}" ] ; then
-          PAYLOAD=" -d '${!PAYLOAD}'"
+        if [ -n "${PAYLOAD}" ] ; then
+          PAYLOAD=" -d '${PAYLOAD}'"
         else
           PAYLOAD=""
         fi;
@@ -87,7 +105,7 @@ ASDF
         fi;
 
       read -r -d '' OUTPUT << ASDF
-function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD} '${!ENDPOINT}' "\$@" ; }
+function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD} '${ENDPOINT}' "\$@" ; }
 rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
 ASDF
 

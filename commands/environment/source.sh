@@ -13,6 +13,6 @@ describe environment_source << EOF
 Load environment variables
 EOF
 
-example environment_get << EOF
+example environment_source << EOF
 myaccount
 EOF

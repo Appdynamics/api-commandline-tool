@@ -3,6 +3,7 @@
 function apiCall {
   local OPTS
   local OPTIONAL_OPTIONS=""
+  local OPTS_TYPES=()
   local METHOD="GET"
 
   while getopts "X:d:" opt "$@";
@@ -37,9 +38,10 @@ function apiCall {
   OLDIFS=$IFS
   IFS="{{"
   for MATCH in $PAYLOAD ; do
-    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
-      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+      OPTS_TYPES+=(${BASH_REMATCH[1]}${BASH_REMATCH[2]})
+      if [ "${BASH_REMATCH[3]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
       fi
       OPTS="${OPTS}${OPT}"
@@ -47,9 +49,10 @@ function apiCall {
   done;
 
   for MATCH in $ENDPOINT ; do
-    if [[ $MATCH =~ ([a-zA-Z])(\??)\}\} ]]; then
+    if [[ $MATCH =~ ([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]]; then
       OPT=${BASH_REMATCH[1]}:
-      if [ "${BASH_REMATCH[2]}" = "?" ] ; then
+      OPTS_TYPES+=(${BASH_REMATCH[1]}${BASH_REMATCH[2]})
+      if [ "${BASH_REMATCH[3]}" = "?" ] ; then
         OPTIONAL_OPTIONS=${OPTIONAL_OPTIONS}${OPT}
       fi
       OPTS="${OPTS}${OPT}"
@@ -58,6 +61,7 @@ function apiCall {
   IFS=$OLDIFS
 
   debug "Identified Options: ${OPTS}"
+  debug "Identified Types: ${OPTS_TYPES[*]}"
   debug "Optional Options: $OPTIONAL_OPTIONS"
 
   if [ -n "$OPTS" ] ; then
@@ -67,10 +71,10 @@ function apiCall {
       debug "Applying $opt with $ARG"
       # PAYLOAD=${PAYLOAD//\$\{${opt}\}/$OPTARG}
       # ENDPOINT=${ENDPOINT//\$\{${opt}\}/$OPTARG}
-      while [[ $PAYLOAD =~ \{\{$opt\??\}\} ]] ; do
+      while [[ $PAYLOAD =~ \{\{$opt(:[a-zA-Z0-9_-]+)?\??\}\} ]] ; do
         PAYLOAD=${PAYLOAD//${BASH_REMATCH[0]}/$OPTARG}
       done;
-      while [[ $ENDPOINT =~ \{\{$opt\??\}\} ]] ; do
+      while [[ $ENDPOINT =~ \{\{$opt(:[a-zA-Z0-9_-]+)?\??\}\} ]] ; do
         ENDPOINT=${ENDPOINT//${BASH_REMATCH[0]}/$ARG}
       done;
     done
@@ -78,7 +82,7 @@ function apiCall {
     shift $SHIFTS
   fi
 
-  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
+  while [[ $PAYLOAD =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
@@ -92,13 +96,22 @@ function apiCall {
     shift
   done
 
-  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(\??)\}\} ]] ; do
+  while [[ $ENDPOINT =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
       if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
+        debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
         ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
       else
-        error "Please provide an argument for paramater -${BASH_REMATCH:2:1}"
+        ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
+        for TYPE in "${OPTS_TYPES[@]}" ;
+        do
+          if [[ "${TYPE}" == ${MISSING}:* ]] ; then
+            TYPE=${TYPE//_/ }
+            ERROR_MESSAGE="Missing ${TYPE#*:}: ${ERROR_MESSAGE}"
+          fi
+        done;
+        error "${ERROR_MESSAGE}"
         return;
       fi
     fi
