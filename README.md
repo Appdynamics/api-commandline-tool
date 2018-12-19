@@ -4,7 +4,9 @@ The [API Commandline Tool](https://github.com/Appdynamics/api-commandline-tool) 
 
 ACT is completely bash based, so you don't need to install or compile anything, just download and run it!
 
-If you want to see some examples what ACT can do, before installing it, look into the list of [RECIPES.md](RECIPES.md)
+If you want to see some examples what ACT can do, before installing it, look into the list of [available commands](USAGE.md) and [available recipes](RECIPES.md)
+
+As a byproduct the tool generates a [postman](https://www.getpostman.com/) compatible [collection of API calls](postman-collection.json).
 
 ## Installation
 
