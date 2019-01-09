@@ -207,7 +207,7 @@ elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
   COMMAND=$2
   if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ] ; then
     debug "Will display help for $NAMESPACE"
-    echo _help ${NAMESPACE}
+    _help ${NAMESPACE}
   elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2

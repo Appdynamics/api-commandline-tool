@@ -1016,7 +1016,7 @@
 							"path": ["controller","databasesui","databases","queryListData"],
               "query": []
 						},
-            "description": "Requires a server id (-s), a start time (-b) and an end time (-f) as parameters."
+            "description": "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters."
 					}
 				},{
 					"name": "List all servers.",

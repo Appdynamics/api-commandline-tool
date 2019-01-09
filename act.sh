@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="d7340c2adabcfb4fbc952bf129cb082ca0118548"
+ACT_LAST_COMMIT="5670548904ccb4db6bad9fe5d89d6d2a3c6a5d31"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -159,7 +159,7 @@ rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as
 function dbmon_list { apiCall '/controller/rest/databases/collectors' "$@" ; }
 rde dbmon_list "List all collectors." "No further arguments required." ""
 function dbmon_queries { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
-rde dbmon_queries "Get queries for a server." "Requires a server id (-s), a start time (-b) and an end time (-f) as parameters." "-s 2 -b 1545237000000 -f 1545238602"
+rde dbmon_queries "Get queries for a server." "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters." "-i 2 -b 1545237000000 -f 1545238602"
 function dbmon_servers { apiCall '/controller/rest/databases/servers' "$@" ; }
 rde dbmon_servers "List all servers." "No further arguments required." ""
 doc event << EOF
@@ -1098,11 +1098,12 @@ function metric_get {
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
   local TYPE="BEFORE_NOW"
-  while getopts "a:s:e:d:t:" opt "$@";
+  local ROLLUP="true"
+  while getopts "a:s:e:d:t:r:" opt "$@";
   do
     case "${opt}" in
       a)
-        APPLICATION=${OPTARG}
+        APPLICATION=`urlencode "${OPTARG}"`
       ;;
       s)
         START_TIME=${OPTARG}
@@ -1116,12 +1117,16 @@ function metric_get {
       t)
         TYPE=${OPTARG}
       ;;
+      r)
+        ROLLUP=${OPTARG}
+      ;;
     esac
   done;
   shiftOptInd
   shift $SHIFTS
+  debug ${APPLICATION}
   local METRIC_PATH=`urlencode "$*"`
-  controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
+  controller_call -B -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}&rollup=${ROLLUP}"
 }
 register metric_get Get a specific metric
 describe metric_get << EOF
@@ -1233,8 +1238,8 @@ EOF
 function healthrule_copy {
   local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local TARGET_APPLICATION=""
-  local HEALTH_RULE_NAME=""
-  while getopts "s:t:n:" opt "$@";
+  local TARGET_ENVIRONMENT=""
+  while getopts "s:t:e:" opt "$@";
   do
     case "${opt}" in
       s)
@@ -1243,19 +1248,40 @@ function healthrule_copy {
       t)
         TARGET_APPLICATION="${OPTARG}"
       ;;
-      n)
-        HEALTH_RULE_NAME="${OPTARG}"
+      e)
+        TARGET_ENVIRONMENT="${OPTARG}"
       ;;
     esac
   done;
   shiftOptInd
   shift $SHIFTS
+  if [ -z "${SOURCE_APPLICATION}" ] ; then
+    COMMAND_RESULT=""
+    error "Source application is empty."
+    exit
+  fi
+  if [ -z "${TARGET_APPLICATION}" ] ; then
+    COMMAND_RESULT=""
+    error "Target application is empty."
+    exit
+  fi
+  OLD_CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}
+  CONFIG_OUTPUT_VERBOSITY="output"
   healthrule_list -a ${SOURCE_APPLICATION}
-  if [ "${COMMAND_RESULT:1:12}" == "health-rules" ]
+  CONFIG_OUTPUT_VERBOSITY="${OLD_CONFIG_OUTPUT_VERBOSITY}"
+  SOURCE_HEALTHRULE=${COMMAND_RESULT}
+  COMMAND_RESULT=""
+  if [ "${SOURCE_HEALTHRULE:1:12}" == "health-rules" ]
   then
     local R=${RANDOM}
-    echo "$COMMAND_RESULT" > "/tmp/act-output-${R}"
-    healthrule_import -a ${TARGET_APPLICATION} "/tmp/act-output-${R}"
+    echo "$SOURCE_HEALTHRULE" > "/tmp/act-output-${R}"
+    if [ -n "${TARGET_ENVIRONMENT}" ] ; then
+      debug "Copy to target environment $TARGET_ENVIRONMENT, target application $TARGET_APPLICATION."
+      $0 -E ${TARGET_ENVIRONMENT} healthrule import -a ${TARGET_APPLICATION} "/tmp/act-output-${R}"
+    else
+      debug "Copy to target application $TARGET_APPLICATION"
+      healthrule_import -a "${TARGET_APPLICATION}" "/tmp/act-output-${R}"
+    fi
     rm "/tmp/act-output-${R}"
   else
     COMMAND_RESULT="Could not export health rules from source application: ${COMMAND_RESULT}"
@@ -1643,7 +1669,7 @@ elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_}" != "$GLOBAL_COMMANDS" ] ; then
   COMMAND=$2
   if [ "$COMMAND" == "" ] || [ "$COMMAND" == "help" ] ; then
     debug "Will display help for $NAMESPACE"
-    echo _help ${NAMESPACE}
+    _help ${NAMESPACE}
   elif [ "${GLOBAL_COMMANDS/${NAMESPACE}_${COMMAND}}" != "$GLOBAL_COMMANDS" ] ; then
     debug "${NAMESPACE}_${COMMAND} is a valid command"
     shift 2

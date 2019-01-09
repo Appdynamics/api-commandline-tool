@@ -6,11 +6,12 @@ function metric_get {
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
   local TYPE="BEFORE_NOW"
-  while getopts "a:s:e:d:t:" opt "$@";
+  local ROLLUP="true"
+  while getopts "a:s:e:d:t:r:" opt "$@";
   do
     case "${opt}" in
       a)
-        APPLICATION=${OPTARG}
+        APPLICATION=`urlencode "${OPTARG}"`
       ;;
       s)
         START_TIME=${OPTARG}
@@ -24,12 +25,16 @@ function metric_get {
       t)
         TYPE=${OPTARG}
       ;;
+      r)
+        ROLLUP=${OPTARG}
+      ;;
     esac
   done;
   shiftOptInd
   shift $SHIFTS
+  debug ${APPLICATION}
   local METRIC_PATH=`urlencode "$*"`
-  controller_call -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}"
+  controller_call -B -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}&rollup=${ROLLUP}"
 }
 
 register metric_get Get a specific metric
