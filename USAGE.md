@@ -262,8 +262,11 @@ Import and export policies
 
 ## server
 
+List servers, their properties and metrics
+
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get ` |
 | list | List all servers |  |
 
 

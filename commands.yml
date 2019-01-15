@@ -330,6 +330,15 @@ policies:
     example: -a 29
     method: GET
     endpoint: /controller/policies/{{a:application}}
+server:
+  title: Server & Infrastructure Monitoring API
+  description: List servers, their properties and metrics
+  get:
+    title: Get a machine.
+    description: Provide a machine id (-m) as parameter.
+    example -i 244
+    method: GET
+    endpoint: /controller/sim/v2/user/machines/{{m:machine}}
 snapshot:
   title: Snapshot API
   description: List APM snapshots.

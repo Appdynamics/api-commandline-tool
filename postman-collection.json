@@ -1348,6 +1348,36 @@
 						},
             "description": "Provide an application (-a) as parameter."
 					}
+				}]},{"name": "server","item": [{
+					"name": "Get a machine.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/machines/{{m:machine}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","machines","{{machine}}"],
+              "query": []
+						},
+            "description": "Provide a machine id (-m) as parameter."
+					}
 				}]},{"name": "snapshot","item": [{
 					"name": "Retrieve a list of snapshots",
 					"request": {

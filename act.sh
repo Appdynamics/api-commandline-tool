@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="5670548904ccb4db6bad9fe5d89d6d2a3c6a5d31"
+ACT_LAST_COMMIT="6a2bb84d927353b5e5a7da8daddb4fbe6544de88"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -197,6 +197,11 @@ Import and export policies
 EOF
 function policies_list { apiCall '/controller/policies/{{a:application}}' "$@" ; }
 rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
+doc server << EOF
+List servers, their properties and metrics
+EOF
+function server_get { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
+rde server_get "Get a machine." "Provide a machine id (-m) as parameter." ""
 doc snapshot << EOF
 List APM snapshots.
 EOF
