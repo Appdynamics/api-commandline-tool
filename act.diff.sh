@@ -62,14 +62,10 @@ RRREOF
 doc action << EOF
 Import or export all actions in the specified application to a JSON file.
 EOF
-function action_delete { apiCall -X POST -d '[{{i:action_id}}]' '/controller/restui/policy/deleteActions' "$@" ; }
-rde action_delete "" "Provide an action id (-i) as parameter." ""
 function action_export { apiCall '/controller/actions/{{a:application}}' "$@" ; }
 rde action_export "Export actions." "Provide an application id or name as parameter (-a)." "-a 15"
-function action_import { apiCall -X POST -F 'file={{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
-rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -F @actions.json"
-function action_list { apiCall '/controller/restui/policy/getActionsListViewData/{{a:application}}' "$@" ; }
-rde action_list "List actions." "Provide an application id or name as parameter (-a)." "-a 15"
+function action_import { apiCall -X POST -d '{{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
+rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -d @actions.json"
 doc actiontemplate << EOF
 These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
 EOF
@@ -531,7 +527,6 @@ function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""
-  local PAYLOAD
   local USE_BASIC_AUTH=0
   debug "$@"
   while getopts "X:d:F:B" opt "$@";
@@ -583,7 +578,6 @@ function controller_call {
     else
       HTTP_CALL+=("-H" "Content-Type: application/json;charset=UTF-8")
     fi;
-    HTTP_CALL+=("-H" "Accept: application/json, text/plain, */*")
     if [ -n "${PAYLOAD}" ] ; then
       HTTP_CALL+=("-d" "${PAYLOAD}")
     fi;
@@ -1379,9 +1373,7 @@ function apiCall {
   local OPTIONAL_OPTIONS=""
   local OPTS_TYPES=()
   local METHOD="GET"
-  local WITH_FORM=0
-  local PAYLOAD
-  while getopts "X:d:F:" opt "$@";
+  while getopts "X:d:" opt "$@";
   do
     case "${opt}" in
       X)
@@ -1389,10 +1381,6 @@ function apiCall {
       ;;
       d)
         PAYLOAD=${OPTARG}
-      ;;
-      F)
-        PAYLOAD=${OPTARG}
-        WITH_FORM=1
       ;;
     esac
   done
@@ -1500,6 +1488,7 @@ function apiCall {
       debug "Loading payload from file ${PAYLOAD:1}"
       if [ -r "${PAYLOAD:1}" ] ; then
         PAYLOAD=$(<${PAYLOAD:1})
+        CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
       else
         COMMAND_RESULT=""
         error "File not found or not readable: ${PAYLOAD:1}"
@@ -1507,12 +1496,6 @@ function apiCall {
       fi
     fi
   fi;
-  debug "With form: ${WITH_FORM}"
-  if [ "${WITH_FORM}" -eq 1 ] ; then
-    CONTROLLER_ARGS+=("-F" "${PAYLOAD}")
-  else
-    CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
-  fi
   CONTROLLER_ARGS+=("-X" "${METHOD}" "${ENDPOINT}")
   debug "Call Controller with ${CONTROLLER_ARGS[*]}"
   controller_call "${CONTROLLER_ARGS[@]}"

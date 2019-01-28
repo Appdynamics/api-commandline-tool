@@ -5,8 +5,10 @@ function apiCall {
   local OPTIONAL_OPTIONS=""
   local OPTS_TYPES=()
   local METHOD="GET"
+  local WITH_FORM=0
+  local PAYLOAD
 
-  while getopts "X:d:" opt "$@";
+  while getopts "X:d:F:" opt "$@";
   do
     case "${opt}" in
       X)
@@ -14,6 +16,10 @@ function apiCall {
       ;;
       d)
         PAYLOAD=${OPTARG}
+      ;;
+      F)
+        PAYLOAD=${OPTARG}
+        WITH_FORM=1
       ;;
     esac
   done
@@ -133,7 +139,6 @@ function apiCall {
       debug "Loading payload from file ${PAYLOAD:1}"
       if [ -r "${PAYLOAD:1}" ] ; then
         PAYLOAD=$(<${PAYLOAD:1})
-        CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
       else
         COMMAND_RESULT=""
         error "File not found or not readable: ${PAYLOAD:1}"
@@ -141,6 +146,13 @@ function apiCall {
       fi
     fi
   fi;
+
+  debug "With form: ${WITH_FORM}"
+  if [ "${WITH_FORM}" -eq 1 ] ; then
+    CONTROLLER_ARGS+=("-F" "${PAYLOAD}")
+  else
+    CONTROLLER_ARGS+=("-d" "${PAYLOAD}")
+  fi
 
   CONTROLLER_ARGS+=("-X" "${METHOD}" "${ENDPOINT}")
 

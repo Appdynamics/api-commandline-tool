@@ -1,4 +1,124 @@
-{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "actiontemplate","item": [{
+{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "action","item": [{
+					"name": "",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{action_id}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/policy/deleteActions",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","policy","deleteActions"],
+              "query": []
+						},
+            "description": "Provide an action id (-i) as parameter."
+					}
+				},{
+					"name": "Export actions.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/actions/{{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","actions","{{application}}"],
+              "query": []
+						},
+            "description": "Provide an application id or name as parameter (-a)."
+					}
+				},{
+					"name": "Import actions.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/actions/{{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","actions","{{application}}"],
+              "query": []
+						},
+            "description": "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)"
+					}
+				},{
+					"name": "List actions.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/policy/getActionsListViewData/{{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","policy","getActionsListViewData","{{application}}"],
+              "query": []
+						},
+            "description": "Provide an application id or name as parameter (-a)."
+					}
+				}]},{"name": "actiontemplate","item": [{
 					"name": "Create a custom media type.",
 					"request": {
 						"method": "POST",
@@ -236,7 +356,7 @@
 							"path": ["controller","rest","applications","{{application}}"],
               "query": []
 						},
-            "description": "Provide application id or name as parameter (-a)."
+            "description": "Provide an application id or name as parameter (-a)."
 					}
 				},{
 					"name": "List all applications.",

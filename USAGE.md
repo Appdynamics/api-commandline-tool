@@ -30,6 +30,18 @@ The following commands in the global namespace can be called directly.
 | version | Print the current version of act.sh | `act.sh  version ` |
 
 
+## action
+
+Import or export all actions in the specified application to a JSON file.
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| delete | Provide an action id (-i) as parameter. | `act.sh action delete ` |
+| export | Export actions. Provide an application id or name as parameter (-a). | `act.sh action export -a 15` |
+| import | Import actions. Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d) | `act.sh action import -a 15 -F @actions.json` |
+| list | List actions. Provide an application id or name as parameter (-a). | `act.sh action list -a 15` |
+
+
 ## actiontemplate
 
 These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
@@ -63,7 +75,7 @@ The applications API lets you retrieve information about the monitored environme
 | create | Create a new application. Provide a name and a type (APM or WEB) as parameter. | `act.sh application create -t APM -n MyNewApplication` |
 | delete | Delete an application. Provide an application id as parameter (-a) | `act.sh application delete -a 29` |
 | export | Export an application. Provide an application id as parameter (-a) | `act.sh application export -a 29` |
-| get | Get an application. Provide application id or name as parameter (-a). | `act.sh application get -a 15` |
+| get | Get an application. Provide an application id or name as parameter (-a). | `act.sh application get -a 15` |
 | list | List all applications. This command requires no further arguments. | `act.sh application list ` |
 
 

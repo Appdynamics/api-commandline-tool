@@ -8,7 +8,7 @@ function from_yaml {
   NAMESPACES=`set | grep "^y_" | awk -F"_" '{ print $2; }' | sort -u`
   POSTMAN='{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": ['
   for NS in ${NAMESPACES}; do
-    COMMANDS=`set | grep "^y_${NS}"  | awk -F"_" '{ print $3; }'| grep -v "=" | sort -u`
+    COMMANDS=`set | grep "^y_${NS}_"  | awk -F"_" '{ print $3; }'| grep -v "=" | sort -u`
     echo -e "Building ${NS}"
     NS_DESCRIPTION="y_${NS}_description"
 
@@ -29,9 +29,11 @@ ASDF
       METHOD="y_${NS}_${CMD}_method"
       ENDPOINT="y_${NS}_${CMD}_endpoint"
       PAYLOAD="y_${NS}_${CMD}_payload"
+      FORM="y_${NS}_${CMD}_form"
 
       ENDPOINT=${!ENDPOINT}
       PAYLOAD=${!PAYLOAD}
+      FORM=${!FORM}
 
       echo -e "\t- ${CMD} (${ENDPOINT})"
 
@@ -98,6 +100,14 @@ ASDF
         else
           PAYLOAD=""
         fi;
+
+        if [ -n "${FORM}" ] ; then
+          FORM=" -F '${FORM}'"
+        else
+          FORM=""
+        fi;
+
+
         if [ -n "${!METHOD}" ] && [ "${!METHOD}" != "GET" ]; then
           METHOD=" -X ${!METHOD}"
         else
@@ -105,7 +115,7 @@ ASDF
         fi;
 
       read -r -d '' OUTPUT << ASDF
-function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD} '${ENDPOINT}' "\$@" ; }
+function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
 rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
 ASDF
 

@@ -4,6 +4,7 @@ function controller_call {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""
+  local PAYLOAD
   local USE_BASIC_AUTH=0
   debug "$@"
   while getopts "X:d:F:B" opt "$@";
@@ -59,13 +60,13 @@ function controller_call {
       HTTP_CALL+=("-b" "${CONFIG_CONTROLLER_COOKIE_LOCATION}" "-X" "${METHOD}" "-H" "X-CSRF-TOKEN: ${XCSRFTOKEN}")
     fi
 
-
-
     if [ -n "$FORM" ] ; then
       HTTP_CALL+=("-F" "${FORM}")
     else
       HTTP_CALL+=("-H" "Content-Type: application/json;charset=UTF-8")
     fi;
+
+    HTTP_CALL+=("-H" "Accept: application/json, text/plain, */*")
 
     if [ -n "${PAYLOAD}" ] ; then
       HTTP_CALL+=("-d" "${PAYLOAD}")

@@ -1,9 +1,37 @@
+action:
+  title: Import/Export actions from an application
+  description: Import or export all actions in the specified application to a JSON file.
+  list:
+    title: List actions.
+    description: Provide an application id or name as parameter (-a).
+    example: -a 15
+    method: GET
+    endpoint: /controller/restui/policy/getActionsListViewData/{{a:application}}
+  export:
+    title: Export actions.
+    description: Provide an application id or name as parameter (-a).
+    example: -a 15
+    method: GET
+    endpoint: /controller/actions/{{a:application}}
+  import:
+    title: Import actions.
+    description: Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)
+    example: -a 15 -F @actions.json
+    method: POST
+    endpoint: /controller/actions/{{a:application}}
+    form: file={{d:actions}}
+  delete:
+    Title: Delete actions.
+    description: Provide an action id (-i) as parameter.
+    method: POST
+    endpoint: /controller/restui/policy/deleteActions
+    payload: [{{i:action_id}}]
 application:
   title: Application Model API
   description: The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
   get:
     title: Get an application.
-    description: Provide application id or name as parameter (-a).
+    description: Provide an application id or name as parameter (-a).
     example: -a 15
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}
