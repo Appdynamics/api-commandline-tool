@@ -224,6 +224,6 @@ else
   COMMAND_RESULT="Unknown command: $*"
 fi
 
-echo -e "$COMMAND_RESULT"
+printf '%s\n' "$COMMAND_RESULT"
 
 debug END
