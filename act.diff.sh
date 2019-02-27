@@ -1697,5 +1697,5 @@ elif [ "${GLOBAL_COMMANDS/_${NAMESPACE}}" != "$GLOBAL_COMMANDS" ] ; then
 else
   COMMAND_RESULT="Unknown command: $*"
 fi
-echo -e "$COMMAND_RESULT"
+printf '%s\n' "$COMMAND_RESULT"
 debug END
