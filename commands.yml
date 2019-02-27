@@ -376,6 +376,16 @@ snapshot:
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}
+synthetic:
+  title: Synthetic
+  description: Create synthetic snapshots or jobs
+  snapshot:
+    title: Generate synthetic snapshot.
+    description: Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter.
+    example: -u http://www.appdynmics.com -l AMS -b Chrome -a 128
+    method: POST
+    endpoint: /controller/restui/synthetic/launch/generateLoad
+    payload: {\"url\":\"{{u:url}}\",\"location\":\"{{l:location}}\",\"browser\":\"{{b:browser}}\",\"applicationId\":{{a:application}},\"timeRangeString\":null,\"timeoutSeconds\":30,\"script\":null}
 tier:
   title: Tiers
   description: List all tiers.
@@ -397,6 +407,22 @@ tier:
     example: -a 29 -t 45
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes
+transactiondetection:
+  title: Transaction Detection Rules.
+  description: Import and export transaction detection rules.
+  export:
+    title: Export transaction detection rules.
+    description: Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter.
+    example: -a 29 -t custom -e servlet
+    method: GET
+    endpoint: /controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}
+  import:
+    title: Import transaction detection rules.
+    description: Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter.
+    example: -a 29 -t custom -e servlet -d @rules.xml
+    method: POST
+    endpoint: /controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}
+    form: file={{d:transaction_detection_rules}}
 user:
   title: Users
   description: Create and Modify AppDynamics Users.

@@ -291,6 +291,15 @@ List APM snapshots.
 | list | Retrieve a list of snapshots Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f) | `act.sh snapshot list -a 29 -t BEFORE_NOW -d 120` |
 
 
+## synthetic
+
+Create synthetic snapshots or jobs
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| snapshot | Generate synthetic snapshot. Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter. | `act.sh synthetic snapshot -u http://www.appdynmics.com -l AMS -b Chrome -a 128` |
+
+
 ## tier
 
 List all tiers.
@@ -309,6 +318,16 @@ List all tiers.
 | delete | Delete a specific time range by id |  |
 | create | Create a custom time range |  |
 | list | List all custom timeranges available on the controller |  |
+
+
+## transactiondetection
+
+Import and export transaction detection rules.
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| export | Export transaction detection rules. Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection export -a 29 -t custom -e servlet` |
+| import | Import transaction detection rules. Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection import -a 29 -t custom -e servlet -d @rules.xml` |
 
 
 ## user

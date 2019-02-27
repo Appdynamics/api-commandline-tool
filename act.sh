@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="72927e8d6d984bdf3e07c6214aa21aa66bd47729"
+ACT_LAST_COMMIT="ab8a3e64c5683c1567ed2e84f1916446a9b4e32c"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -218,6 +218,11 @@ List APM snapshots.
 EOF
 function snapshot_list { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
 rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+function synthetic_snapshot { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
+rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
 doc tier << EOF
 List all tiers.
 EOF
@@ -227,6 +232,13 @@ function tier_list { apiCall '/controller/rest/applications/{{a:application}}/ti
 rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
 function tier_nodes { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
 rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+function transactiondetection_export { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet"
+function transactiondetection_import { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet -d @rules.xml"
 doc user << EOF
 Create and Modify AppDynamics Users.
 EOF
@@ -1491,7 +1503,7 @@ function apiCall {
     shift
   done
   local CONTROLLER_ARGS=()
-  if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
+  if [[ "${ENDPOINT}" == */controller/rest/* ]] || [[ "${ENDPOINT}" == */controller/transactiondetection/* ]] ; then
     CONTROLLER_ARGS+=("-B")
     debug "Using basic http authentication"
   fi;

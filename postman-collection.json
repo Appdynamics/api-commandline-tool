@@ -1528,6 +1528,36 @@
 						},
             "description": "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)"
 					}
+				}]},{"name": "synthetic","item": [{
+					"name": "Generate synthetic snapshot.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"url\":\"{{url}}\",\"location\":\"{{location}}\",\"browser\":\"{{browser}}\",\"applicationId\":{{application}},\"timeRangeString\":null,\"timeoutSeconds\":30,\"script\":null}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/synthetic/launch/generateLoad",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","synthetic","launch","generateLoad"],
+              "query": []
+						},
+            "description": "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter."
+					}
 				}]},{"name": "tier","item": [{
 					"name": "Get a tier.",
 					"request": {
@@ -1617,6 +1647,66 @@
               "query": []
 						},
             "description": "Provide the application (-a) and the tier (-t) as parameters"
+					}
+				}]},{"name": "transactiondetection","item": [{
+					"name": "Export transaction detection rules.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","transactiondetection","{{application}}","{{ruletype}}","{{entrypointtype}}"],
+              "query": []
+						},
+            "description": "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter."
+					}
+				},{
+					"name": "Import transaction detection rules.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","transactiondetection","{{application}}","{{ruletype}}","{{entrypointtype}}"],
+              "query": []
+						},
+            "description": "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter."
 					}
 				}]},{"name": "user","item": [{
 					"name": "Create a new user.",

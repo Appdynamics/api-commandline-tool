@@ -129,7 +129,7 @@ function apiCall {
 
   local CONTROLLER_ARGS=()
 
-  if [[ "${ENDPOINT}" == */controller/rest/* ]]; then
+  if [[ "${ENDPOINT}" == */controller/rest/* ]] || [[ "${ENDPOINT}" == */controller/transactiondetection/* ]] ; then
     CONTROLLER_ARGS+=("-B")
     debug "Using basic http authentication"
   fi;
