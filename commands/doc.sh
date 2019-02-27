@@ -2,17 +2,17 @@
 
 function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
-# Usage
+# Usage\n\n
 Below you will find a list of all available namespaces and commands available with
 \`act.sh\`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)\n
-
-## Options
-
+\n
+## Options\n
+\n
 The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):\n
-
-| Option | Description |
-|--------|-------------|
+\n
+| Option | Description |\n
+|--------|-------------|\n
 ${AVAILABLE_GLOBAL_OPTIONS}
 EOM
   local NAMESPACES=""

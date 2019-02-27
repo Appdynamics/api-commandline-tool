@@ -1,6 +1,14 @@
-# Usage Below you will find a list of all available namespaces and commands available with `act.sh`. The given examples allow you to understand, how each command is used. For more complex examples, have a look into [RECIPES.md](RECIPES.md)
- ## Options The following options are available on a global level. Put them in front of your command (e.g. `act.sh -E testenv -vvv application list`):
- | Option | Description | |--------|-------------| |-H <controller-host> |specify the host of the controller you want to connect to| |-C <controller-credentials> |provide the credentials for the controller. Format: user@tenant:password| |-D <output-verbosity> |Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output| |-E <environment> |Call the controller within the given environment| |-A <application-name> |Provide a default application.| |-J <cookie-location> |Store the session cookie at a different location.| |-F <controller-info-xml> |Read the controller credentials from a given controller-info.xml| |-O |Don't execute the command and just print the curl call.| |-N |Don't use colors for the verbose output.| |-v[vv] |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
+# Usage
+
+ Below you will find a list of all available namespaces and commands available with `act.sh`. The given examples allow you to understand, how each command is used. For more complex examples, have a look into [RECIPES.md](RECIPES.md)
+ 
+ ## Options
+ 
+ The following options are available on a global level. Put them in front of your command (e.g. `act.sh -E testenv -vvv application list`):
+ 
+ | Option | Description |
+ |--------|-------------|
+ |-H <controller-host> |specify the host of the controller you want to connect to| |-C <controller-credentials> |provide the credentials for the controller. Format: user@tenant:password| |-D <output-verbosity> |Change the output verbosity. Provide a list of the following values: debug,error,warn,info,output| |-E <environment> |Call the controller within the given environment| |-A <application-name> |Provide a default application.| |-J <cookie-location> |Store the session cookie at a different location.| |-F <controller-info-xml> |Read the controller credentials from a given controller-info.xml| |-O |Don't execute the command and just print the curl call.| |-N |Don't use colors for the verbose output.| |-v[vv] |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
 
 
 ## Global
@@ -44,7 +52,7 @@ Manage custom analytics metrics
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| create | Create analytics metric Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional. | `act.sh analyticsmetric create -q` |
+| create | Create analytics metric Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional. | `act.sh analyticsmetric create -q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'` |
 
 
 ## analyticssearch

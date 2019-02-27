@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="49ea58e09fb09c204953147013a09701c3621da0"
+ACT_LAST_COMMIT="9bfea5bf26e194f638995c58dba675d23ad7b87b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -408,14 +408,17 @@ Download an appdynamics agent
 EOF
 function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
-# Usage
+# Usage\n\n
 Below you will find a list of all available namespaces and commands available with
 \`act.sh\`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)\n
-## Options
+\n
+## Options\n
+\n
 The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):\n
-| Option | Description |
-|--------|-------------|
+\n
+| Option | Description |\n
+|--------|-------------|\n
 ${AVAILABLE_GLOBAL_OPTIONS}
 EOM
   local NAMESPACES=""
