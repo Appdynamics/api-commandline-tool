@@ -178,6 +178,36 @@
 						},
             "description": "Provide the type (-t email or httprequest) as parameter."
 					}
+				}]},{"name": "analyticsmetric","item": [{
+					"name": "Create analytics metric",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"adqlQueryString\":\"{{query}}\",\"eventType\":\"{{eventType}}\",\"enabled\":true,\"queryType\":\"ADQL_QUERY\",\"queryName\":\"{{queryname}}\",\"queryDescription\":\"{{querydescription}}\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analyticsMetric/create",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analyticsMetric","create"],
+              "query": []
+						},
+            "description": "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional."
+					}
 				}]},{"name": "analyticssearch","item": [{
 					"name": "Get an analytics search by id.",
 					"request": {

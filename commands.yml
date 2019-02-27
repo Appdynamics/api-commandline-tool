@@ -92,6 +92,16 @@ analyticssearch:
     example:
     method: GET
     endpoint: /controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches
+analyticsmetric:
+  title: Analytics metrics
+  description: Manage custom analytics metrics
+  create:
+    title: Create analytics metric
+    description: Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional.
+    example: -q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'
+    method: POST
+    endpoint: /controller/restui/analyticsMetric/create
+    payload: {\"adqlQueryString\":\"{{q:query}}\",\"eventType\":\"{{e:eventType}}\",\"enabled\":true,\"queryType\":\"ADQL_QUERY\",\"queryName\":\"{{n:queryname}}\",\"queryDescription\":\"{{d:querydescription?}}\"}
 audit:
   title: Controller Audit History
   description: The Controller audit history is a record of the configuration and user activities in the Controller configuration.

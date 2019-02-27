@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="ab8a3e64c5683c1567ed2e84f1916446a9b4e32c"
+ACT_LAST_COMMIT="f8a7c40aa086a7e117f7e4bb3215d6449755a57e"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -77,6 +77,11 @@ function actiontemplate_createmediatype { apiCall -X POST -d '{"name":"{{n:media
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
 function actiontemplate_export { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+function analyticsmetric_create { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
+rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF
