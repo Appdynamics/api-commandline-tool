@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="f68a0c127a2546ecf2d574dd13617ba4db8036ea"
+ACT_LAST_COMMIT="68051e712a31fac064a91762b22240f10d53c80c"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -307,7 +307,7 @@ Below you will find a list of all available namespaces and commands available wi
 \`act.sh\`. The given examples allow you to understand, how each command is used.
 For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 ## Options
-The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):
+The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):${EOL}
 | Option | Description |
 |--------|-------------|
 ${AVAILABLE_GLOBAL_OPTIONS}
@@ -315,9 +315,10 @@ EOM
   local NAMESPACES=""
   for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
     local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
-    NAMESPACES="${NAMESPACES}${EOL}${COMMAND%%_*}"
+    NAMESPACES="${NAMESPACES}\n${COMMAND%%_*}"
   done
   for NS in "" $(echo -en $NAMESPACES | sort -u); do
+    debug "Processing ${NS}";
     COMMAND_RESULT="${COMMAND_RESULT}${EOL}${EOL}## ${NS:-Global}${EOL}"
     for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
       local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"

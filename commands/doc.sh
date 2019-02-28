@@ -9,7 +9,7 @@ For more complex examples, have a look into [RECIPES.md](RECIPES.md)
 
 ## Options
 
-The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):
+The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):${EOL}
 
 | Option | Description |
 |--------|-------------|
@@ -18,9 +18,10 @@ EOM
   local NAMESPACES=""
   for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
     local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
-    NAMESPACES="${NAMESPACES}${EOL}${COMMAND%%_*}"
+    NAMESPACES="${NAMESPACES}\n${COMMAND%%_*}"
   done
   for NS in "" $(echo -en $NAMESPACES | sort -u); do
+    debug "Processing ${NS}";
     COMMAND_RESULT="${COMMAND_RESULT}${EOL}${EOL}## ${NS:-Global}${EOL}"
     for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
       local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
