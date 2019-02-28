@@ -1,10 +1,9 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="2b182efad34a53b38d3976569a29b0410f19833b"
+ACT_LAST_COMMIT="f68a0c127a2546ecf2d574dd13617ba4db8036ea"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
-CONFIG_PORTAL_COOKIE_LOCATION="/tmp/appdynamics-portal-cookie.txt"
 # Configure default output verbosity. May contain a combination of the following strings:
 # - debug
 # - error
@@ -300,114 +299,6 @@ List all database agent events. This is an alias for \`${SCRIPTNAME} event list 
 EOF
 example dbmon_events << EOF
 -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
-EOF
-PORTAL_LOGIN_STATUS=0
-function portal_login {
-  if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
-    debug "Login at 'https://login.appdynamics.com/sso/login/' with $CONFIG_PORTAL_CREDENTIALS"
-    LOGIN_RESPONSE=$(httpClient -s -c ${CONFIG_PORTAL_COOKIE_LOCATION} -d "username=${CONFIG_PORTAL_CREDENTIALS%%:*}&password=${CONFIG_PORTAL_CREDENTIALS##*:}" 'https://login.appdynamics.com/sso/login/')
-    grep -q sso-sessionid ${CONFIG_PORTAL_COOKIE_LOCATION} && PORTAL_LOGIN_STATUS=1
-    if [ $PORTAL_LOGIN_STATUS -eq 1 ]; then
-      COMMAND_RESULT="Portal Login Successful"
-    else
-      COMMAND_RESULT="Portal Login Error! Please check your credentials"
-    fi
-  else
-    COMMAND_RESULT="Please run $1 config -p to setup portal credentials."
-  fi
-}
-register portal_login Login to portal.appdynamics.com
-describe portal_login << EOF
-Login to portal.appdynamics.com
-EOF
-function portal_download {
-  local VERSION=0
-  local OPERATING_SYSTEM=`uname -s`
-  local MACHINE_HARDWARE=`uname -m`
-  local MACHINE_HARDWARE_BITS=""
-  local INSTALLER_SUFFIX=".sh"
-  while getopts "v:s:m:" opt "$@";
-  do
-    case "${opt}" in
-      v)
-        VERSION=${OPTARG}
-      ;;
-      s)
-        OPERATING_SYSTEM=${OPTARG}
-      ;;
-      m)
-        MACHINE_HARDWARE=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  local TARGET=$*
-  if [ $VERSION = "0" ] ; then
-    controller_version
-    VERSION=$COMMAND_RESULT
-  fi
-  local FILE=""
-  case "$OPERATING_SYSTEM" in
-    Darwin|darwin|OSX|osx)
-      OPERATING_SYSTEM="osx"
-      INSTALLER_SUFFIX=".dmg"
-    ;;
-    linux|Linux)
-      OPERATING_SYSTEM="linux"
-      INSTALLER_SUFFIX=".sh"
-    ;;
-    SunOS)
-      OPERATING_SYSTEM="solaris-sparc"
-      INSTALLER_SUFFIX=".sh"
-    ;;
-    Windows|windows|win)
-    OPERATING_SYSTEM="windows"
-    INSTALLER_SUFFIX=".msi"
-    ;;
-  esac
-  case "$MACHINE_HARDWARE" in
-    64bit|x86_64|64)
-      MACHINE_HARDWARE="x64"
-      MACHINE_HARDWARE_BITS="64bit"
-    ;;
-    32bit|i686)
-      MACHINE_HARDWARE="x32"
-      MACHINE_HARDWARE_BITS="32bit"
-    ;;
-  esac
-  case "$TARGET" in
-    java*)
-      FILE="sun-jvm/$VERSION/AppServerAgent-$VERSION.zip"
-    ;;
-    universal*)
-      FILE="universal-agent/$VERSION/universal-agent-$MACHINE_HARDWARE-$OPERATING_SYSTEM-$VERSION.zip"
-    ;;
-    machine*)
-      FILE="machine-bundle/$VERSION/machineagent-bundle-$MACHINE_HARDWARE_BITS-$OPERATING_SYSTEM-$VERSION.zip"
-    ;;
-    controller)
-      FILE="controller/$VERSION/controller_${MACHINE_HARDWARE_BITS}_$OPERATING_SYSTEM-$VERSION$INSTALLER_SUFFIX"
-    ;;
-    file*)
-      shift
-      FILE=$*
-    ;;
-    *)
-      COMMAND_RESULT="Unknown agent type: $TARGET"
-    ;;
-  esac
-  if [ "$FILE" != "" ]; then
-    portal_login
-    if [ $PORTAL_LOGIN_STATUS -eq 1 ] ; then
-      info "Downloading https://download.appdynamics.com/download/prox/download-file/$FILE"
-      httpClient -O -b $CONFIG_PORTAL_COOKIE_LOCATION https://download.appdynamics.com/download/prox/download-file/$FILE
-    fi
-  fi
-}
-register portal_download Download an appdynamics agent
-describe portal_download << EOF
-Download an appdynamics agent
 EOF
 function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
@@ -786,6 +677,130 @@ EOF
 example actiontemplate_export << EOF
 -t httprequest
 EOF
+PORTAL_LOGIN_STATUS=0
+PORTAL_LOGIN_TOKEN=""
+function download_login {
+  if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
+    USERNAME=${CONFIG_PORTAL_CREDENTIALS%%:*}
+    PASSWORD=${CONFIG_PORTAL_CREDENTIALS#*:}
+    debug "Login at 'https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token' with $USERNAME and $PASSWORD"
+    LOGIN_RESPONSE=$(httpClient -s -X POST -d "{\"username\": \"${USERNAME}\",\"password\": \"${PASSWORD}\",\"scopes\": [\"download\"]}" https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token)
+    if [[ "${LOGIN_RESPONSE/\"error\"}" != "${LOGIN_RESPONSE}" ]]; then
+      COMMAND_RESULT="Login Error! Please check your portal credentials."
+    else
+      PORTAL_LOGIN_STATUS=1
+      PORTAL_LOGIN_TOKEN="${LOGIN_RESPONSE#*"access_token\": \""}"
+      PORTAL_LOGIN_TOKEN=${PORTAL_LOGIN_TOKEN%%\"*}
+      COMMAND_RESULT="Login Successful! Token: ${PORTAL_LOGIN_TOKEN}"
+    fi
+  else
+    COMMAND_RESULT="Please run $1 config -p to setup portal credentials."
+  fi
+}
+rde download_login "Login with AppDynamics to retrieve an OAUTH token for downloads." "You can use the provided token for downloads from https://download.appdynamics.com/" ""
+function download_get {
+  local WORKING_DIRECTORY="."
+  local DOWNLOAD_DRYRUN=0
+  local DOWNLOAD_ALL_MATCHES=1
+  local DOWNLOAD_FILTER=""
+  while getopts "Aard:" opt "$@";
+  do
+    case "${opt}" in
+      d)
+        WORKING_DIRECTORY=${OPTARG}
+      ;;
+      r)
+        DOWNLOAD_DRYRUN=1
+      ;;
+      a)
+        DOWNLOAD_ALL_MATCHES=1
+      ;;
+      A)
+        DOWNLOAD_ALL_MATCHES=1
+        DOWNLOAD_FILTER='.*'
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ ! -d ${WORKING_DIRECTORY} ] ; then
+    error "${WORKING_DIRECTORY} is not a directory"
+    exit 1
+  fi;
+  if [ "${DOWNLOAD_ALL_MATCHES}" -eq "0" ] ; then
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -1 -d
+  else
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -d
+  fi
+  # use echo to remove trailing line breaks
+  FILES=$COMMAND_RESULT
+  COMMAND_RESULT=""
+  if [ "$FILES" != "" ]; then
+    download_login
+    if [ $PORTAL_LOGIN_STATUS -eq 1 ] ; then
+      OLD_DIRECTORY=`pwd`
+      cd ${WORKING_DIRECTORY} || exit
+      for FILE in ${FILES} ; do
+        output "Downloading ${FILE} to ${WORKING_DIRECTORY}"
+        if [ "${DOWNLOAD_DRYRUN}" -eq "0" ] ; then
+          httpClient -L -O -H "Authorization: Bearer ${PORTAL_LOGIN_TOKEN}" "${FILE}"
+        else
+          output "Dry run."
+        fi
+      done
+      COMMAND_RESULT="Successfully downloaded `basename ${FILE}` to ${WORKING_DIRECTORY}"
+      cd "${OLD_DIRECTORY}" || exit
+    fi
+  else
+    COMMAND_RESULT="No matching agent found."
+  fi
+}
+rde download_get "Download an agent." "You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches." "-d /tmp golang"
+function download_list {
+  local FILES
+  local DELIMITER='"filename":'
+  local ENTRY
+  local FILTER='.*'
+  local BREAKONFIRST=0
+  while getopts "1df:" opt "$@";
+  do
+    case "${opt}" in
+      d)
+        DELIMITER='"download_path":'
+      ;;
+      f)
+        FILTER="${OPTARG}"
+      ;;
+      1)
+        BREAKONFIRST=1
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  output "Downloading list of available files. Please wait."
+  FILES=$(httpClient -s https://download.appdynamics.com/download/downloadfilelatest/)
+  #delimiter='"download_path":'
+  s=$FILES${DELIMITER}
+  COMMAND_RESULT=""
+  while [[ $s ]]; do
+    ENTRY="${s%%"${DELIMITER}"*}\n\n"
+    if [ "${ENTRY:0:1}" == "\"" ] ; then
+	    ENTRY=${ENTRY:1}
+      ENTRY=${ENTRY%%\",*}
+      if [[ "${ENTRY}" =~ ${FILTER} ]] ; then
+	       COMMAND_RESULT="${COMMAND_RESULT}${ENTRY}${EOL}"
+         if [ "${BREAKONFIRST}" -eq 1 ] ; then
+           return
+         fi;
+      else
+        debug "${ENTRY} does not match ${FILTER}"
+      fi;
+    fi;
+    s=${s#*"${DELIMITER}"};
+  done;
+}
+rde download_list "List latest agent files." "You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path" "-d -f golang"
 function federation_setup {
   local FRIEND_CONTROLLER_CREDENTIALS=""
   local FRIEND_CONTROLLER_HOST=""

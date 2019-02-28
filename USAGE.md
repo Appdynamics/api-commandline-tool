@@ -785,22 +785,6 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 | events | List all database agent events. This is an alias for `act.sh event list -a '_dbmon'`, so you can use the same parameters for querying the events. | `act.sh dbmon events -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT` |
 
 
-## portal
-
-| Command | Description | Example |
-| ------- | ----------- | ------- |
-| login | Login to portal.appdynamics.com |  |
-| download | Download an appdynamics agent |  |
-
-
-## portal
-
-| Command | Description | Example |
-| ------- | ----------- | ------- |
-| login | Login to portal.appdynamics.com |  |
-| download | Download an appdynamics agent |  |
-
-
 ## server
 
 List servers, their properties and metrics
@@ -936,6 +920,33 @@ These commands allow you to import and export email/http action templates. A com
 | delete | Delete an action template. Provide an id (-i) and a type (-t) as parameters. |  |
 | import | Import an action template of a given type (email, httprequest) | `act.sh actiontemplate import template.json` |
 | list | List all actiontemplates. Provide a type (-t) as parameter. |  |
+
+
+## download
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| login | Login with AppDynamics to retrieve an OAUTH token for downloads. You can use the provided token for downloads from https://download.appdynamics.com/ | `act.sh download login ` |
+| get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
+| list | List latest agent files. You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
+
+
+## download
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| login | Login with AppDynamics to retrieve an OAUTH token for downloads. You can use the provided token for downloads from https://download.appdynamics.com/ | `act.sh download login ` |
+| get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
+| list | List latest agent files. You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
+
+
+## download
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| login | Login with AppDynamics to retrieve an OAUTH token for downloads. You can use the provided token for downloads from https://download.appdynamics.com/ | `act.sh download login ` |
+| get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
+| list | List latest agent files. You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
 
 
 ## federation

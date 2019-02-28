@@ -9,7 +9,7 @@ function from_yaml {
   POSTMAN='{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": ['
   for NS in ${NAMESPACES}; do
     COMMANDS=`set | grep "^y_${NS}_"  | awk -F"_" '{ print $3; }'| grep -v "=" | sort -u`
-    echo -e "Building ${NS}"
+    # echo -e "Building ${NS}"
     NS_DESCRIPTION="y_${NS}_description"
 
     read -r -d '' OUTPUT << ASDF
@@ -35,7 +35,7 @@ ASDF
       PAYLOAD=${!PAYLOAD}
       FORM=${!FORM}
 
-      echo -e "\t- ${CMD} (${ENDPOINT})"
+      # echo -e "\t- ${CMD} (${ENDPOINT})"
 
       POSTMAN_ENDPOINT=${ENDPOINT}
       POSTMAN_PAYLOAD=${PAYLOAD}
