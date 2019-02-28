@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="9bfea5bf26e194f638995c58dba675d23ad7b87b"
+ACT_LAST_COMMIT="2b182efad34a53b38d3976569a29b0410f19833b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -20,6 +20,9 @@ COLOR_INFO="\033[0;32m"
 COLOR_ERROR="\033[0;31m"
 COLOR_DEBUG="\033[0;35m"
 COLOR_RESET="\033[0m"
+EOL="
+"
+TAB="  "
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
 declare -i GLOBAL_COMMANDS_COUNTER=0
@@ -35,8 +38,8 @@ declare -i VERBOSITY_COUNTER
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS_COUNTER+=1
-  GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
-  GLOBAL_HELP="$GLOBAL_HELP\n$*"
+  GLOBAL_COMMANDS="${GLOBAL_COMMANDS} $1"
+  GLOBAL_HELP="${GLOBAL_HELP}${EOL}$*"
 }
 function describe {
   GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
@@ -408,35 +411,32 @@ Download an appdynamics agent
 EOF
 function _doc {
 read -r -d '' COMMAND_RESULT <<- EOM
-# Usage\n\n
+# Usage
 Below you will find a list of all available namespaces and commands available with
 \`act.sh\`. The given examples allow you to understand, how each command is used.
-For more complex examples, have a look into [RECIPES.md](RECIPES.md)\n
-\n
-## Options\n
-\n
-The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):\n
-\n
-| Option | Description |\n
-|--------|-------------|\n
+For more complex examples, have a look into [RECIPES.md](RECIPES.md)
+## Options
+The following options are available on a global level. Put them in front of your command (e.g. \`${SCRIPTNAME} -E testenv -vvv application list\`):
+| Option | Description |
+|--------|-------------|
 ${AVAILABLE_GLOBAL_OPTIONS}
 EOM
   local NAMESPACES=""
   for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
     local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
-    NAMESPACES="${NAMESPACES}\n${COMMAND%%_*}"
+    NAMESPACES="${NAMESPACES}${EOL}${COMMAND%%_*}"
   done
   for NS in "" $(echo -en $NAMESPACES | sort -u); do
-    COMMAND_RESULT="${COMMAND_RESULT}\n\n## ${NS:-Global}\n"
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}${EOL}## ${NS:-Global}${EOL}"
     for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
       local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
       if [ "${NS}" == "${NS2}" ] ; then
         local DOC=${GLOBAL_DOC_STRINGS[$INDEX]}
-        COMMAND_RESULT="${COMMAND_RESULT}\n${DOC}\n"
+        COMMAND_RESULT="${COMMAND_RESULT}${EOL}${DOC}${EOL}"
       fi
     done;
-    COMMAND_RESULT="${COMMAND_RESULT}\n| Command | Description | Example |"
-    COMMAND_RESULT="${COMMAND_RESULT}\n| ------- | ----------- | ------- |"
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}| Command | Description | Example |"
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}| ------- | ----------- | ------- |"
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ ${COMMAND} == ${NS}_* ]] ; then
@@ -448,10 +448,10 @@ EOM
             EXAMPLE='`'"${SCRIPTNAME} ${NS} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}"'`'
           fi
         done
-        COMMAND_RESULT="${COMMAND_RESULT}\n| ${COMMAND##*_} | ${HELP//$'\n'/"<br>"/} | ${EXAMPLE} |"
+        COMMAND_RESULT="${COMMAND_RESULT}${EOL}| ${COMMAND##*_} | ${HELP//$'\n'/"<br>"/} | ${EXAMPLE} |"
       fi
     done
-    COMMAND_RESULT="${COMMAND_RESULT}\n"
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}"
   done;
 }
 register _doc Print the output of help in markdown
@@ -461,11 +461,11 @@ EOF
 function _help {
   if [ "$1" = "" ] ; then
     read -r -d '' COMMAND_RESULT <<- EOM
-Usage: ${USAGE_DESCRIPTION}\n
-You can use the following options on a global level:\n
-${AVAILABLE_GLOBAL_OPTIONS//|/}
-To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.\n
-The following commands in the global namespace can be called directly:\n
+Usage: ${USAGE_DESCRIPTION}${EOL}
+You can use the following options on a global level:${EOL}
+${AVAILABLE_GLOBAL_OPTIONS//|/}${EOL}
+To execute a action, provide a namespace and a command, e.g. \"metrics get\" to get a specific metric.
+The following commands in the global namespace can be called directly:
 EOM
     local NAMESPACE=""
     local SORTED
@@ -476,32 +476,32 @@ EOM
       NEW_NAMESPACE=${LINE%%_*}
       if [ "$NEW_NAMESPACE" != "$NAMESPACE" ]
       then
-        COMMAND_RESULT="${COMMAND_RESULT}\n$NEW_NAMESPACE\n"
+        COMMAND_RESULT="${COMMAND_RESULT}${EOL}$NEW_NAMESPACE${EOL}"
         NAMESPACE=$NEW_NAMESPACE
       fi
       COMMAND=${LINE##*_}
-      COMMAND_RESULT="${COMMAND_RESULT}\t${COMMAND%% *}\t\t${COMMAND#* }\n"
+      COMMAND_RESULT="${COMMAND_RESULT}${TAB}${COMMAND%% *} - ${COMMAND#* }${EOL}"
     done
     IFS=$OLD_IFS
-    COMMAND_RESULT="${COMMAND_RESULT}\nRun $SCRIPTNAME help <namespace> to get detailed help on subcommands in that namespace."
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}Run $SCRIPTNAME help <namespace> to get detailed help on subcommands in that namespace."
   else
     COMMAND_RESULT="Usage $SCRIPTNAME ${1} <command>"
     for INDEX in "${!GLOBAL_DOC_NAMESPACES[@]}" ; do
       local NS2="${GLOBAL_DOC_NAMESPACES[$INDEX]}"
       if [ "${1}" == "${NS2}" ] ; then
         local DOC=${GLOBAL_DOC_STRINGS[$INDEX]}
-        COMMAND_RESULT="${COMMAND_RESULT}\n\n${DOC}\n"
+        COMMAND_RESULT="${COMMAND_RESULT}${EOL}${EOL}${DOC}${EOL}"
       fi
     done;
-    COMMAND_RESULT="${COMMAND_RESULT}\nTo execute a action within the ${1} namespace provide one of the following commands:\n"
+    COMMAND_RESULT="${COMMAND_RESULT}${EOL}To execute a action within the ${1} namespace provide one of the following commands:${EOL}"
     for INDEX in "${!GLOBAL_LONG_HELP_COMMANDS[@]}" ; do
       local COMMAND="${GLOBAL_LONG_HELP_COMMANDS[$INDEX]}"
       if [[ $COMMAND == $1_* ]] ; then
-        COMMAND_RESULT="${COMMAND_RESULT}\n--- ${COMMAND##*_} ---\n${GLOBAL_LONG_HELP_STRINGS[$INDEX]}\n"
+        COMMAND_RESULT="${COMMAND_RESULT}${EOL}--- ${COMMAND##*_} ---${EOL}${GLOBAL_LONG_HELP_STRINGS[$INDEX]}${EOL}"
         for INDEX2 in "${!GLOBAL_EXAMPLE_COMMANDS[@]}" ; do
           local EXAMPLE_COMMAND="${GLOBAL_EXAMPLE_COMMANDS[$INDEX2]}"
           if [ "${COMMAND}" == "${EXAMPLE_COMMAND}" ] ; then
-            COMMAND_RESULT="${COMMAND_RESULT}\nExample: ${SCRIPTNAME} ${1} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}\n"
+            COMMAND_RESULT="${COMMAND_RESULT}${EOL}Example: ${SCRIPTNAME} ${1} ${COMMAND##*_} ${GLOBAL_EXAMPLE_STRINGS[$INDEX2]}${EOL}"
           fi
         done
       fi
@@ -519,7 +519,7 @@ EOF
 function _usage {
     # shellcheck disable=SC2034
     read -r -d '' COMMAND_RESULT <<- EOM
-Usage: ${USAGE_DESCRIPTION}\n
+Usage: ${USAGE_DESCRIPTION}${EOL}
 '${SCRIPTNAME} help' will list available namespaces and subcommands.
 See '${SCRIPTNAME} help <namespace>' to read about a specific namespace and the available subcommands
 EOM
@@ -1211,7 +1211,7 @@ function metric_tree {
       ;;
       *\}*)
         name=${name:2}
-        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}\n"
+        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}${EOL}"
         if [[ "$type" == *folder* ]] ; then
           local SUB_PATH="${METRIC_PATH}|${name%\"}"
           metric_tree -d ${DEPTH}+1 -t "${TABS} " -a $APPLICATION ${SUB_PATH#"|"}
@@ -1619,7 +1619,7 @@ read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
 |-O                            |Don't execute the command and just print the curl call.|
 |-N                            |Don't use colors for the verbose output.|
-|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|\n
+|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
 EOM
 while getopts "A:H:C:E:J:D:OP:S:F:Nv" opt;
 do

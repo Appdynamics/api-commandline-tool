@@ -47,7 +47,7 @@ function metric_tree {
       ;;
       *\}*)
         name=${name:2}
-        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}\n"
+        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}${EOL}"
         if [[ "$type" == *folder* ]] ; then
           local SUB_PATH="${METRIC_PATH}|${name%\"}"
           metric_tree -d ${DEPTH}+1 -t "${TABS} " -a $APPLICATION ${SUB_PATH#"|"}

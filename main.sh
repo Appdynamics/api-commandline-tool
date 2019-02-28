@@ -25,6 +25,11 @@ COLOR_ERROR="\033[0;31m"
 COLOR_DEBUG="\033[0;35m"
 COLOR_RESET="\033[0m"
 
+EOL="
+"
+TAB="  "
+
+
 GLOBAL_COMMANDS=""
 GLOBAL_HELP=""
 declare -i GLOBAL_COMMANDS_COUNTER=0
@@ -42,8 +47,8 @@ declare -i VERBOSITY_COUNTER
 # register namespace_command help
 function register {
   GLOBAL_COMMANDS_COUNTER+=1
-  GLOBAL_COMMANDS="$GLOBAL_COMMANDS $1"
-  GLOBAL_HELP="$GLOBAL_HELP\n$*"
+  GLOBAL_COMMANDS="${GLOBAL_COMMANDS} $1"
+  GLOBAL_HELP="${GLOBAL_HELP}${EOL}$*"
 }
 
 function describe {
@@ -100,7 +105,8 @@ read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
 |-O                            |Don't execute the command and just print the curl call.|
 |-N                            |Don't use colors for the verbose output.|
-|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|\n
+|-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
+
 EOM
 while getopts "A:H:C:E:J:D:OP:S:F:Nv" opt;
 do
