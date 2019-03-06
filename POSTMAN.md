@@ -62,3 +62,7 @@ Some of the requests can be executed using Basic HTTP Authentication, so you can
 ## Commands with parameters
 
 Many requests require you to provide a parameter like an application id or a json payload. Those parameters are exported as variables (e.g. `{{application}}` or `{{dashboard_id}}`), so you can configure them as environment variables or global variables to have them reusable. Otherwise, you can replace the variables with the required value.
+
+## Export into Code
+
+Postman comes with the capability to [export an existing request into a code snippet](https://learning.getpostman.com/docs/postman/sending_api_requests/generate_code_snippets/) in different languages (C, C#, Go, Java, JavaScript, Objective-C, OCAML, PHP, Python, Ruby, ...). This means, if you need any of the requests provided in a programming language, you can use those snippets as a template.
