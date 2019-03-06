@@ -6,7 +6,7 @@ ACT is completely bash based, so you don't need to install or compile anything, 
 
 If you want to see some examples what ACT can do, before installing it, look into the list of [available commands](USAGE.md) and [available recipes](RECIPES.md)
 
-As a byproduct the tool generates a [postman](https://www.getpostman.com/) compatible [collection of API calls](postman-collection.json).
+As a byproduct the tool generates a [postman](https://www.getpostman.com/) compatible [collection of API calls](postman-collection.json). The integration is described at [POSTMAN.md](POSTMAN.md)
 
 ## Installation
 
@@ -70,6 +70,9 @@ act.sh controller call /controller/rest/applications?output=JSON
 
 Finally, you can find some more recipes on using ACT in [RECIPES.md](RECIPES.md).
 
+## Postman Integration
+
+If you prefer using a graphical user interface to interact with the API you can import all available commands and your environments into [postman](https://www.getpostman.com/). Read the guide at [POSTMAN.md](POSTMAN.md) to learn more.
 
 ## Plugins
 
