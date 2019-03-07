@@ -1498,6 +1498,126 @@
 						},
             "description": "Provide an application (-a) as parameter."
 					}
+				}]},{"name": "sam","item": [{
+					"name": "Create a monitor.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"{{name}}\",\"description\":\"\",\"protocol\":\"HTTP\",\"machineId\":{{machineId}},\"configs\":{\"target\":\"{{url}}\",\"pingIntervalSeconds\":{{pingInterval}},\"failureThreshold\":{{failureThreshold}},\"successThreshold\":{{successThreshold}},\"thresholdWindow\":{{thresholdWindow}},\"connectTimeoutMillis\":{{connectTimeout}},\"socketTimeoutMillis\":{{socketTimeout}},\"method\":\"{{method}}\",\"downloadSize\":{{downloadSize}},\"followRedirects\":true,\"headers\":[{{headers}}],\"body\":\"{{body}}\",\"validationRules\":[{{validationRules}}]}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/sam/targets/http",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","sam","targets","http"],
+              "query": []
+						},
+            "description": "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)"
+					}
+				},{
+					"name": "Get a monitor.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","sam","targets","http","{{monitorId}}"],
+              "query": []
+						},
+            "description": "Provide a monitor id (-i) as parameter"
+					}
+				},{
+					"name": "Import a monitor.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{monitor_definition}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/sam/targets/http",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","sam","targets","http"],
+              "query": []
+						},
+            "description": "Provide a json string or a @file (-d) as parameter."
+					}
+				},{
+					"name": "List monitors.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/sam/targets/http",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","sam","targets","http"],
+              "query": []
+						},
+            "description": "This command requires no further arguments."
+					}
 				}]},{"name": "server","item": [{
 					"name": "Get a machine.",
 					"request": {

@@ -280,13 +280,25 @@ Import and export policies
 | list | List all policies. Provide an application (-a) as parameter. | `act.sh policies list -a 29` |
 
 
+## sam
+
+Manage service monitoring configurations
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| create | Create a monitor. This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v) | `act.sh sam create -n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000` |
+| get | Get a monitor. Provide a monitor id (-i) as parameter | `act.sh sam get -i 29` |
+| import | Import a monitor. Provide a json string or a @file (-d) as parameter. | `act.sh sam import -d @examples/sam.json` |
+| list | List monitors. This command requires no further arguments. | `act.sh sam list ` |
+
+
 ## server
 
 List servers, their properties and metrics
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get ` |
+| get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -i 244` |
 | list | List all servers |  |
 
 

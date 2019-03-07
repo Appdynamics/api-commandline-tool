@@ -368,13 +368,42 @@ policies:
     example: -a 29
     method: GET
     endpoint: /controller/policies/{{a:application}}
+sam:
+  title: Service Availability Monitoring
+  description: Manage service monitoring configurations
+  get:
+    title: Get a monitor.
+    description: Provide a monitor id (-i) as parameter
+    example: -i 29
+    method: GET
+    endpoint: /controller/sim/v2/user/sam/targets/http/{{i:monitorId}}
+  list:
+    title: List monitors.
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/sim/v2/user/sam/targets/http
+  create:
+    title: Create a monitor.
+    description: This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)
+    example: -n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000
+    method: POST
+    endpoint: /controller/sim/v2/user/sam/targets/http
+    payload: {\"name\":\"{{n:name}}\",\"description\":\"\",\"protocol\":\"HTTP\",\"machineId\":{{i:machineId}},\"configs\":{\"target\":\"{{u:url}}\",\"pingIntervalSeconds\":{{p:pingInterval}},\"failureThreshold\":{{f:failureThreshold}},\"successThreshold\":{{s:successThreshold}},\"thresholdWindow\":{{w:thresholdWindow}},\"connectTimeoutMillis\":{{c:connectTimeout}},\"socketTimeoutMillis\":{{t:socketTimeout}},\"method\":\"{{m:method}}\",\"downloadSize\":{{d:downloadSize}},\"followRedirects\":true,\"headers\":[{{h:headers?}}],\"body\":\"{{b:body?}}\",\"validationRules\":[{{v:validationRules}}]}}
+  import:
+    title: Import a monitor.
+    description: Provide a json string or a @file (-d) as parameter.
+    example: -d @examples/sam.json
+    method: POST
+    endpoint: /controller/sim/v2/user/sam/targets/http
+    payload: {{d:monitor_definition}}
 server:
   title: Server & Infrastructure Monitoring API
   description: List servers, their properties and metrics
   get:
     title: Get a machine.
     description: Provide a machine id (-m) as parameter.
-    example -i 244
+    example: -i 244
     method: GET
     endpoint: /controller/sim/v2/user/machines/{{m:machine}}
 snapshot:

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="68051e712a31fac064a91762b22240f10d53c80c"
+ACT_LAST_COMMIT="580edd34e591f66c20579d33fc4174f608fb3d23"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -215,11 +215,22 @@ Import and export policies
 EOF
 function policies_list { apiCall '/controller/policies/{{a:application}}' "$@" ; }
 rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+function sam_create { apiCall -X POST -d '{"name":"{{n:name}}","description":"","protocol":"HTTP","machineId":{{i:machineId}},"configs":{"target":"{{u:url}}","pingIntervalSeconds":{{p:pingInterval}},"failureThreshold":{{f:failureThreshold}},"successThreshold":{{s:successThreshold}},"thresholdWindow":{{w:thresholdWindow}},"connectTimeoutMillis":{{c:connectTimeout}},"socketTimeoutMillis":{{t:socketTimeout}},"method":"{{m:method}}","downloadSize":{{d:downloadSize}},"followRedirects":true,"headers":[{{h:headers?}}],"body":"{{b:body?}}","validationRules":[{{v:validationRules}}]}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_create "Create a monitor." "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)" "-n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000"
+function sam_get { apiCall '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+rde sam_get "Get a monitor." "Provide a monitor id (-i) as parameter" "-i 29"
+function sam_import { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_import "Import a monitor." "Provide a json string or a @file (-d) as parameter." "-d @examples/sam.json"
+function sam_list { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_list "List monitors." "This command requires no further arguments." ""
 doc server << EOF
 List servers, their properties and metrics
 EOF
 function server_get { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
-rde server_get "Get a machine." "Provide a machine id (-m) as parameter." ""
+rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-i 244"
 doc snapshot << EOF
 List APM snapshots.
 EOF

@@ -1,0 +1,43 @@
+{
+  "name": "My Example",
+  "description": "",
+  "protocol": "HTTP",
+  "machineId": 48,
+  "configs": {
+    "target": "https://www.appdynamics.com",
+    "pingIntervalSeconds": 10,
+    "failureThreshold": 1,
+    "successThreshold": 3,
+    "thresholdWindow": 5,
+    "connectTimeoutMillis": 30000,
+    "socketTimeoutMillis": 30000,
+    "method": "POST",
+    "downloadSize": 5000,
+    "followRedirects": true,
+    "headers": [{
+      "name": "My-Custom-Header",
+      "value": "headervalue"
+    }, {
+      "name": "Another-Custom-Header",
+      "value": "Woooot"
+    }],
+    "body": "{\"a\":\"b\"}",
+    "validationRules": [{
+      "field": "STATUS_CODE",
+      "value": "200",
+      "operator": "GREATER_THAN"
+    }, {
+      "field": "RESPONSE_TIME",
+      "value": "5000",
+      "operator": "LESS_THAN_EQ"
+    }, {
+      "field": "RESPONSE_SIZE",
+      "value": "512",
+      "operator": "GREATER_THAN"
+    }, {
+      "field": "RESPONSE_CONTENT",
+      "value": "AppDynamics",
+      "operator": "CONTAINS"
+    }]
+  }
+}
