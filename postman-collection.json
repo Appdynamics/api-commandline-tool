@@ -1529,6 +1529,36 @@
             "description": "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)"
 					}
 				},{
+					"name": "Delete a monitor",
+					"request": {
+						"method": "DELETE",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","sam","targets","http","{{monitorId}}"],
+              "query": []
+						},
+            "description": "Provide a monitor id (-i) as parameter"
+					}
+				},{
 					"name": "Get a monitor.",
 					"request": {
 						"method": "GET",

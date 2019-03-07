@@ -377,6 +377,12 @@ sam:
     example: -i 29
     method: GET
     endpoint: /controller/sim/v2/user/sam/targets/http/{{i:monitorId}}
+  delete:
+    title: Delete a monitor
+    description: Provide a monitor id (-i) as parameter
+    example: -i 29
+    method: DELETE
+    endpoint: /controller/sim/v2/user/sam/targets/http/{{i:monitorId}}
   list:
     title: List monitors.
     description: This command requires no further arguments.
