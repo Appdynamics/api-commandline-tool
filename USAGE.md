@@ -16,6 +16,7 @@ The following options are available on a global level. Put them in front of your
 |-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
 |-O                            |Don't execute the command and just print the curl call.|
 |-N                            |Don't use colors for the verbose output.|
+|-Q                            |If possible set the output format to JSON.|
 |-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
 
 ## Global

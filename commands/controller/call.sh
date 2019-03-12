@@ -33,6 +33,14 @@ function controller_call {
 
   ENDPOINT=$*
 
+  if [ "${CONFIG_OUTPUT_FORMAT}" == "JSON" ] ; then
+    if [[ ${ENDPOINT} = *"?"* ]]; then
+      ENDPOINT="${ENDPOINT}&output=JSON"
+    else
+      ENDPOINT="${ENDPOINT}?output=JSON"
+    fi;
+  fi;
+
   if [ "${USE_BASIC_AUTH}" -eq 1 ] ; then
     debug "Using basic authentication"
     CONTROLLER_LOGIN_STATUS=1

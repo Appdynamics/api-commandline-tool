@@ -16,6 +16,7 @@ CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
 CONFIG_OUTPUT_VERBOSITY="error,output"
 
 CONFIG_OUTPUT_COMMAND=0
+CONFIG_OUTPUT_FORMAT="XML"
 
 # Default Colors
 COLOR_WARNING="\033[0;33m"
@@ -93,7 +94,7 @@ else
 fi
 
 # Parse global options
-USAGE_DESCRIPTION="$SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-E <environment>] [-J <cookie-location>] [-P <plugin-directory>] [-F <controller-info-xml>] [-A <application-name>] [-O] [-v[vv]] <namespace> <command>"
+USAGE_DESCRIPTION="$SCRIPTNAME [-H <controller-host>] [-C <controller-credentials>] [-D <output-verbosity>] [-E <environment>] [-J <cookie-location>] [-P <plugin-directory>] [-F <controller-info-xml>] [-A <application-name>] [-O] [-N] [-Q] [-v[vv]] <namespace> <command>"
 read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-H <controller-host>          |specify the host of the controller you want to connect to|
 |-C <controller-credentials>   |provide the credentials for the controller. Format: user@tenant:password|
@@ -104,10 +105,11 @@ read -r -d '' AVAILABLE_GLOBAL_OPTIONS <<- EOM
 |-F <controller-info-xml>      |Read the controller credentials from a given controller-info.xml|
 |-O                            |Don't execute the command and just print the curl call.|
 |-N                            |Don't use colors for the verbose output.|
+|-Q                            |If possible set the output format to JSON.|
 |-v[vv]                        |Increase application verbosity: v = warn, vv = warn,info, vvv = warn,info,debug|
 
 EOM
-while getopts "A:H:C:E:J:D:OP:S:F:Nv" opt;
+while getopts "A:H:C:E:J:D:OP:S:F:NQv" opt;
 do
   case "${opt}" in
     E)
@@ -148,6 +150,10 @@ do
     O)
       CONFIG_OUTPUT_COMMAND=1
       debug "Set CONFIG_OUTPUT_COMMAND=${CONFIG_OUTPUT_COMMAND}"
+    ;;
+    Q)
+      CONFIG_OUTPUT_FORMAT="JSON"
+      debug "Set CONFIG_OUTPUT_FORMAT=${CONFIG_OUTPUT_FORMAT}"
     ;;
     S)
       CONFIG_PORTAL_CREDENTIALS=${OPTARG}
