@@ -300,6 +300,21 @@ event:
     example: -l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'
     method: POST
     endpoint: /controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}
+flowmap:
+  title: Flowmap
+  description: Retrieve flowmaps
+  application:
+    title: Get an application flowmap
+    description: Provide an application (-a) and a time range string (-t) as parameter.
+    example: -a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60
+    method: GET
+    endpoint: /controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false
+  component:
+    title: Get an component flowmap
+    description: Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter
+    example: -c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60
+    method: GET
+    endpoint: /controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1
 federation:
   title: Federation
   description: Establish a federation between two AppDynamics Controllers.

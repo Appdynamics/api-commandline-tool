@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="f5b1a202ae46d1d9b1456d714859e6da5fdd0927"
+ACT_LAST_COMMIT="6da09b22d08b0abbcd200f4de671149b74a680ca"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -193,6 +193,13 @@ function federation_createkey { apiCall -X POST -d '{"apiKeyName": "{{n:federati
 rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
 function federation_establish { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
 rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+function flowmap_application { apiCall '/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false' "$@" ; }
+rde flowmap_application "Get an application flowmap" "Provide an application (-a) and a time range string (-t) as parameter." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+function flowmap_component { apiCall '/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1' "$@" ; }
+rde flowmap_component "Get an component flowmap" "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter" "-c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60"
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF

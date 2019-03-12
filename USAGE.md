@@ -239,6 +239,16 @@ Establish a federation between two AppDynamics Controllers.
 | setup | Setup a controller federation: Generates a key and establishes the mutal friendship. |  |
 
 
+## flowmap
+
+Retrieve flowmaps
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| application | Get an application flowmap Provide an application (-a) and a time range string (-t) as parameter. | `act.sh flowmap application -a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60` |
+| component | Get an component flowmap Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter | `act.sh flowmap component -c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60` |
+
+
 ## healthrule
 
 Configure and retrieve health rules and their violates.

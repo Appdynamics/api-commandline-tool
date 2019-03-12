@@ -1288,6 +1288,66 @@
 						},
             "description": "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account."
 					}
+				}]},{"name": "flowmap","item": [{
+					"name": "Get an application flowmap",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","applicationFlowMapUiService","application","{{application}}"],
+              "query": [{"key": "time-range","value": "{{timerange}}"},{"key":"mapId","value": "-1"},{"key":"baselineId","value": "-1"},{"key":"forceFetch","value": "false"}]
+						},
+            "description": "Provide an application (-a) and a time range string (-t) as parameter."
+					}
+				},{
+					"name": "Get an component flowmap",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","componentFlowMapUiService","component","{{component}}"],
+              "query": [{"key": "time-range","value": "{{timerange}}"},{"key":"mapId","value": "-1"},{"key":"baselineId","value": "-1"}]
+						},
+            "description": "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter"
+					}
 				}]},{"name": "healthrule","item": [{
 					"name": "Get a healthrule.",
 					"request": {
