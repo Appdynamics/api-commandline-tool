@@ -1766,9 +1766,69 @@
 							"path": ["controller","rest","applications","{{application}}","request-snapshots"],
               "query": [{"key": "time-range-type","value": "{{time_range_type}}"},{"key":"duration-in-mins","value": "{{duration_in_minutes}}"},{"key":"start-time","value": "{{start_time}}"},{"key":"end-time","value": "{{end_time}}"}]
 						},
-            "description": "Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)"
+            "description": "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)"
 					}
 				}]},{"name": "synthetic","item": [{
+					"name": "Import a synthetic job.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{synthetic_job}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","synthetic","schedule","{{application}}","updateSchedule"],
+              "query": []
+						},
+            "description": "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)"
+					}
+				},{
+					"name": "List all synthetic jobs.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"applicationId\":{{application}},\"timeRangeString\":\"{{time_range}}\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/synthetic/schedule/getJobList",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","synthetic","schedule","getJobList"],
+              "query": []
+						},
+            "description": "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)."
+					}
+				},{
 					"name": "Generate synthetic snapshot.",
 					"request": {
 						"method": "POST",

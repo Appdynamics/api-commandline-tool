@@ -432,13 +432,27 @@ snapshot:
   description: List APM snapshots.
   list:
     title: Retrieve a list of snapshots
-    description: Provide an application (-a) as parameter, as well es a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
+    description: Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}
 synthetic:
   title: Synthetic
   description: Create synthetic snapshots or jobs
+  list:
+    title: List all synthetic jobs.
+    description: Provide an EUM application id (-a) as parameter, as well as an time range string (-t).
+    example: -a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60
+    method: POST
+    endpoint: /controller/restui/synthetic/schedule/getJobList
+    payload: {\"applicationId\":{{a:application}},\"timeRangeString\":\"{{t:time_range}}\"}
+  import:
+    title: Import a synthetic job.
+    description: Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)
+    example: -a 41 -d @examples/syntheticjob.json
+    method: POST
+    endpoint: /controller/restui/synthetic/schedule/{{a:application}}/updateSchedule
+    payload: {{d:synthetic_job}}
   snapshot:
     title: Generate synthetic snapshot.
     description: Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter.

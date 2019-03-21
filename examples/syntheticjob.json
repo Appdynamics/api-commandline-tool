@@ -1,0 +1,58 @@
+{
+  "id": null,
+  "rate": {
+    "unit": "MINUTES",
+    "value": 15
+  },
+  "daysOfWeek": ["SUN", "MON", "TUES", "WED", "THUR", "FRI", "SAT"],
+  "timeRange": null,
+  "timezone": null,
+  "description": "test script",
+  "userEnabled": true,
+  "systemEnabled": true,
+  "failOnPageError": true,
+  "version": 0,
+  "startTimeMillis": null,
+  "endTimeMillis": null,
+  "url": null,
+  "script": {
+    "script": "pageUrl = \"http://www.appdynamics.com\"\ndriver.get(pageUrl)\nassert \"AppDynamics\" in driver.title, \"Title should contain AppDynamics\"\n",
+    "contentType": "INLINE_PYTHON"
+  },
+  "browserCodes": ["Chrome"],
+  "locationCodes": ["YYZ", "MXP"],
+  "scheduleMode": "NONE",
+  "timeoutSeconds": 30,
+  "appKey": null,
+  "state": null,
+  "projectedUsage": null,
+  "networkProfile": {
+    "name": "FIOS",
+    "description": "",
+    "downloadKbps": 5000,
+    "uploadKbps": 1000,
+    "roundtripTimeMillis": 28,
+    "packetLossPercent": 0
+  },
+  "composableConfig": {
+    "resourceErrorDetection": {
+      "ignoreWhen": {
+        "resourceUrlContains": [],
+        "resourceMimeType": []
+      },
+      "onlyWhen": {
+        "resourceUrlContains": [],
+        "resourceMimeType": []
+      },
+      "sessionStatus": null
+    }
+  },
+  "created": null,
+  "updated": null,
+  "performanceCriteria": {
+    "retestOnWarning": false,
+    "retestOnCritical": false,
+    "warningCriterion": [],
+    "criticalCriterion": []
+  }
+}
