@@ -27,8 +27,9 @@ function apiCallExpand {
       debug "apiCallExpand: With expansion"
       local COMBINED_RESULT=""
       for ELEMENT in ${LIST}; do
-        COMBINED_RESULT="${COMBINED_RESULT}${EOL}$(apiCall ${PREFIX} @${ELEMENT} ${SUFFIX})"
-        echo $COMBINED_RESULT
+        apiCall ${PREFIX} @${ELEMENT} ${SUFFIX}
+        COMBINED_RESULT="${COMBINED_RESULT}${EOL}${COMMAND_RESULT}"
+        COMMAND_RESULT=""
       done;
       COMMAND_RESULT=${COMBINED_RESULT}
     ;;

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="4552f78b04ab60b8ca907d6214afd2605e715600"
+ACT_LAST_COMMIT="375ea8f52adfb5b7d708ae8614103c7586fd519d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1460,8 +1460,9 @@ function apiCallExpand {
       debug "apiCallExpand: With expansion"
       local COMBINED_RESULT=""
       for ELEMENT in ${LIST}; do
-        COMBINED_RESULT="${COMBINED_RESULT}${EOL}$(apiCall ${PREFIX} @${ELEMENT} ${SUFFIX})"
-        echo $COMBINED_RESULT
+        apiCall ${PREFIX} @${ELEMENT} ${SUFFIX}
+        COMBINED_RESULT="${COMBINED_RESULT}${EOL}${COMMAND_RESULT}"
+        COMMAND_RESULT=""
       done;
       COMMAND_RESULT=${COMBINED_RESULT}
     ;;
