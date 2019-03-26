@@ -959,6 +959,36 @@
             "description": "Provide a dashboard id (-i) as parameter"
 					}
 				},{
+					"name": "Get a dashboard.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","dashboards","dashboardIfUpdated","{{dashboard_id}}","-1"],
+              "query": []
+						},
+            "description": "Provide a dashboard id (-i) as parameter."
+					}
+				},{
 					"name": "Import a dashboard.",
 					"request": {
 						"method": "POST",
@@ -1046,7 +1076,7 @@
 							"path": ["controller","restui","dashboards","updateDashboard"],
               "query": []
 						},
-            "description": "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format."
+            "description": "Provide a dashboard file or json (-d) as parameter. Use the \`dashboard get\` command to retrieve the correct format for updating."
 					}
 				}]},{"name": "dbmon","item": [{
 					"name": "Delete multiple collectors.",

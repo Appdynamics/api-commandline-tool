@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="375ea8f52adfb5b7d708ae8614103c7586fd519d"
+ACT_LAST_COMMIT="cdd8b4bff4df64e2eae56ccb4bc0eb1e5b7f0639"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -162,12 +162,14 @@ function dashboard_delete { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controll
 rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
 function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
 rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+function dashboard_get { apiCall '/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1' "$@" ; }
+rde dashboard_get "Get a dashboard." "Provide a dashboard id (-i) as parameter." "-i 2"
 function dashboard_import { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
 rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d) as parameter." "-d @examples/dashboard.json"
 function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
 rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
-function dashboard_update { apiCall -X POST -d '{{f:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
-rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-d @dashboardUpdate.json"
+function dashboard_update { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the \`dashboard get\` command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF

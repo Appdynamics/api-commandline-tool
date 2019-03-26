@@ -286,11 +286,11 @@ dashboard:
     payload: [{{i:dashboard_id}}]
   update:
     title: Update a dashboard.
-    description: Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format.
+    description: Provide a dashboard file or json (-d) as parameter. Use the \\\`dashboard get\\\` command to retrieve the correct format for updating.
     example: -d @dashboardUpdate.json
     method: POST
     endpoint: /controller/restui/dashboards/updateDashboard
-    payload: {{f:dashboard_definition}}
+    payload: {{d:dashboard_definition}}
   import:
     title: Import a dashboard.
     description: Provide a dashboard file or json (-d) as parameter.
@@ -299,6 +299,12 @@ dashboard:
     endpoint: /controller/CustomDashboardImportExportServlet
     form: file={{d:dashboard}}
     expand: true
+  get:
+    title: Get a dashboard.
+    description: Provide a dashboard id (-i) as parameter.
+    example: -i 2
+    method: GET
+    endpoint: /controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1
 event:
   title: Events
   description: Create and list events in your business applications.
