@@ -1,0 +1,22 @@
+{
+    "schemaVersion": null,
+    "dashboardFormatVersion": "4.0",
+    "name": "Empty Dashboard",
+    "description": null,
+    "properties": null,
+    "templateEntityType": "APPLICATION_COMPONENT_NODE",
+    "associatedEntityTemplates": null,
+    "minutesBeforeAnchorTime": -1,
+    "startDate": null,
+    "endDate": null,
+    "refreshInterval": 120000,
+    "backgroundColor": 15856629,
+    "color": 15856629,
+    "height": 768,
+    "width": 1024,
+    "canvasType": "CANVAS_TYPE_GRID",
+    "layoutType": "",
+    "widgetTemplates": null,
+    "warRoom": false,
+    "template": false
+}

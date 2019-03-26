@@ -1,4 +1,43 @@
 #!/bin/bash
+# Helper function to expand multiple files that are provided as payload
+function apiCallExpand {
+  debug "Calling apiCallExpand"
+  local COUNTER=0
+  local PREFIX=""
+  local SUFFIX=""
+  local LIST=""
+  declare -i COUNTER
+  for ARG in $*; do
+    if [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
+      LIST=$(echo ${ARG:1})
+      COUNTER=${COUNTER}+1
+    elif [ "${COUNTER}" -eq "0" ]; then
+      PREFIX="${PREFIX} ${ARG}"
+    else
+      SUFFIX="${SUFFIX} ${ARG}"
+    fi;
+  done;
+
+  case "${COUNTER}" in
+    "0")
+      debug "apiCallExpand: No expansion"
+      apiCall "$@"
+    ;;
+    "1")
+      debug "apiCallExpand: With expansion"
+      local COMBINED_RESULT=""
+      for ELEMENT in ${LIST}; do
+        COMBINED_RESULT="${COMBINED_RESULT}${EOL}$(apiCall ${PREFIX} @${ELEMENT} ${SUFFIX})"
+        echo $COMBINED_RESULT
+      done;
+      COMMAND_RESULT=${COMBINED_RESULT}
+    ;;
+    *)
+      error "You can only provide one file list for expansion."
+      COMMAND_RESULT=""
+    ;;
+  esac
+}
 
 function apiCall {
   local OPTS
@@ -134,7 +173,7 @@ function apiCall {
     debug "Using basic http authentication"
   fi;
 
-  if [ -n "$PAYLOAD" ] ; then
+  if [ -n "${PAYLOAD}" ] ; then
     if [ "${PAYLOAD:0:1}" = "@" ] ; then
       debug "Loading payload from file ${PAYLOAD:1}"
       if [ -r "${PAYLOAD:1}" ] ; then

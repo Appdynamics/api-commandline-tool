@@ -287,10 +287,18 @@ dashboard:
   update:
     title: Update a dashboard.
     description: Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format.
-    example: -i 2
+    example: -d @dashboardUpdate.json
     method: POST
     endpoint: /controller/restui/dashboards/updateDashboard
     payload: {{f:dashboard_definition}}
+  import:
+    title: Import a dashboard.
+    description: Provide a dashboard file or json (-d) as parameter.
+    example: -d @examples/dashboard.json
+    method: POST
+    endpoint: /controller/CustomDashboardImportExportServlet
+    form: file={{d:dashboard}}
+    expand: true
 event:
   title: Events
   description: Create and list events in your business applications.

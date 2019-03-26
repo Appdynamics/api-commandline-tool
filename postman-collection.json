@@ -959,6 +959,36 @@
             "description": "Provide a dashboard id (-i) as parameter"
 					}
 				},{
+					"name": "Import a dashboard.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/CustomDashboardImportExportServlet",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","CustomDashboardImportExportServlet"],
+              "query": []
+						},
+            "description": "Provide a dashboard file or json (-d) as parameter."
+					}
+				},{
 					"name": "List all dashboards.",
 					"request": {
 						"method": "GET",

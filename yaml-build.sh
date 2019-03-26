@@ -30,10 +30,12 @@ ASDF
       ENDPOINT="y_${NS}_${CMD}_endpoint"
       PAYLOAD="y_${NS}_${CMD}_payload"
       FORM="y_${NS}_${CMD}_form"
+      EXPAND="y_${NS}_${CMD}_expand"
 
       ENDPOINT=${!ENDPOINT}
       PAYLOAD=${!PAYLOAD}
       FORM=${!FORM}
+      EXPAND=${!EXPAND}
 
       # echo -e "\t- ${CMD} (${ENDPOINT})"
 
@@ -114,10 +116,17 @@ ASDF
           METHOD=""
         fi;
 
-      read -r -d '' OUTPUT << ASDF
+        if [ "${EXPAND}" == "true" ] ; then
+          read -r -d '' OUTPUT << ASDF
+function ${NS}_${CMD} { apiCallExpand${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
+rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
+ASDF
+        else
+          read -r -d '' OUTPUT << ASDF
 function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
 rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
 ASDF
+        fi
 
       echo -en "${OUTPUT}" >> temp.sh
     done;

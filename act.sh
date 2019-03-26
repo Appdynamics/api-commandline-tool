@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="05b09dfd00a013c4ec108156661cd20e8218bde2"
+ACT_LAST_COMMIT="43a2301ebe6ce3e819b9ac5a09a6fb0a3687c4a7"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -162,10 +162,12 @@ function dashboard_delete { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controll
 rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
 function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
 rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+function dashboard_import { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
+rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d) as parameter." "-d @examples/dashboard.json"
 function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
 rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
 function dashboard_update { apiCall -X POST -d '{{f:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
-rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-i 2"
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-f) as parameter. Please not that the json you need to provide is not compatible with the export format." "-d @dashboardUpdate.json"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
@@ -611,19 +613,6 @@ describe controller_version << EOF
 Get installed version from controller
 EOF
 example controller_version << EOF
-EOF
-function dashboard_import {
-  FILE="$*"
-  if [ -r $FILE ] ; then
-    controller_call -X POST -F file=@$FILE /controller/CustomDashboardImportExportServlet
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register dashboard_import Import a dashboard
-describe dashboard_import << EOF
-Import a dashboard from a given file
 EOF
 function actiontemplate_delete {
   local TYPE="httprequest"
@@ -1442,6 +1431,44 @@ function recursiveSource {
     done
   fi
 }
+# Helper function to expand multiple files that are provided as payload
+function apiCallExpand {
+  debug "Calling apiCallExpand"
+  local COUNTER=0
+  local PREFIX=""
+  local SUFFIX=""
+  local LIST=""
+  declare -i COUNTER
+  for ARG in $*; do
+    if [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
+      LIST=$(echo ${ARG:1})
+      COUNTER=${COUNTER}+1
+    elif [ "${COUNTER}" -eq "0" ]; then
+      PREFIX="${PREFIX} ${ARG}"
+    else
+      SUFFIX="${SUFFIX} ${ARG}"
+    fi;
+  done;
+  case "${COUNTER}" in
+    "0")
+      debug "apiCallExpand: No expansion"
+      apiCall "$@"
+    ;;
+    "1")
+      debug "apiCallExpand: With expansion"
+      local COMBINED_RESULT=""
+      for ELEMENT in ${LIST}; do
+        COMBINED_RESULT="${COMBINED_RESULT}${EOL}$(apiCall ${PREFIX} @${ELEMENT} ${SUFFIX})"
+        echo $COMBINED_RESULT
+      done;
+      COMMAND_RESULT=${COMBINED_RESULT}
+    ;;
+    *)
+      error "You can only provide one file list for expansion."
+      COMMAND_RESULT=""
+    ;;
+  esac
+}
 function apiCall {
   local OPTS
   local OPTIONAL_OPTIONS=""
@@ -1563,7 +1590,7 @@ function apiCall {
     CONTROLLER_ARGS+=("-B")
     debug "Using basic http authentication"
   fi;
-  if [ -n "$PAYLOAD" ] ; then
+  if [ -n "${PAYLOAD}" ] ; then
     if [ "${PAYLOAD:0:1}" = "@" ] ; then
       debug "Loading payload from file ${PAYLOAD:1}"
       if [ -r "${PAYLOAD:1}" ] ; then
