@@ -282,13 +282,14 @@ Retrieve nodes within a business application
 | markhistorical | Mark nodes as historical. Provide a comma separated list of node ids. | `act.sh node markhistorical -n 45,46` |
 
 
-## policies
+## policy
 
 Import and export policies
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | List all policies. Provide an application (-a) as parameter. | `act.sh policies list -a 29` |
+| export | List all policies. Provide an application (-a) as parameter. | `act.sh policy export -a 29` |
+| import | Import a policy. Provide an application (-a) and a policy file or json (-d) as parameter. | `act.sh policy import -a 29 -d @examples/policy.json` |
 
 
 ## sam

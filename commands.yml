@@ -382,15 +382,22 @@ node:
     example: -n 45,46
     method: POST
     endpoint: /controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}
-policies:
+policy:
   title: Policies API
   description: Import and export policies
-  list:
+  export:
     title: List all policies.
     description: Provide an application (-a) as parameter.
     example: -a 29
     method: GET
     endpoint: /controller/policies/{{a:application}}
+  import:
+    title: Import a policy.
+    description: Provide an application (-a) and a policy file or json (-d) as parameter.
+    example: -a 29 -d @examples/policy.json
+    method: POST
+    endpoint: /controller/policies/{{a:application}}
+    form: file={{d:policy}}
 sam:
   title: Service Availability Monitoring
   description: Manage service monitoring configurations

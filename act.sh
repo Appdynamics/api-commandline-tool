@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.4.0"
-ACT_LAST_COMMIT="43a2301ebe6ce3e819b9ac5a09a6fb0a3687c4a7"
+ACT_LAST_COMMIT="4552f78b04ab60b8ca907d6214afd2605e715600"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -220,11 +220,13 @@ function node_list { apiCall '/controller/rest/applications/{{a:application}}/no
 rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
 function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
-doc policies << EOF
+doc policy << EOF
 Import and export policies
 EOF
-function policies_list { apiCall '/controller/policies/{{a:application}}' "$@" ; }
-rde policies_list "List all policies." "Provide an application (-a) as parameter." "-a 29"
+function policy_export { apiCall '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_export "List all policies." "Provide an application (-a) as parameter." "-a 29"
+function policy_import { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
 doc sam << EOF
 Manage service monitoring configurations
 EOF

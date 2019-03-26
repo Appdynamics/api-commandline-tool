@@ -1,0 +1,24 @@
+[ {
+  "applicationName" : "example application",
+  "name" : "example policy",
+  "reactorType" : "IMMEDIATE",
+  "enabled" : true,
+  "batchActionsPerMinute" : true,
+  "durationInMin" : 1,
+  "eventFilterTemplate" : {
+    "applicationName" : "example application",
+    "healthRuleNames" : null,
+    "eventTypes" : null,
+    "rsdTypes" : [ "SLOW", "VERY_SLOW", "STALL" ],
+    "customEventFilters" : null,
+    "specificEntityNamesByType" : null
+  },
+  "entityFilterTemplates" : [ ],
+  "actionWrapperTemplates" : [ {
+    "actionTag" : "example",
+    "type" : "PERCENTAGE",
+    "value" : 10,
+    "notes" : "",
+    "entityIdentifierTemplates" : [ ]
+  } ]
+} ]

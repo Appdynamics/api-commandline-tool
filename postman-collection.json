@@ -1558,7 +1558,7 @@
 						},
             "description": "Provide a comma separated list of node ids."
 					}
-				}]},{"name": "policies","item": [{
+				}]},{"name": "policy","item": [{
 					"name": "List all policies.",
 					"request": {
 						"method": "GET",
@@ -1587,6 +1587,36 @@
               "query": []
 						},
             "description": "Provide an application (-a) as parameter."
+					}
+				},{
+					"name": "Import a policy.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/policies/{{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","policies","{{application}}"],
+              "query": []
+						},
+            "description": "Provide an application (-a) and a policy file or json (-d) as parameter."
 					}
 				}]},{"name": "sam","item": [{
 					"name": "Create a monitor.",
