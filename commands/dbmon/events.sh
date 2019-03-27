@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function dbmon_events {
+dbmon_events() {
   event_list -a '_dbmon' "$@"
 }
 

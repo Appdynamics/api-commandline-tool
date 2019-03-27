@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function controller_call {
+controller_call() {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""

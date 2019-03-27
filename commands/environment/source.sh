@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_source {
+environment_source() {
   if [ "$1" == "" ] ; then
     source "${HOME}/.appdynamics/act/config.sh"
   else

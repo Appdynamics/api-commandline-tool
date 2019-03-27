@@ -1,7 +1,6 @@
 #!/bin/bash
 
-function httpClient {
- # debug "$*"
+httpClient() {
  local TIMEOUT=10
  if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
    TIMEOUT=$CONFIG_HTTP_TIMEOUT

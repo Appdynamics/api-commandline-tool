@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _usage {
+_usage() {
     # shellcheck disable=SC2034
     read -r -d '' COMMAND_RESULT <<- EOM
 Usage: ${USAGE_DESCRIPTION}${EOL}

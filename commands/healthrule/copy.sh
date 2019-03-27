@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function healthrule_copy {
+healthrule_copy() {
   local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local TARGET_APPLICATION=""
   local TARGET_ENVIRONMENT=""

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function actiontemplate_delete {
+actiontemplate_delete() {
   local TYPE="httprequest"
   local ID=0
   while getopts "t:i:" opt "$@";

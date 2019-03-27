@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function download_list {
+download_list() {
   local FILES
   local DELIMITER='"filename":'
   local ENTRY
@@ -25,7 +25,7 @@ function download_list {
   output "Downloading list of available files. Please wait."
   FILES=$(httpClient -s https://download.appdynamics.com/download/downloadfilelatest/)
   #delimiter='"download_path":'
-  s=$FILES${DELIMITER}
+  local s=$FILES${DELIMITER}
   COMMAND_RESULT=""
   while [[ $s ]]; do
     ENTRY="${s%%"${DELIMITER}"*}\n\n"

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="1184ebadb4c7f1efb50666ccff5b69661d1a51a5"
+ACT_LAST_COMMIT="b70cd27d6276d64df861594c0e3cef7a4aa1b162"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -36,24 +36,24 @@ SCRIPTNAME=$(basename "$0")
 VERBOSITY_COUNTER=0
 declare -i VERBOSITY_COUNTER
 # register namespace_command help
-function register {
+register() {
   GLOBAL_COMMANDS_COUNTER+=1
   GLOBAL_COMMANDS="${GLOBAL_COMMANDS} $1"
   GLOBAL_HELP="${GLOBAL_HELP}${EOL}$*"
 }
-function describe {
+describe() {
   GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
   read -r -d '' GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]
 }
-function example {
+example() {
   GLOBAL_EXAMPLE_COMMANDS[${#GLOBAL_EXAMPLE_COMMANDS[@]}]="$1"
   read -r -d '' GLOBAL_EXAMPLE_STRINGS[${#GLOBAL_EXAMPLE_STRINGS[@]}]
 }
-function doc {
+doc() {
   GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
-function rde {
+rde() {
   register "${1}" "${2}"
   describe "${1}" <<RRREOF
 ${2} ${3}
@@ -65,226 +65,228 @@ RRREOF
 doc action << EOF
 Import or export all actions in the specified application to a JSON file.
 EOF
-function action_delete { apiCall -X POST -d '[{{i:action_id}}]' '/controller/restui/policy/deleteActions' "$@" ; }
+action_delete() { apiCall -X POST -d '[{{i:action_id}}]' '/controller/restui/policy/deleteActions' "$@" ; }
 rde action_delete "" "Provide an action id (-i) as parameter." ""
-function action_export { apiCall '/controller/actions/{{a:application}}' "$@" ; }
+action_export() { apiCall '/controller/actions/{{a:application}}' "$@" ; }
 rde action_export "Export actions." "Provide an application id or name as parameter (-a)." "-a 15"
-function action_import { apiCall -X POST -F 'file={{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
-rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -F @actions.json"
-function action_list { apiCall '/controller/restui/policy/getActionsListViewData/{{a:application}}' "$@" ; }
+action_import() { apiCall -X POST -F 'file={{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
+rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -d @actions.json"
+action_list() { apiCall '/controller/restui/policy/getActionsListViewData/{{a:application}}' "$@" ; }
 rde action_list "List actions." "Provide an application id or name as parameter (-a)." "-a 15"
 doc actiontemplate << EOF
 These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
 EOF
-function actiontemplate_createmediatype { apiCall -X POST -d '{"name":"{{n:media_type_name}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+actiontemplate_createmediatype() { apiCall -X POST -d '{"name":"{{n:media_type_name}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
-function actiontemplate_export { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
+actiontemplate_export() { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
 doc analyticsmetric << EOF
 Manage custom analytics metrics
 EOF
-function analyticsmetric_create { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
+analyticsmetric_create() { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
 rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF
-function analyticssearch_get { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
+analyticssearch_get() { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
 rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)" "-i 6"
-function analyticssearch_list { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
+analyticssearch_list() { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
 rde analyticssearch_list "List all analytics searches." "This command requires no further arguments" ""
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
-function application_create { apiCall -X POST -d '{"name": "{{n:application_name}}", "description": "{{d:application_description?}}"}' '/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}' "$@" ; }
+application_create() { apiCall -X POST -d '{"name": "{{n:application_name}}", "description": "{{d:application_description?}}"}' '/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}' "$@" ; }
 rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
-function application_delete { apiCall -X POST -d '{{a:application}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+application_delete() { apiCall -X POST -d '{{a:application}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
 rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
-function application_export { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}' "$@" ; }
+application_export() { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}' "$@" ; }
 rde application_export "Export an application." "Provide an application id as parameter (-a)" "-a 29"
-function application_get { apiCall '/controller/rest/applications/{{a:application}}' "$@" ; }
+application_get() { apiCall '/controller/rest/applications/{{a:application}}' "$@" ; }
 rde application_get "Get an application." "Provide an application id or name as parameter (-a)." "-a 15"
-function application_list { apiCall '/controller/rest/applications' "$@" ; }
+application_list() { apiCall '/controller/rest/applications' "$@" ; }
 rde application_list "List all applications." "This command requires no further arguments." ""
 doc audit << EOF
 The Controller audit history is a record of the configuration and user activities in the Controller configuration.
 EOF
-function audit_get { apiCall '/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}' "$@" ; }
+audit_get() { apiCall '/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}' "$@" ; }
 rde audit_get "Get audit history." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
 doc backend << EOF
 Retrieve information about backends within a given business application
 EOF
-function backend_list { apiCall '/controller/rest/applications/{{a:application}}/backends' "$@" ; }
+backend_list() { apiCall '/controller/rest/applications/{{a:application}}/backends' "$@" ; }
 rde backend_list "List all backends." "Provide the application id as parameter (-a)" "-a 29"
 doc bizjourney << EOF
 Manage business journeys in AppDynamics Analytics
 EOF
-function bizjourney_disable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable' "$@" ; }
+bizjourney_disable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable' "$@" ; }
 rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
-function bizjourney_enable { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable' "$@" ; }
+bizjourney_enable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable' "$@" ; }
 rde bizjourney_enable "Enable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
-function bizjourney_import { apiCall -X POST -d '{{d:business_journey_draft}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
+bizjourney_import() { apiCall -X POST -d '{{d:business_journey_draft}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
 rde bizjourney_import "Import a business journey." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
-function bizjourney_list { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
+bizjourney_list() { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
 rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
 doc bt << EOF
 Retrieve information about business transactions within a given business application
 EOF
-function bt_creategroup { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}' "$@" ; }
+bt_creategroup() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}' "$@" ; }
 rde bt_creategroup "Create a BT group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
-function bt_delete { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+bt_delete() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
 rde bt_delete "Delete a BT." "Provide the bt id as parameter (-b)" "-b 13"
-function bt_get { apiCall '/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}' "$@" ; }
+bt_get() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}' "$@" ; }
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
-function bt_list { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
+bt_list() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
 rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
-function bt_rename { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
+bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
 rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc configuration << EOF
 The configuration API enables you read and modify selected Controller configuration settings programmatically.
 EOF
-function configuration_get { apiCall '/controller/rest/configuration?name={{n:controller_setting_name}}' "$@" ; }
+configuration_get() { apiCall '/controller/rest/configuration?name={{n:controller_setting_name}}' "$@" ; }
 rde configuration_get "Get a controller setting by name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
-function configuration_list { apiCall '/controller/rest/configuration' "$@" ; }
+configuration_list() { apiCall '/controller/rest/configuration' "$@" ; }
 rde configuration_list "List all controller settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
-function configuration_set { apiCall -X POST '/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}' "$@" ; }
+configuration_set() { apiCall -X POST '/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}' "$@" ; }
 rde configuration_set "Set a controller setting." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
 doc controller << EOF
 Basic calls against an AppDynamics controller.
 EOF
-function controller_auth { apiCall '/controller/auth?action=login' "$@" ; }
+controller_auth() { apiCall '/controller/auth?action=login' "$@" ; }
 rde controller_auth "Authenticate." "" ""
-function controller_status { apiCall '/controller/rest/serverstatus' "$@" ; }
+controller_status() { apiCall '/controller/rest/serverstatus' "$@" ; }
 rde controller_status "Get the server status." "This command will return a XML containing status information about the controller." ""
 doc dashboard << EOF
 Import and export custom dashboards in the AppDynamics controller
 EOF
-function dashboard_delete { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
+dashboard_delete() { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
 rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
-function dashboard_export { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
+dashboard_export() { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
 rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
-function dashboard_get { apiCall '/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1' "$@" ; }
+dashboard_get() { apiCall '/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1' "$@" ; }
 rde dashboard_get "Get a dashboard." "Provide a dashboard id (-i) as parameter." "-i 2"
-function dashboard_import { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
+dashboard_import() { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
 rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d) as parameter." "-d @examples/dashboard.json"
-function dashboard_list { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
+dashboard_list() { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
 rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
-function dashboard_update { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+dashboard_update() { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
 rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the \`dashboard get\` command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF
-function dbmon_delete { apiCall -X POST -d '[{{c:database_collectors}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
+dbmon_delete() { apiCall -X POST -d '[{{c:database_collectors}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
 rde dbmon_delete "Delete multiple collectors." "Provide a comma seperated list of collector analyticsSavedSearches" "-c 17,18"
-function dbmon_get { apiCall '/controller/rest/databases/collectors/{{c:database_collector}}' "$@" ; }
+dbmon_get() { apiCall '/controller/rest/databases/collectors/{{c:database_collector}}' "$@" ; }
 rde dbmon_get "Get a specifc collector." "Provide the collector id as parameter (-c)." "-c 17"
-function dbmon_import { apiCall -X POST -d '{{d:database_collector_definition}}' '/controller/rest/databases/collectors/create' "$@" ; }
+dbmon_import() { apiCall -X POST -d '{{d:database_collector_definition}}' '/controller/rest/databases/collectors/create' "$@" ; }
 rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
-function dbmon_list { apiCall '/controller/rest/databases/collectors' "$@" ; }
+dbmon_list() { apiCall '/controller/rest/databases/collectors' "$@" ; }
 rde dbmon_list "List all collectors." "No further arguments required." ""
-function dbmon_queries { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
+dbmon_queries() { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
 rde dbmon_queries "Get queries for a server." "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters." "-i 2 -b 1545237000000 -f 1545238602"
-function dbmon_servers { apiCall '/controller/rest/databases/servers' "$@" ; }
+dbmon_servers() { apiCall '/controller/rest/databases/servers' "$@" ; }
 rde dbmon_servers "List all servers." "No further arguments required." ""
 doc event << EOF
 Create and list events in your business applications.
 EOF
-function event_create { apiCall -X POST '/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}' "$@" ; }
+event_create() { apiCall -X POST '/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}' "$@" ; }
 rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
 doc federation << EOF
 Establish a federation between two AppDynamics Controllers.
 EOF
-function federation_createkey { apiCall -X POST -d '{"apiKeyName": "{{n:federation_api_key_name}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
+federation_createkey() { apiCall -X POST -d '{"apiKeyName": "{{n:federation_api_key_name}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
 rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
-function federation_establish { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
+federation_establish() { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
 rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
 doc flowmap << EOF
 Retrieve flowmaps
 EOF
-function flowmap_application { apiCall '/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false' "$@" ; }
+flowmap_application() { apiCall '/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false' "$@" ; }
 rde flowmap_application "Get an application flowmap" "Provide an application (-a) and a time range string (-t) as parameter." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
-function flowmap_component { apiCall '/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1' "$@" ; }
+flowmap_component() { apiCall '/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1' "$@" ; }
 rde flowmap_component "Get an component flowmap" "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter" "-c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60"
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
-function healthrule_get { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
+healthrule_get() { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
 rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
-function healthrule_list { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; }
+healthrule_list() { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; }
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
-function healthrule_violations { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
+healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
 rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc node << EOF
 Retrieve nodes within a business application
 EOF
-function node_get { apiCall '/controller/rest/applications/{{a:application}}/nodes/{{n:node}}' "$@" ; }
+node_get() { apiCall '/controller/rest/applications/{{a:application}}/nodes/{{n:node}}' "$@" ; }
 rde node_get "Get a node." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
-function node_list { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$@" ; }
+node_list() { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$@" ; }
 rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
-function node_markhistorical { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
+node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
 doc policy << EOF
 Import and export policies
 EOF
-function policy_export { apiCall '/controller/policies/{{a:application}}' "$@" ; }
+policy_export() { apiCall '/controller/policies/{{a:application}}' "$@" ; }
 rde policy_export "List all policies." "Provide an application (-a) as parameter." "-a 29"
-function policy_import { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
+policy_import() { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
 rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
 doc sam << EOF
 Manage service monitoring configurations
 EOF
-function sam_create { apiCall -X POST -d '{"name":"{{n:name}}","description":"","protocol":"HTTP","machineId":{{i:machineId}},"configs":{"target":"{{u:url}}","pingIntervalSeconds":{{p:pingInterval}},"failureThreshold":{{f:failureThreshold}},"successThreshold":{{s:successThreshold}},"thresholdWindow":{{w:thresholdWindow}},"connectTimeoutMillis":{{c:connectTimeout}},"socketTimeoutMillis":{{t:socketTimeout}},"method":"{{m:method}}","downloadSize":{{d:downloadSize}},"followRedirects":true,"headers":[{{h:headers?}}],"body":"{{b:body?}}","validationRules":[{{v:validationRules}}]}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+sam_create() { apiCall -X POST -d '{"name":"{{n:name}}","description":"","protocol":"HTTP","machineId":{{i:machineId}},"configs":{"target":"{{u:url}}","pingIntervalSeconds":{{p:pingInterval}},"failureThreshold":{{f:failureThreshold}},"successThreshold":{{s:successThreshold}},"thresholdWindow":{{w:thresholdWindow}},"connectTimeoutMillis":{{c:connectTimeout}},"socketTimeoutMillis":{{t:socketTimeout}},"method":"{{m:method}}","downloadSize":{{d:downloadSize}},"followRedirects":true,"headers":[{{h:headers?}}],"body":"{{b:body?}}","validationRules":[{{v:validationRules}}]}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
 rde sam_create "Create a monitor." "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)" "-n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000"
-function sam_delete { apiCall -X DELETE '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+sam_delete() { apiCall -X DELETE '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
 rde sam_delete "Delete a monitor" "Provide a monitor id (-i) as parameter" "-i 29"
-function sam_get { apiCall '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+sam_get() { apiCall '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
 rde sam_get "Get a monitor." "Provide a monitor id (-i) as parameter" "-i 29"
-function sam_import { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+sam_import() { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
 rde sam_import "Import a monitor." "Provide a json string or a @file (-d) as parameter." "-d @examples/sam.json"
-function sam_list { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+sam_list() { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
 rde sam_list "List monitors." "This command requires no further arguments." ""
 doc server << EOF
 List servers, their properties and metrics
 EOF
-function server_get { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
+server_get() { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
 rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-i 244"
+server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
+rde server_list "List all machines." "No additional argument required." ""
 doc snapshot << EOF
 List APM snapshots.
 EOF
-function snapshot_list { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
+snapshot_list() { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
 rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc synthetic << EOF
 Create synthetic snapshots or jobs
 EOF
-function synthetic_import { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
+synthetic_import() { apiCallExpand -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
 rde synthetic_import "Import a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/syntheticjob.json"
-function synthetic_list { apiCall -X POST -d '{"applicationId":{{a:application}},"timeRangeString":"{{t:time_range}}"}' '/controller/restui/synthetic/schedule/getJobList' "$@" ; }
+synthetic_list() { apiCall -X POST -d '{"applicationId":{{a:application}},"timeRangeString":"{{t:time_range}}"}' '/controller/restui/synthetic/schedule/getJobList' "$@" ; }
 rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
-function synthetic_snapshot { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
+synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
 rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
 doc tier << EOF
 List all tiers.
 EOF
-function tier_get { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}' "$@" ; }
+tier_get() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}' "$@" ; }
 rde tier_get "Get a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
-function tier_list { apiCall '/controller/rest/applications/{{a:application}}/tiers' "$@" ; }
+tier_list() { apiCall '/controller/rest/applications/{{a:application}}/tiers' "$@" ; }
 rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
-function tier_nodes { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
+tier_nodes() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
 rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
 doc transactiondetection << EOF
 Import and export transaction detection rules.
 EOF
-function transactiondetection_export { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+transactiondetection_export() { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
 rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet"
-function transactiondetection_import { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+transactiondetection_import() { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
 rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet -d @rules.xml"
 doc user << EOF
 Create and Modify AppDynamics Users.
 EOF
-function user_create { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+user_create() { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
 rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
-function user_update { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+user_update() { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
 rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
-function dbmon_create {
+dbmon_create() {
   apiCall -X POST -d "{ \
                       \"name\": \"{{i}}\",\
                       \"username\": \"{{u}}\",\
@@ -321,7 +323,7 @@ EOF
 example dbmon_create << EOF
 -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
 EOF
-function dbmon_events {
+dbmon_events() {
   event_list -a '_dbmon' "$@"
 }
 register dbmon_events List all database agent events.
@@ -331,7 +333,7 @@ EOF
 example dbmon_events << EOF
 -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
 EOF
-function _doc {
+_doc() {
 read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with
@@ -381,7 +383,7 @@ register _doc Print the output of help in markdown
 doc "" << EOF
 The following commands in the global namespace can be called directly.
 EOF
-function _help {
+_help() {
   if [ "$1" = "" ] ; then
     read -r -d '' COMMAND_RESULT <<- EOM
 Usage: ${USAGE_DESCRIPTION}${EOL}
@@ -432,14 +434,7 @@ EOM
   fi
 }
 register _help Display the global help.
-function server_list {
-  apiCall -X GET "/controller/sim/v2/user/machines" "$@"
-}
-register server_list List all servers
-describe server_list << EOF
-List all servers
-EOF
-function _usage {
+_usage() {
     # shellcheck disable=SC2034
     read -r -d '' COMMAND_RESULT <<- EOM
 Usage: ${USAGE_DESCRIPTION}${EOL}
@@ -448,7 +443,7 @@ See '${SCRIPTNAME} help <namespace>' to read about a specific namespace and the 
 EOM
 }
 register _usage Display usage information.
-function controller_isup {
+controller_isup() {
   local START
   local END
   declare -i END
@@ -470,7 +465,7 @@ EOF
 example controller_isup << EOF
 ; ${SCRIPTNAME} application list
 EOF
-function controller_call {
+controller_call() {
   debug "Calling $CONFIG_CONTROLLER_HOST"
   local METHOD="GET"
   local FORM=""
@@ -571,7 +566,7 @@ example controller_call << EOF
 /controller/rest/serverstatus
 EOF
 CONTROLLER_LOGIN_STATUS=0
-function controller_login {
+controller_login() {
   debug "Login at ${CONFIG_CONTROLLER_HOST} with ${CONFIG_CONTROLLER_CREDENTIALS}"
   LOGIN_RESPONSE=$(httpClient -sI -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login")
   debug "RESPONSE: ${LOGIN_RESPONSE}"
@@ -591,7 +586,7 @@ Check if the login with your appdynamics controller works properly. If the login
 EOF
 example controller_login << EOF
 EOF
-function controller_ping {
+controller_ping() {
   debug "Ping $CONFIG_CONTROLLER_HOST"
   local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
   debug "RESPONSE: ${PING_RESPONSE}"
@@ -608,7 +603,7 @@ Check the availability of an appdynamics controller. On success the response tim
 EOF
 example controller_ping << EOF
 EOF
-function controller_version {
+controller_version() {
   controller_call -X GET /controller/rest/serverstatus
   COMMAND_RESULT=`echo -e $COMMAND_RESULT | sed -n -e 's/.*Controller v\(.*\) Build.*/\1/p'`
 }
@@ -618,7 +613,7 @@ Get installed version from controller
 EOF
 example controller_version << EOF
 EOF
-function actiontemplate_delete {
+actiontemplate_delete() {
   local TYPE="httprequest"
   local ID=0
   while getopts "t:i:" opt "$@";
@@ -650,7 +645,7 @@ EOF
 example actiontemplate_export << EOF
 -t httprequest
 EOF
-function actiontemplate_import {
+actiontemplate_import() {
   local FILE=""
   local TYPE="httprequest"
   while getopts "t:" opt "$@";
@@ -678,7 +673,7 @@ EOF
 example actiontemplate_import << EOF
 template.json
 EOF
-function actiontemplate_list {
+actiontemplate_list() {
   local TYPE="httprequest"
   while getopts "t:" opt "$@";
   do
@@ -705,7 +700,7 @@ example actiontemplate_export << EOF
 EOF
 PORTAL_LOGIN_STATUS=0
 PORTAL_LOGIN_TOKEN=""
-function download_login {
+download_login() {
   if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
     USERNAME=${CONFIG_PORTAL_CREDENTIALS%%:*}
     PASSWORD=${CONFIG_PORTAL_CREDENTIALS#*:}
@@ -724,7 +719,7 @@ function download_login {
   fi
 }
 rde download_login "Login with AppDynamics to retrieve an OAUTH token for downloads." "You can use the provided token for downloads from https://download.appdynamics.com/" ""
-function download_get {
+download_get() {
   local WORKING_DIRECTORY="."
   local DOWNLOAD_DRYRUN=0
   local DOWNLOAD_ALL_MATCHES=1
@@ -774,7 +769,7 @@ function download_get {
           output "Dry run."
         fi
       done
-      COMMAND_RESULT="Successfully downloaded `basename ${FILE}` to ${WORKING_DIRECTORY}"
+      COMMAND_RESULT="Successfully downloaded $(bashBasename ${FILE}) to ${WORKING_DIRECTORY}"
       cd "${OLD_DIRECTORY}" || exit
     fi
   else
@@ -782,7 +777,7 @@ function download_get {
   fi
 }
 rde download_get "Download an agent." "You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches." "-d /tmp golang"
-function download_list {
+download_list() {
   local FILES
   local DELIMITER='"filename":'
   local ENTRY
@@ -807,7 +802,7 @@ function download_list {
   output "Downloading list of available files. Please wait."
   FILES=$(httpClient -s https://download.appdynamics.com/download/downloadfilelatest/)
   #delimiter='"download_path":'
-  s=$FILES${DELIMITER}
+  local s=$FILES${DELIMITER}
   COMMAND_RESULT=""
   while [[ $s ]]; do
     ENTRY="${s%%"${DELIMITER}"*}\n\n"
@@ -827,7 +822,7 @@ function download_list {
   done;
 }
 rde download_list "List latest agent files." "You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path" "-d -f golang"
-function federation_setup {
+federation_setup() {
   local FRIEND_CONTROLLER_CREDENTIALS=""
   local FRIEND_CONTROLLER_HOST=""
   local KEY_NAME=""
@@ -872,14 +867,14 @@ register federation_setup Setup a controller federation: Generates a key and est
 describe federation_setup << EOF
 Setup a controller federation: Generates a key and establishes the mutal friendship.
 EOF
-function eum_getapps {
+eum_getapps() {
   apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
 }
 register eum_getapps Get EUM App Keys
 describe eum_getapps << EOF
 Get EUM Apps.
 EOF
-function timerange_delete {
+timerange_delete() {
   local TIMERANGE_ID=$*
   if [[ $TIMERANGE_ID =~ ^[0-9]+$ ]]; then
     controller_call -X POST -d "$TIMERANGE_ID" /controller/restui/user/deleteCustomRange
@@ -892,7 +887,7 @@ register timerange_delete Delete a specific time range by id
 describe timerange_delete << EOF
 Delete a specific time range by id
 EOF
-function timerange_create {
+timerange_create() {
   local START_TIME=-1
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
@@ -921,7 +916,7 @@ register timerange_create Create a custom time range
 describe timerange_create << EOF
 Create a custom time range
 EOF
-function timerange_list {
+timerange_list() {
   controller_call -X GET /controller/restui/user/getAllCustomTimeRanges
 }
 register timerange_list List all custom timeranges available on the controller
@@ -933,7 +928,7 @@ If you want to use ${SCRIPTNAME} to manage multiple controllers, you can use env
 Use \`${SCRIPTNAME} environment add\` to create an environment providing a name, controller url and credentials.
 Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
 EOF
-function environment_source {
+environment_source() {
   if [ "$1" == "" ] ; then
     source "${HOME}/.appdynamics/act/config.sh"
   else
@@ -947,7 +942,7 @@ EOF
 example environment_source << EOF
 myaccount
 EOF
-function environment_get {
+environment_get() {
   COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
 }
 register environment_get Retrieve an environment
@@ -957,7 +952,7 @@ EOF
 example environment_get << EOF
 myaccount
 EOF
-function environment_delete {
+environment_delete() {
   rm "${HOME}/.appdynamics/act/config.$1.sh"
   COMMAND_RESULT="${1} deleted"
 }
@@ -968,7 +963,7 @@ EOF
 example environment_delete << EOF
 myaccount
 EOF
-function environment_add {
+environment_add() {
   local FORCE=0
   local GLOBAL=0
   local SHOW=0
@@ -1079,13 +1074,13 @@ EOF
 example environment_add << EOF
 -d
 EOF
-function environment_list {
+environment_list() {
   local BASE
   local TEMP
   COMMAND_RESULT="(default)"
   for file in "${HOME}/.appdynamics/act/config."*".sh"
   do
-    BASE=`basename "${file}"`
+    BASE=$(bashBasename "${file}")
     TEMP=${BASE#*.}
     COMMAND_RESULT="${COMMAND_RESULT} ${TEMP%.*}"
   done
@@ -1096,7 +1091,7 @@ List all your environments
 EOF
 example environment_list << EOF
 EOF
-function environment_export {
+environment_export() {
   environment_source "${1}";
   local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"
   read -r -d '' COMMAND_RESULT << EOF
@@ -1139,7 +1134,7 @@ EOF
 example environment_export << EOF
 > output.json
 EOF
-function environment_edit {
+environment_edit() {
   if [ -x "${EDITOR}" ] || [ -x "`which "${EDITOR}"`" ] ; then
     ${EDITOR} "${HOME}/.appdynamics/act/config.$1.sh"
   else
@@ -1152,7 +1147,7 @@ EOF
 example environment_edit << EOF
 myaccount
 EOF
-function _config {
+_config() {
   environment_add -d "$@"
 }
 register _config "Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`"
@@ -1161,7 +1156,7 @@ Initialize the default environment. This is an alias for \`${SCRIPTNAME} environ
 EOF
 example _config << EOF
 EOF
-function _version {
+_version() {
   # shellcheck disable=SC2034
   COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
 }
@@ -1171,7 +1166,7 @@ Print the current version of $SCRIPTNAME
 EOF
 example _version << EOF
 EOF
-function metric_get {
+metric_get() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
   local END_TIME=-1
@@ -1212,7 +1207,7 @@ describe metric_get << EOF
 Get a specific metric by providing the metric path. Provide the application with option -a
 EOF
 RECURSIVE_COMMAND_RESULT=""
-function metric_tree {
+metric_tree() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local DEPTH=0
   declare -i DEPTH
@@ -1268,7 +1263,7 @@ register metric_tree Build and return a metrics tree for one application
 describe metric_tree << EOF
 Create a metric tree for the given application (-a). Note that this will create a lot of requests towards your controller.
 EOF
-function metric_list {
+metric_list() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local METRIC_PATH=""
   while getopts "a:" opt "$@";
@@ -1289,7 +1284,7 @@ register metric_list List metrics available for one application.
 describe metric_list << EOF
 List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
 EOF
-function healthrule_import {
+healthrule_import() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local FILE=""
   while getopts "a:" opt "$@";
@@ -1314,7 +1309,7 @@ register healthrule_import Import a health rule
 describe healthrule_import << EOF
 Import a health rule.
 EOF
-function healthrule_copy {
+healthrule_copy() {
   local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local TARGET_APPLICATION=""
   local TARGET_ENVIRONMENT=""
@@ -1371,7 +1366,7 @@ describe healthrule_list << EOF
 Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
 If you provide ("-n") only the named health rule will be copied.
 EOF
-function event_list {
+event_list() {
   # Add some "ALL" magic
   local PREV=""
   local ARGS=()
@@ -1395,7 +1390,7 @@ EOF
 example event_list << EOF
 -a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
 EOF
-function analyticssearch_import {
+analyticssearch_import() {
   FILE="$*"
   if [ -r "${FILE}" ] ; then
     DATA="$(<${FILE})"
@@ -1422,7 +1417,7 @@ EOF
 example analyticssearch_import << EOF
 search.json
 EOF
-function recursiveSource {
+recursiveSource() {
   if [ -d "$*" ]; then
     debug "Sourcing plugins from $*"
     for file in $*/* ; do
@@ -1436,7 +1431,7 @@ function recursiveSource {
   fi
 }
 # Helper function to expand multiple files that are provided as payload
-function apiCallExpand {
+apiCallExpand() {
   debug "Calling apiCallExpand"
   local COUNTER=0
   local PREFIX=""
@@ -1474,7 +1469,7 @@ function apiCallExpand {
     ;;
   esac
 }
-function apiCall {
+apiCall() {
   local OPTS
   local OPTIONAL_OPTIONS=""
   local OPTS_TYPES=()
@@ -1619,39 +1614,39 @@ function apiCall {
 }
 SHIFTS=0
 declare -i SHIFTS
-function shiftOptInd {
+shiftOptInd() {
   SHIFTS=$OPTIND
   SHIFTS=${SHIFTS}-1
   OPTIND=0
   return $SHIFTS
 }
-function debug {
+debug() {
   if [ "${CONFIG_OUTPUT_VERBOSITY/debug}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_DEBUG}DEBUG: $*${COLOR_RESET}"
   fi
 }
-function error {
+error() {
   if [ "${CONFIG_OUTPUT_VERBOSITY/error}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_ERROR}ERROR: $*${COLOR_RESET}"
   fi
 }
-function warning {
+warning() {
   if [ "${CONFIG_OUTPUT_VERBOSITY/warning}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_WARNING}WARNING: $*${COLOR_RESET}"
   fi
 }
-function info {
+info() {
   if [ "${CONFIG_OUTPUT_VERBOSITY/info}" != "$CONFIG_OUTPUT_VERBOSITY" ]; then
     echo -e "${COLOR_INFO}INFO: $*${COLOR_RESET}"
   fi
 }
-function output {
+output() {
   if [ "${CONFIG_OUTPUT_VERBOSITY}" != "" ]; then
     echo -e "$*"
   fi
 }
 # from https://gist.github.com/cdown/1163649
-function urlencode {
+urlencode() {
     # urlencode <string>
     old_lc_collate=$LC_COLLATE
     LC_COLLATE=C
@@ -1665,8 +1660,13 @@ function urlencode {
     done
     LC_COLLATE=$old_lc_collate
 }
-function httpClient {
- # debug "$*"
+# Source: https://github.com/dylanaraps/pure-bash-bible#get-the-base-name-of-a-file-path
+bashBasename() {
+    # Usage: basename "path"
+    : "${1%/}"
+    printf '%s\n' "${_##*/}"
+}
+httpClient() {
  local TIMEOUT=10
  if [ -n "$CONFIG_HTTP_TIMEOUT" ] ; then
    TIMEOUT=$CONFIG_HTTP_TIMEOUT

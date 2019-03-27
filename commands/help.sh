@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _help {
+_help() {
   if [ "$1" = "" ] ; then
     read -r -d '' COMMAND_RESULT <<- EOM
 Usage: ${USAGE_DESCRIPTION}${EOL}

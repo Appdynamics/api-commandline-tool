@@ -1,6 +1,6 @@
 #!/bin/bash
 # Helper function to expand multiple files that are provided as payload
-function apiCallExpand {
+apiCallExpand() {
   debug "Calling apiCallExpand"
   local COUNTER=0
   local PREFIX=""
@@ -40,7 +40,7 @@ function apiCallExpand {
   esac
 }
 
-function apiCall {
+apiCall() {
   local OPTS
   local OPTIONAL_OPTIONS=""
   local OPTS_TYPES=()

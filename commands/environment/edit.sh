@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_edit {
+environment_edit() {
   if [ -x "${EDITOR}" ] || [ -x "`which "${EDITOR}"`" ] ; then
     ${EDITOR} "${HOME}/.appdynamics/act/config.$1.sh"
   else

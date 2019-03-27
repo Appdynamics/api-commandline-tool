@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function recursiveSource {
+recursiveSource() {
   if [ -d "$*" ]; then
     debug "Sourcing plugins from $*"
     for file in $*/* ; do

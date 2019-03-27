@@ -16,7 +16,7 @@ action:
   import:
     title: Import actions.
     description: Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)
-    example: -a 15 -F @actions.json
+    example: -a 15 -d @actions.json
     method: POST
     endpoint: /controller/actions/{{a:application}}
     form: file={{d:actions}}
@@ -448,6 +448,12 @@ server:
     example: -i 244
     method: GET
     endpoint: /controller/sim/v2/user/machines/{{m:machine}}
+  list:
+    title: List all machines.
+    description: No additional argument required.
+    example:
+    method: GET
+    endpoint: /controller/sim/v2/user/machines
 snapshot:
   title: Snapshot API
   description: List APM snapshots.
@@ -474,6 +480,7 @@ synthetic:
     method: POST
     endpoint: /controller/restui/synthetic/schedule/{{a:application}}/updateSchedule
     payload: {{d:synthetic_job}}
+    expand: true
   snapshot:
     title: Generate synthetic snapshot.
     description: Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter.

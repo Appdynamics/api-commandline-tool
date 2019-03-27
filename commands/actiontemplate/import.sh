@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function actiontemplate_import {
+actiontemplate_import() {
   local FILE=""
   local TYPE="httprequest"
   while getopts "t:" opt "$@";

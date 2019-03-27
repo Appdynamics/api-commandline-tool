@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function timerange_create {
+timerange_create() {
   local START_TIME=-1
   local END_TIME=-1
   local DURATION_IN_MINUTES=0

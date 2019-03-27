@@ -37,7 +37,7 @@ Import or export all actions in the specified application to a JSON file.
 | ------- | ----------- | ------- |
 | delete | Provide an action id (-i) as parameter. | `act.sh action delete ` |
 | export | Export actions. Provide an application id or name as parameter (-a). | `act.sh action export -a 15` |
-| import | Import actions. Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d) | `act.sh action import -a 15 -F @actions.json` |
+| import | Import actions. Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d) | `act.sh action import -a 15 -d @actions.json` |
 | list | List actions. Provide an application id or name as parameter (-a). | `act.sh action list -a 15` |
 
 
@@ -313,7 +313,7 @@ List servers, their properties and metrics
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -i 244` |
-| list | List all servers |  |
+| list | List all machines. No additional argument required. | `act.sh server list ` |
 
 
 ## snapshot

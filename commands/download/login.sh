@@ -2,7 +2,7 @@
 PORTAL_LOGIN_STATUS=0
 PORTAL_LOGIN_TOKEN=""
 
-function download_login {
+download_login() {
   if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
     USERNAME=${CONFIG_PORTAL_CREDENTIALS%%:*}
     PASSWORD=${CONFIG_PORTAL_CREDENTIALS#*:}

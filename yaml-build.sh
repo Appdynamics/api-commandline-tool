@@ -118,12 +118,12 @@ ASDF
 
         if [ "${EXPAND}" == "true" ] ; then
           read -r -d '' OUTPUT << ASDF
-function ${NS}_${CMD} { apiCallExpand${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
+${NS}_${CMD}() { apiCallExpand${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
 rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
 ASDF
         else
           read -r -d '' OUTPUT << ASDF
-function ${NS}_${CMD} { apiCall${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
+${NS}_${CMD}() { apiCall${METHOD}${PAYLOAD}${FORM} '${ENDPOINT}' "\$@" ; }
 rde ${NS}_${CMD} "${!TITLE}" "${!DESCRIPTION}" "${!EXAMPLE}"\n
 ASDF
         fi

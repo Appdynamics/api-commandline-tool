@@ -2,7 +2,7 @@
 
 CONTROLLER_LOGIN_STATUS=0
 
-function controller_login {
+controller_login() {
   debug "Login at ${CONFIG_CONTROLLER_HOST} with ${CONFIG_CONTROLLER_CREDENTIALS}"
   LOGIN_RESPONSE=$(httpClient -sI -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login")
   debug "RESPONSE: ${LOGIN_RESPONSE}"

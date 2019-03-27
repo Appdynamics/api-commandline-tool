@@ -1,6 +1,6 @@
 #!/bin/bash
 # from https://gist.github.com/cdown/1163649
-function urlencode {
+urlencode() {
     # urlencode <string>
     old_lc_collate=$LC_COLLATE
     LC_COLLATE=C

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function metric_get {
+metric_get() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local START_TIME=-1
   local END_TIME=-1

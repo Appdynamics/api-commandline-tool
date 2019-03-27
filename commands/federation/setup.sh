@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function federation_setup {
+federation_setup() {
 
   local FRIEND_CONTROLLER_CREDENTIALS=""
   local FRIEND_CONTROLLER_HOST=""

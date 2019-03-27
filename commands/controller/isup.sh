@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function controller_isup {
+controller_isup() {
   local START
   local END
   declare -i END

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function event_list {
+event_list() {
   # Add some "ALL" magic
   local PREV=""
   local ARGS=()

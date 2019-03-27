@@ -2,7 +2,7 @@
 
 RECURSIVE_COMMAND_RESULT=""
 
-function metric_tree {
+metric_tree() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local DEPTH=0
   declare -i DEPTH

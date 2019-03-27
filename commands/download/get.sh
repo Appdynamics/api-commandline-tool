@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function download_get {
+download_get() {
   local WORKING_DIRECTORY="."
   local DOWNLOAD_DRYRUN=0
   local DOWNLOAD_ALL_MATCHES=1
@@ -55,7 +55,7 @@ function download_get {
           output "Dry run."
         fi
       done
-      COMMAND_RESULT="Successfully downloaded `basename ${FILE}` to ${WORKING_DIRECTORY}"
+      COMMAND_RESULT="Successfully downloaded $(bashBasename ${FILE}) to ${WORKING_DIRECTORY}"
       cd "${OLD_DIRECTORY}" || exit
     fi
   else

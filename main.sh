@@ -45,28 +45,28 @@ VERBOSITY_COUNTER=0
 declare -i VERBOSITY_COUNTER
 
 # register namespace_command help
-function register {
+register() {
   GLOBAL_COMMANDS_COUNTER+=1
   GLOBAL_COMMANDS="${GLOBAL_COMMANDS} $1"
   GLOBAL_HELP="${GLOBAL_HELP}${EOL}$*"
 }
 
-function describe {
+describe() {
   GLOBAL_LONG_HELP_COMMANDS[${#GLOBAL_LONG_HELP_COMMANDS[@]}]="$1"
   read -r -d '' GLOBAL_LONG_HELP_STRINGS[${#GLOBAL_LONG_HELP_STRINGS[@]}]
 }
 
-function example {
+example() {
   GLOBAL_EXAMPLE_COMMANDS[${#GLOBAL_EXAMPLE_COMMANDS[@]}]="$1"
   read -r -d '' GLOBAL_EXAMPLE_STRINGS[${#GLOBAL_EXAMPLE_STRINGS[@]}]
 }
 
-function doc {
+doc() {
   GLOBAL_DOC_NAMESPACES[${#GLOBAL_DOC_STRINGS[@]}]="$1"
   read -r -d '' GLOBAL_DOC_STRINGS[${#GLOBAL_DOC_STRINGS[@]}]
 }
 
-function rde {
+rde() {
   register "${1}" "${2}"
   describe "${1}" <<RRREOF
 ${2} ${3}

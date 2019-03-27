@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _version {
+_version() {
   # shellcheck disable=SC2034
   COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
 }

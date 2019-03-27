@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_get {
+environment_get() {
   COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
 }
 

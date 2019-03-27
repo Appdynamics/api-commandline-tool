@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function controller_ping {
+controller_ping() {
   debug "Ping $CONFIG_CONTROLLER_HOST"
   local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
   debug "RESPONSE: ${PING_RESPONSE}"

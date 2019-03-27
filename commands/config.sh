@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _config {
+_config() {
   environment_add -d "$@"
 }
 

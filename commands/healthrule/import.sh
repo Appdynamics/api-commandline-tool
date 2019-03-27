@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function healthrule_import {
+healthrule_import() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local FILE=""
   while getopts "a:" opt "$@";

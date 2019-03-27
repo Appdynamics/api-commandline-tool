@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_add {
+environment_add() {
   local FORCE=0
   local GLOBAL=0
   local SHOW=0

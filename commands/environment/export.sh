@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_export {
+environment_export() {
   environment_source "${1}";
 
   local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"

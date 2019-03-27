@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function environment_delete {
+environment_delete() {
   rm "${HOME}/.appdynamics/act/config.$1.sh"
   COMMAND_RESULT="${1} deleted"
 }

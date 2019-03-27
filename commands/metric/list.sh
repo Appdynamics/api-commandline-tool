@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function metric_list {
+metric_list() {
   local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
   local METRIC_PATH=""
   while getopts "a:" opt "$@";

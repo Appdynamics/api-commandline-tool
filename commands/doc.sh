@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function _doc {
+_doc() {
 read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
 Below you will find a list of all available namespaces and commands available with

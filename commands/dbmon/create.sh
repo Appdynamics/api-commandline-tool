@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function dbmon_create {
+dbmon_create() {
   apiCall -X POST -d "{ \
                       \"name\": \"{{i}}\",\
                       \"username\": \"{{u}}\",\

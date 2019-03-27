@@ -1,12 +1,12 @@
 #!/bin/bash
 
-function environment_list {
+environment_list() {
   local BASE
   local TEMP
   COMMAND_RESULT="(default)"
   for file in "${HOME}/.appdynamics/act/config."*".sh"
   do
-    BASE=`basename "${file}"`
+    BASE=$(bashBasename "${file}")
     TEMP=${BASE#*.}
     COMMAND_RESULT="${COMMAND_RESULT} ${TEMP%.*}"
   done

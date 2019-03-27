@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function timerange_list {
+timerange_list() {
   controller_call -X GET /controller/restui/user/getAllCustomTimeRanges
 }
 

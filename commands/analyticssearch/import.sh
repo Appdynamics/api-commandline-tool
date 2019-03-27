@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function analyticssearch_import {
+analyticssearch_import() {
   FILE="$*"
   if [ -r "${FILE}" ] ; then
     DATA="$(<${FILE})"

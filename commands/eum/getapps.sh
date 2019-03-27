@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function eum_getapps {
+eum_getapps() {
   apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
 }
 

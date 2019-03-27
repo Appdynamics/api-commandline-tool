@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function actiontemplate_list {
+actiontemplate_list() {
   local TYPE="httprequest"
   while getopts "t:" opt "$@";
   do
