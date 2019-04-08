@@ -3,9 +3,11 @@
 download_get() {
   local WORKING_DIRECTORY="."
   local DOWNLOAD_DRYRUN=0
-  local DOWNLOAD_ALL_MATCHES=1
+  local DOWNLOAD_ALL_MATCHES=0
   local DOWNLOAD_FILTER=""
-  while getopts "Aard:" opt "$@";
+  local SEARCH=""
+  local WITHSEARCH=""
+  while getopts "Aard:s:" opt "$@";
   do
     case "${opt}" in
       d)
@@ -13,6 +15,11 @@ download_get() {
       ;;
       r)
         DOWNLOAD_DRYRUN=1
+      ;;
+      s)
+        WITHSEARCH="-s"
+        SEARCH="${OPTARG}"
+        DOWNLOAD_FILTER='.*'
       ;;
       a)
         DOWNLOAD_ALL_MATCHES=1
@@ -32,9 +39,9 @@ download_get() {
   fi;
 
   if [ "${DOWNLOAD_ALL_MATCHES}" -eq "0" ] ; then
-    download_list -f "${1:-${DOWNLOAD_FILTER}}" -1 -d
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -1 -d ${WITHSEARCH} "${SEARCH}"
   else
-    download_list -f "${1:-${DOWNLOAD_FILTER}}" -d
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -d ${WITHSEARCH} "${SEARCH}"
   fi
 
   # use echo to remove trailing line breaks

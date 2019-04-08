@@ -192,7 +192,8 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 | ------- | ----------- | ------- |
 | login | Login with AppDynamics to retrieve an OAUTH token for downloads. You can use the provided token for downloads from https://download.appdynamics.com/ | `act.sh download login ` |
 | get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
-| list | List latest agent files. You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
+| list | List agent files. You can provide a filter (-f) to filter for specific agent files. Or you can provide a search query (-s) to execute . Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
+| versionlist |  | `act.sh download versionlist ` |
 
 
 ## environment

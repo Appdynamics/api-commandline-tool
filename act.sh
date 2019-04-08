@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="b70cd27d6276d64df861594c0e3cef7a4aa1b162"
+ACT_LAST_COMMIT="07d9c97c950b295e05b5781c4b774e3b94aa31e0"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -722,9 +722,11 @@ rde download_login "Login with AppDynamics to retrieve an OAUTH token for downlo
 download_get() {
   local WORKING_DIRECTORY="."
   local DOWNLOAD_DRYRUN=0
-  local DOWNLOAD_ALL_MATCHES=1
+  local DOWNLOAD_ALL_MATCHES=0
   local DOWNLOAD_FILTER=""
-  while getopts "Aard:" opt "$@";
+  local SEARCH=""
+  local WITHSEARCH=""
+  while getopts "Aard:s:" opt "$@";
   do
     case "${opt}" in
       d)
@@ -732,6 +734,11 @@ download_get() {
       ;;
       r)
         DOWNLOAD_DRYRUN=1
+      ;;
+      s)
+        WITHSEARCH="-s"
+        SEARCH="${OPTARG}"
+        DOWNLOAD_FILTER='.*'
       ;;
       a)
         DOWNLOAD_ALL_MATCHES=1
@@ -749,9 +756,9 @@ download_get() {
     exit 1
   fi;
   if [ "${DOWNLOAD_ALL_MATCHES}" -eq "0" ] ; then
-    download_list -f "${1:-${DOWNLOAD_FILTER}}" -1 -d
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -1 -d ${WITHSEARCH} "${SEARCH}"
   else
-    download_list -f "${1:-${DOWNLOAD_FILTER}}" -d
+    download_list -f "${1:-${DOWNLOAD_FILTER}}" -d ${WITHSEARCH} "${SEARCH}"
   fi
   # use echo to remove trailing line breaks
   FILES=$COMMAND_RESULT
@@ -781,9 +788,10 @@ download_list() {
   local FILES
   local DELIMITER='"filename":'
   local ENTRY
+  local DOWNLOADFILES="https://download.appdynamics.com/download/downloadfilelatest/"
   local FILTER='.*'
   local BREAKONFIRST=0
-  while getopts "1df:" opt "$@";
+  while getopts "1df:s:" opt "$@";
   do
     case "${opt}" in
       d)
@@ -791,6 +799,9 @@ download_list() {
       ;;
       f)
         FILTER="${OPTARG}"
+      ;;
+      s)
+        DOWNLOADFILES="https://download.appdynamics.com/download/downloadfile/?format=json&page=1&search=$(urlencode "${OPTARG}")"
       ;;
       1)
         BREAKONFIRST=1
@@ -800,7 +811,8 @@ download_list() {
   shiftOptInd
   shift $SHIFTS
   output "Downloading list of available files. Please wait."
-  FILES=$(httpClient -s https://download.appdynamics.com/download/downloadfilelatest/)
+  debug "Download URL: ${DOWNLOADFILES}"
+  FILES=$(httpClient -s "${DOWNLOADFILES}")
   #delimiter='"download_path":'
   local s=$FILES${DELIMITER}
   COMMAND_RESULT=""
@@ -821,7 +833,35 @@ download_list() {
     s=${s#*"${DELIMITER}"};
   done;
 }
-rde download_list "List latest agent files." "You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path" "-d -f golang"
+rde download_list "List agent files." "You can provide a filter (-f) to filter for specific agent files. Or you can provide a search query (-s) to execute . Provide parameter -d to get the full download path" "-d -f golang"
+download_versionlist() {
+  local DELIMITER='"version":'
+  local DEGREE=3
+  local FILES=''
+  while getopts "d:" opt "$@";
+  do
+    case "${opt}" in
+      d)
+        DEGREE="${OPTARG}"
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  FILES=$(httpClient -s "https://download.appdynamics.com/download/version/?version-degree=${DEGREE}")
+  local s=$FILES${DELIMITER}
+  COMMAND_RESULT=""
+  while [[ $s ]]; do
+    ENTRY="${s%%"${DELIMITER}"*}\n\n"
+    if [ "${ENTRY:0:1}" == "\"" ] ; then
+      ENTRY=${ENTRY:1}
+      ENTRY=${ENTRY%%\",*}
+      COMMAND_RESULT="${COMMAND_RESULT}${ENTRY}${EOL}"
+    fi;
+    s=${s#*"${DELIMITER}"};
+  done;
+}
+rde download_versionlist "" "" ""
 federation_setup() {
   local FRIEND_CONTROLLER_CREDENTIALS=""
   local FRIEND_CONTROLLER_HOST=""

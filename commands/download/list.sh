@@ -4,9 +4,10 @@ download_list() {
   local FILES
   local DELIMITER='"filename":'
   local ENTRY
+  local DOWNLOADFILES="https://download.appdynamics.com/download/downloadfilelatest/"
   local FILTER='.*'
   local BREAKONFIRST=0
-  while getopts "1df:" opt "$@";
+  while getopts "1df:s:" opt "$@";
   do
     case "${opt}" in
       d)
@@ -14,6 +15,9 @@ download_list() {
       ;;
       f)
         FILTER="${OPTARG}"
+      ;;
+      s)
+        DOWNLOADFILES="https://download.appdynamics.com/download/downloadfile/?format=json&page=1&search=$(urlencode "${OPTARG}")"
       ;;
       1)
         BREAKONFIRST=1
@@ -23,7 +27,8 @@ download_list() {
   shiftOptInd
   shift $SHIFTS
   output "Downloading list of available files. Please wait."
-  FILES=$(httpClient -s https://download.appdynamics.com/download/downloadfilelatest/)
+  debug "Download URL: ${DOWNLOADFILES}"
+  FILES=$(httpClient -s "${DOWNLOADFILES}")
   #delimiter='"download_path":'
   local s=$FILES${DELIMITER}
   COMMAND_RESULT=""
@@ -44,4 +49,4 @@ download_list() {
     s=${s#*"${DELIMITER}"};
   done;
 }
-rde download_list "List latest agent files." "You can provide a filter (-f) to search only for specific agent files. Provide parameter -d to get the full download path" "-d -f golang"
+rde download_list "List agent files." "You can provide a filter (-f) to filter for specific agent files. Or you can provide a search query (-s) to execute . Provide parameter -d to get the full download path" "-d -f golang"
