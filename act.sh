@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="93259611e2db84de86fb1785886a6f20ff1f03b8"
+ACT_LAST_COMMIT="61b008854b5d45627607993a4d916a3fc23e7a8d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1484,13 +1484,13 @@ apiCallExpand() {
   local LIST=""
   declare -i COUNTER
   for ARG in $*; do
-    if [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
+    if [ "${COUNTER}" -gt "0" ]; then
+      SUFFIX="${SUFFIX} ${ARG}"
+    elif [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
       LIST=$(echo ${ARG:1})
       COUNTER=${COUNTER}+1
-    elif [ "${COUNTER}" -eq "0" ]; then
-      PREFIX="${PREFIX} ${ARG}"
     else
-      SUFFIX="${SUFFIX} ${ARG}"
+      PREFIX="${PREFIX} ${ARG}"
     fi;
   done;
   case "${COUNTER}" in

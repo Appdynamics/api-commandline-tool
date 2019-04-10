@@ -8,13 +8,13 @@ apiCallExpand() {
   local LIST=""
   declare -i COUNTER
   for ARG in $*; do
-    if [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
+    if [ "${COUNTER}" -gt "0" ]; then
+      SUFFIX="${SUFFIX} ${ARG}"
+    elif [ "${ARG:0:1}" = "@" ] && [ "${ARG:1}" != "$(echo ${ARG:1})" ] ; then
       LIST=$(echo ${ARG:1})
       COUNTER=${COUNTER}+1
-    elif [ "${COUNTER}" -eq "0" ]; then
-      PREFIX="${PREFIX} ${ARG}"
     else
-      SUFFIX="${SUFFIX} ${ARG}"
+      PREFIX="${PREFIX} ${ARG}"
     fi;
   done;
 
