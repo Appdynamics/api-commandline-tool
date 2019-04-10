@@ -307,6 +307,15 @@ Manage service monitoring configurations
 | list | List monitors. This command requires no further arguments. | `act.sh sam list ` |
 
 
+## scope
+
+Manage scopes for instrumentation
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| list | List all scopes. Provide an application id (-a) as parameter | `act.sh scope list -a 25` |
+
+
 ## server
 
 List servers, their properties and metrics

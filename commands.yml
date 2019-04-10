@@ -439,6 +439,15 @@ sam:
     method: POST
     endpoint: /controller/sim/v2/user/sam/targets/http
     payload: {{d:monitor_definition}}
+scope:
+  title: Scopes for Instrumentation
+  description: Manage scopes for instrumentation
+  list:
+    title: List all scopes.
+    description: Provide an application id (-a) as parameter
+    example: -a 25
+    method: GET
+    endpoint: /controller/restui/transactionConfigProto/getScopes/{{a:application}}
 server:
   title: Server & Infrastructure Monitoring API
   description: List servers, their properties and metrics

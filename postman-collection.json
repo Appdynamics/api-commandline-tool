@@ -1798,6 +1798,36 @@
 						},
             "description": "This command requires no further arguments."
 					}
+				}]},{"name": "scope","item": [{
+					"name": "List all scopes.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/transactionConfigProto/getScopes/{{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","transactionConfigProto","getScopes","{{application}}"],
+              "query": []
+						},
+            "description": "Provide an application id (-a) as parameter"
+					}
 				}]},{"name": "server","item": [{
 					"name": "Get a machine.",
 					"request": {

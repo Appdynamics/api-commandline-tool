@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="07d9c97c950b295e05b5781c4b774e3b94aa31e0"
+ACT_LAST_COMMIT="93259611e2db84de86fb1785886a6f20ff1f03b8"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -242,6 +242,11 @@ sam_import() { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2
 rde sam_import "Import a monitor." "Provide a json string or a @file (-d) as parameter." "-d @examples/sam.json"
 sam_list() { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
 rde sam_list "List monitors." "This command requires no further arguments." ""
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+scope_list() { apiCall '/controller/restui/transactionConfigProto/getScopes/{{a:application}}' "$@" ; }
+rde scope_list "List all scopes." "Provide an application id (-a) as parameter" "-a 25"
 doc server << EOF
 List servers, their properties and metrics
 EOF
@@ -1092,11 +1097,11 @@ environment_add() {
       read PORTAL_CREDENTIALS
     fi
     OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}\nCONFIG_PORTAL_CREDENTIALS=${PORTAL_CREDENTIALS}"
-    OUTPUT_FILE="$OUTPUT_DIRECTORY/config.${ENVIRONMENT}.sh"
+    OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.${ENVIRONMENT}.sh"
     if [ $DEFAULT -eq 1 ] ; then
-      OUTPUT_FILE="$OUTPUT_DIRECTORY/config.sh"
+      OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.sh"
     fi
-    if [ ! -s "$OUTPUT_DIRECTORY/config.${ENVIRONMENT}.sh" ] || [ $FORCE -eq 1 ]
+    if [ ! -s "${OUTPUT_FILE}" ] || [ $FORCE -eq 1 ]
     then
       mkdir -p $OUTPUT_DIRECTORY
       echo -e "$OUTPUT" > "${OUTPUT_FILE}"
