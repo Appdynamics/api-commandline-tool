@@ -2008,6 +2008,36 @@
 						},
             "description": "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter."
 					}
+				},{
+					"name": "Update a synthetic job.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{synthetic_job}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","synthetic","schedule","{{application}}","updateScheduleBatch"],
+              "query": []
+						},
+            "description": "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)"
+					}
 				}]},{"name": "tier","item": [{
 					"name": "Get a tier.",
 					"request": {

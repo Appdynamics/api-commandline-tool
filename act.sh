@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="61b008854b5d45627607993a4d916a3fc23e7a8d"
+ACT_LAST_COMMIT="db9116bdcb2536791b846cfaaa9d37033b23406d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -268,6 +268,8 @@ synthetic_list() { apiCall -X POST -d '{"applicationId":{{a:application}},"timeR
 rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
 synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
 rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
+synthetic_update() { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch' "$@" ; }
+rde synthetic_update "Update a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/updatesyntheticjob.json"
 doc tier << EOF
 List all tiers.
 EOF

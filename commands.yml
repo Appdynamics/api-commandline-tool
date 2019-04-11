@@ -497,6 +497,13 @@ synthetic:
     method: POST
     endpoint: /controller/restui/synthetic/launch/generateLoad
     payload: {\"url\":\"{{u:url}}\",\"location\":\"{{l:location}}\",\"browser\":\"{{b:browser}}\",\"applicationId\":{{a:application}},\"timeRangeString\":null,\"timeoutSeconds\":30,\"script\":null}
+  update:
+    title: Update a synthetic job.
+    description: Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)
+    example: -a 41 -d @examples/updatesyntheticjob.json
+    method: POST
+    endpoint: /controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch
+    payload: {{d:synthetic_job}}
 tier:
   title: Tiers
   description: List all tiers.
