@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="c1a2ea67f69c379a97e89b91341f4386e40535a3"
+ACT_LAST_COMMIT="0f2f90254db898dd245958b4c2f0f19c9dd9e265"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -62,6 +62,11 @@ RRREOF
 ${4}
 RRREOF
 }
+doc account << EOF
+Query the Account API
+EOF
+account_my() { apiCall '/controller/api/accounts/myaccount' "$@" ; }
+rde account_my "Get details about the current account" "This command requires no further arguments." ""
 doc action << EOF
 Import or export all actions in the specified application to a JSON file.
 EOF
@@ -256,8 +261,8 @@ rde scope_list "List all scopes." "Provide an application id (-a) as parameter" 
 doc sep << EOF
 List service endpoints
 EOF
-sep_list() { apiCall '/controller/restui/serviceEndpoint/list2/{{a:application}}/{{a:application}}/APPLICATION?time-range={{t:time_range}}' "$@" ; }
-rde sep_list "List all SEPs." "Provide an application id (-a), as well as an time range string (-t)." "-a 29 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+sep_list() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
 doc server << EOF
 List servers, their properties and metrics
 EOF
@@ -1622,18 +1627,34 @@ apiCall() {
   while [[ $ENDPOINT =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
-      if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
-        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
-      else
-        ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
-        for TYPE in "${OPTS_TYPES[@]}" ;
-        do
-          if [[ "${TYPE}" == ${MISSING}:* ]] ; then
-            TYPE=${TYPE//_/ }
-            ERROR_MESSAGE="Missing ${TYPE#*:}: ${ERROR_MESSAGE}"
-          fi
-        done;
+      ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
+      for TYPE in "${OPTS_TYPES[@]}" ;
+      do
+        if [[ "${TYPE}" == ${MISSING}:* ]] ; then
+          TYPE=${TYPE//_/ }
+          TYPE=${TYPE#*:}
+          if [[ "${TYPE}" == "application" ]] ; then
+            debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
+            ENDPOINT=${ENDPOINT//'{{a:application}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+            ERROR_MESSAGE=""
+          elif [[ "${TYPE}" == "accountid" ]] ; then
+            debug "Querying myaccount..."
+            JSON=$(httpClient -s --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/api/accounts/myaccount")
+            JSON=${JSON// /}
+            JSON=${JSON##*id\":\"}
+            ACCOUNT_ID=${JSON%%\",*}
+            debug "Account ID: ${ACCOUNT_ID}"
+            COMMAND_RESULT=""
+            debug ${ENDPOINT}
+            ENDPOINT=${ENDPOINT//'{{i:accountid}}'/${ACCOUNT_ID}}
+            debug ${ENDPOINT}
+            ERROR_MESSAGE=""
+          else
+            ERROR_MESSAGE="Missing ${TYPE}: ${ERROR_MESSAGE}"
+          fi;
+        fi
+      done;
+      if [ -n "${ERROR_MESSAGE}" ] ; then
         error "${ERROR_MESSAGE}"
         return;
       fi

@@ -29,6 +29,15 @@ The following commands in the global namespace can be called directly.
 | version | Print the current version of act.sh | `act.sh  version ` |
 
 
+## account
+
+Query the Account API
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| my | Get details about the current account This command requires no further arguments. | `act.sh account my ` |
+
+
 ## action
 
 Import or export all actions in the specified application to a JSON file.
@@ -332,7 +341,7 @@ List service endpoints
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | List all SEPs. Provide an application id (-a), as well as an time range string (-t). | `act.sh sep list -a 29 -t last_1_hour.BEFORE_NOW.-1.-1.60` |
+| list | List all SEPs. Provide an application id (-a). | `act.sh sep list -a 29` |
 
 
 ## server

@@ -145,18 +145,35 @@ apiCall() {
   while [[ $ENDPOINT =~ \{\{([a-zA-Z])(:[a-zA-Z0-9_-]+)?(\??)\}\} ]] ; do
     if [ -z "$1" ] && [[ "${OPTIONAL_OPTIONS}" != *"${BASH_REMATCH[1]}"* ]] ; then
       local MISSING=${BASH_REMATCH:2:1}
-      if [ "${MISSING}" == "a" ] && [ -n "${CONFIG_CONTROLLER_DEFAULT_APPLICATION}" ] ; then
-        debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
-        ENDPOINT=${ENDPOINT//'{{a}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
-      else
-        ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
-        for TYPE in "${OPTS_TYPES[@]}" ;
-        do
-          if [[ "${TYPE}" == ${MISSING}:* ]] ; then
-            TYPE=${TYPE//_/ }
-            ERROR_MESSAGE="Missing ${TYPE#*:}: ${ERROR_MESSAGE}"
-          fi
-        done;
+
+      ERROR_MESSAGE="Please provide an argument for parameter -${MISSING}"
+      for TYPE in "${OPTS_TYPES[@]}" ;
+      do
+        if [[ "${TYPE}" == ${MISSING}:* ]] ; then
+          TYPE=${TYPE//_/ }
+          TYPE=${TYPE#*:}
+          if [[ "${TYPE}" == "application" ]] ; then
+            debug "Using default application for -a: ${CONFIG_CONTROLLER_DEFAULT_APPLICATION}"
+            ENDPOINT=${ENDPOINT//'{{a:application}}'/${CONFIG_CONTROLLER_DEFAULT_APPLICATION}}
+            ERROR_MESSAGE=""
+          elif [[ "${TYPE}" == "accountid" ]] ; then
+            debug "Querying myaccount..."
+            JSON=$(httpClient -s --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/api/accounts/myaccount")
+            JSON=${JSON// /}
+            JSON=${JSON##*id\":\"}
+            ACCOUNT_ID=${JSON%%\",*}
+            debug "Account ID: ${ACCOUNT_ID}"
+            COMMAND_RESULT=""
+            debug ${ENDPOINT}
+            ENDPOINT=${ENDPOINT//'{{i:accountid}}'/${ACCOUNT_ID}}
+            debug ${ENDPOINT}
+            ERROR_MESSAGE=""
+          else
+            ERROR_MESSAGE="Missing ${TYPE}: ${ERROR_MESSAGE}"
+          fi;
+        fi
+      done;
+      if [ -n "${ERROR_MESSAGE}" ] ; then
         error "${ERROR_MESSAGE}"
         return;
       fi

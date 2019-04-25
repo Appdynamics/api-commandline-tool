@@ -1,4 +1,34 @@
-{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "action","item": [{
+{"info": {"name": "AppDynamics API","schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"}, "auth": {"type": "basic","basic": [{"key": "password","value": "{{controller_password}}","type": "string"},{"key": "username","value": "{{controller_user}}@{{controller_account}}","type": "string"}]}, "event": [{"listen": "test","script": {"type": "text/javascript","exec": ["pm.globals.set(\"X-CSRF-TOKEN\", postman.getResponseCookie(\"X-CSRF-TOKEN\").value);"]}}],"item": [{"name": "account","item": [{
+					"name": "Get details about the current account",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/api/accounts/myaccount",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","api","accounts","myaccount"],
+              "query": []
+						},
+            "description": "This command requires no further arguments."
+					}
+				}]},{"name": "action","item": [{
 					"name": "",
 					"request": {
 						"method": "POST",
@@ -1909,14 +1939,14 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/serviceEndpoint/list2/{{a:application}}/{{a:application}}/APPLICATION?time-range={{t:time_range}}",
+							"raw": "{{controller_host}}/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","serviceEndpoint","list2","{{application}}","{{application}}","APPLICATION"],
-              "query": [{"key": "time-range","value": "{{time_range}}"}]
+							"path": ["controller","api","accounts","{{accountid}}","applications","{{application}}","sep"],
+              "query": []
 						},
-            "description": "Provide an application id (-a), as well as an time range string (-t)."
+            "description": "Provide an application id (-a)."
 					}
 				}]},{"name": "server","item": [{
 					"name": "Get a machine.",
