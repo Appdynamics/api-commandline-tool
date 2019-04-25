@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="db9116bdcb2536791b846cfaaa9d37033b23406d"
+ACT_LAST_COMMIT="c1a2ea67f69c379a97e89b91341f4386e40535a3"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -213,6 +213,12 @@ healthrule_list() { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; 
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
 healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
 rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc licenserule << EOF
+EOF
+licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_create "Create a license rule." "Provide a json string or a @file (-d) as parameter." "-d examples/licenserule.json"
+licenserule_list() { apiCall '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_list "List all license rules." "This command requires no further arguments" ""
 doc node << EOF
 Retrieve nodes within a business application
 EOF
@@ -247,6 +253,11 @@ Manage scopes for instrumentation
 EOF
 scope_list() { apiCall '/controller/restui/transactionConfigProto/getScopes/{{a:application}}' "$@" ; }
 rde scope_list "List all scopes." "Provide an application id (-a) as parameter" "-a 25"
+doc sep << EOF
+List service endpoints
+EOF
+sep_list() { apiCall '/controller/restui/serviceEndpoint/list2/{{a:application}}/{{a:application}}/APPLICATION?time-range={{t:time_range}}' "$@" ; }
+rde sep_list "List all SEPs." "Provide an application id (-a), as well as an time range string (-t)." "-a 29 -t last_1_hour.BEFORE_NOW.-1.-1.60"
 doc server << EOF
 List servers, their properties and metrics
 EOF
@@ -1633,7 +1644,7 @@ apiCall() {
     shift
   done
   local CONTROLLER_ARGS=()
-  if [[ "${ENDPOINT}" == */controller/rest/* ]] || [[ "${ENDPOINT}" == */controller/transactiondetection/* ]] ; then
+  if [[ "${ENDPOINT}" == */controller/rest/* ]] || [[ "${ENDPOINT}" == */controller/transactiondetection/* ]] || [[ "${ENDPOINT}" == */mds/v1/license/* ]] ; then
     CONTROLLER_ARGS+=("-B")
     debug "Using basic http authentication"
   fi;

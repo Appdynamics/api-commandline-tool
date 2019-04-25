@@ -1,0 +1,54 @@
+{
+    "id": "011116a4-124c-4b73-9343-f315836f103b",
+    "version": 0,
+    "name": "Default_API9",
+    "description": null,
+    "enabled": true,
+    "constraints": [],
+    "entitlements": [
+        {
+            "license_module_type": "JAVA",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "NATIVE_WEB_SERVER",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "NATIVE_SDK",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "DOT_NET",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "NETVIZ",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "MACHINE_AGENT",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "NODEJS",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "SIM_MACHINE_AGENT",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "PHP",
+            "number_of_licenses": 100
+        },
+        {
+            "license_module_type": "PYTHON",
+            "number_of_licenses": 100
+        }
+    ],
+    "account_id": "8b1e92f2-387c-45b6-9bb5-ebd7f67587d4",
+    "access_key": "ap1845ad-1f3e-4c9b-909b-a3cfa510bfb0",
+    "total_licenses": null,
+    "peak_usage": null
+}

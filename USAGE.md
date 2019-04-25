@@ -264,6 +264,16 @@ Configure and retrieve health rules and their violates.
 | list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. | `act.sh healthrule list -a 29` |
 
 
+## licenserule
+
+
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| create | Create a license rule. Provide a json string or a @file (-d) as parameter. | `act.sh licenserule create -d examples/licenserule.json` |
+| list | List all license rules. This command requires no further arguments | `act.sh licenserule list ` |
+
+
 ## metric
 
 | Command | Description | Example |
@@ -314,6 +324,15 @@ Manage scopes for instrumentation
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | list | List all scopes. Provide an application id (-a) as parameter | `act.sh scope list -a 25` |
+
+
+## sep
+
+List service endpoints
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| list | List all SEPs. Provide an application id (-a), as well as an time range string (-t). | `act.sh sep list -a 29 -t last_1_hour.BEFORE_NOW.-1.-1.60` |
 
 
 ## server

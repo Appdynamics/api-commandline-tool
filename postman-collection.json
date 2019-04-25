@@ -1498,6 +1498,66 @@
 						},
             "description": "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)"
 					}
+				}]},{"name": "licenserule","item": [{
+					"name": "Create a license rule.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/mds/v1/license/rules",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","mds","v1","license","rules"],
+              "query": []
+						},
+            "description": "Provide a json string or a @file (-d) as parameter."
+					}
+				},{
+					"name": "List all license rules.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/mds/v1/license/rules",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","mds","v1","license","rules"],
+              "query": []
+						},
+            "description": "This command requires no further arguments"
+					}
 				}]},{"name": "node","item": [{
 					"name": "Get a node.",
 					"request": {
@@ -1827,6 +1887,36 @@
               "query": []
 						},
             "description": "Provide an application id (-a) as parameter"
+					}
+				}]},{"name": "sep","item": [{
+					"name": "List all SEPs.",
+					"request": {
+						"method": "",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/serviceEndpoint/list2/{{a:application}}/{{a:application}}/APPLICATION?time-range={{t:time_range}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","serviceEndpoint","list2","{{application}}","{{application}}","APPLICATION"],
+              "query": [{"key": "time-range","value": "{{time_range}}"}]
+						},
+            "description": "Provide an application id (-a), as well as an time range string (-t)."
 					}
 				}]},{"name": "server","item": [{
 					"name": "Get a machine.",

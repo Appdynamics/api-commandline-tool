@@ -367,6 +367,20 @@ healthrule:
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}
+licenserule:
+  title: License Rules API
+  list:
+    title: List all license rules.
+    description: This command requires no further arguments
+    example:
+    method: GET
+    endpoint: /controller/mds/v1/license/rules
+  create:
+    title: Create a license rule.
+    description: Provide a json string or a @file (-d) as parameter.
+    example: -d examples/licenserule.json
+    method: POST
+    endpoint: /controller/mds/v1/license/rules
 node:
   title: Nodes
   description: Retrieve nodes within a business application
@@ -448,6 +462,14 @@ scope:
     example: -a 25
     method: GET
     endpoint: /controller/restui/transactionConfigProto/getScopes/{{a:application}}
+sep:
+  title: Service Endpoints
+  description: List service endpoints
+  list:
+    title: List all SEPs.
+    description: Provide an application id (-a), as well as an time range string (-t).
+    example: -a 29 -t last_1_hour.BEFORE_NOW.-1.-1.60
+    endpoint: /controller/restui/serviceEndpoint/list2/{{a:application}}/{{a:application}}/APPLICATION?time-range={{t:time_range}}
 server:
   title: Server & Infrastructure Monitoring API
   description: List servers, their properties and metrics
