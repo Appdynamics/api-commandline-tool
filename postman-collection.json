@@ -208,6 +208,36 @@
 						},
             "description": "Provide the type (-t email or httprequest) as parameter."
 					}
+				}]},{"name": "adql","item": [{
+					"name": "Run an ADQL query",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"requests\":[{\"query\":\"{{query}}\",\"label\":\"DataQuery\",\"customResponseRequest\":true,\"responseConverter\":\"UIGRID\",\"responseType\":\"ORDERED\",\"start\":\"{{start}}\",\"end\":\"{{end}}\",\"chunk\":false,\"mode\":\"page\",\"scrollId\":\"\",\"size\":\"50000\",\"offset\":\"0\",\"limit\":\"1000000\"}],\"start\":\"\",\"end\":\"\",\"chunk\":false,\"mode\":\"none\",\"scrollId\":\"\",\"size\":\"\",\"offset\":\"\",\"limit\":\"1000000\",\"chunkDelayMillis\":\"\",\"chunkBreakDelayMillis\":\"\",\"chunkBreakBytes\":\"\",\"others\":\"false\",\"emptyOnError\":\"false\",\"token\":\"\",\"dashboardId\":0,\"warRoomToken\":\"\",\"warRoom\":false}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/adql/query",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","adql","query"],
+              "query": []
+						},
+            "description": ""
+					}
 				}]},{"name": "analyticsmetric","item": [{
 					"name": "Create analytics metric",
 					"request": {

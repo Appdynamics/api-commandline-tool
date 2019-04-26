@@ -63,6 +63,15 @@ These commands allow you to import and export email/http action templates. A com
 | list | List all actiontemplates. Provide a type (-t) as parameter. |  |
 
 
+## adql
+
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| query | Run an ADQL query | `act.sh adql query ` |
+
+
 ## analyticsmetric
 
 Manage custom analytics metrics

@@ -86,6 +86,16 @@ actiontemplate:
     example: -t httprequest
     method: GET
     endpoint: /controller/actiontemplate/{{t:action_template_type}}/
+adql:
+  title: Run ADQL Queries
+  description: These commands allow you to run ADQL queries agains the controller (not the event service!)
+  query:
+    title: Run an ADQL query
+    description:
+    example:
+    method: POST
+    endpoint: /controller/restui/analytics/adql/query
+    payload: {\"requests\":[{\"query\":\"{{q:query}}\",\"label\":\"DataQuery\",\"customResponseRequest\":true,\"responseConverter\":\"UIGRID\",\"responseType\":\"ORDERED\",\"start\":\"{{s:start}}\",\"end\":\"{{e:end}}\",\"chunk\":false,\"mode\":\"page\",\"scrollId\":\"\",\"size\":\"50000\",\"offset\":\"0\",\"limit\":\"1000000\"}],\"start\":\"\",\"end\":\"\",\"chunk\":false,\"mode\":\"none\",\"scrollId\":\"\",\"size\":\"\",\"offset\":\"\",\"limit\":\"1000000\",\"chunkDelayMillis\":\"\",\"chunkBreakDelayMillis\":\"\",\"chunkBreakBytes\":\"\",\"others\":\"false\",\"emptyOnError\":\"false\",\"token\":\"\",\"dashboardId\":0,\"warRoomToken\":\"\",\"warRoom\":false}
 analyticssearch:
   title: Saved Analytics Search
   description: These commands allow you to import and export email/http saved analytics searches.

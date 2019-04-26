@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="0f2f90254db898dd245958b4c2f0f19c9dd9e265"
+ACT_LAST_COMMIT="ae4101ab743d16c773959977d19e3bf3c8537a28"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -85,6 +85,11 @@ actiontemplate_createmediatype() { apiCall -X POST -d '{"name":"{{n:media_type_n
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
 actiontemplate_export() { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
+rde adql_query "Run an ADQL query" "" ""
 doc analyticsmetric << EOF
 Manage custom analytics metrics
 EOF
