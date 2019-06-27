@@ -400,6 +400,22 @@ licenserule:
     example: -d examples/licenserule.json
     method: POST
     endpoint: /controller/mds/v1/license/rules
+logsources:
+  title: Log Analytics Configuration
+  descripion: API to manage log analytics sources
+  list:
+    title: List all sources.
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/restui/analytics/logsources
+  import:
+    title: Import a source rule.
+    description: Provide a json string or a file (with @ as prefix) as parameter (-d)
+    example: -d @examples/logsources.json
+    method: POST
+    endpoint: /controller/restui/analytics/logsources
+    payload: payload: {{d:logsourcerule}}
 node:
   title: Nodes
   description: Retrieve nodes within a business application

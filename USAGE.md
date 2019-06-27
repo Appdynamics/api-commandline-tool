@@ -292,6 +292,16 @@ Configure and retrieve health rules and their violates.
 | list | List all license rules. This command requires no further arguments | `act.sh licenserule list ` |
 
 
+## logsources
+
+
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| import | Import a source rule. Provide a json string or a file (with @ as prefix) as parameter (-d) | `act.sh logsources import -d @examples/logsources.json` |
+| list | List all sources. This command requires no further arguments. | `act.sh logsources list ` |
+
+
 ## metric
 
 | Command | Description | Example |

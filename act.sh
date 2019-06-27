@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="ae4101ab743d16c773959977d19e3bf3c8537a28"
+ACT_LAST_COMMIT="23df79765d17fb1754a82e4061bc2bafa23ff23a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -229,6 +229,12 @@ licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ;
 rde licenserule_create "Create a license rule." "Provide a json string or a @file (-d) as parameter." "-d examples/licenserule.json"
 licenserule_list() { apiCall '/controller/mds/v1/license/rules' "$@" ; }
 rde licenserule_list "List all license rules." "This command requires no further arguments" ""
+doc logsources << EOF
+EOF
+logsources_import() { apiCall -X POST -d 'payload: {{d:logsourcerule}}' '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_import "Import a source rule." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @examples/logsources.json"
+logsources_list() { apiCall '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_list "List all sources." "This command requires no further arguments." ""
 doc node << EOF
 Retrieve nodes within a business application
 EOF

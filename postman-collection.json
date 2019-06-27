@@ -1618,6 +1618,66 @@
 						},
             "description": "This command requires no further arguments"
 					}
+				}]},{"name": "logsources","item": [{
+					"name": "Import a source rule.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "payload: {{logsourcerule}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/logsources",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","logsources"],
+              "query": []
+						},
+            "description": "Provide a json string or a file (with @ as prefix) as parameter (-d)"
+					}
+				},{
+					"name": "List all sources.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/logsources",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","logsources"],
+              "query": []
+						},
+            "description": "This command requires no further arguments."
+					}
 				}]},{"name": "node","item": [{
 					"name": "Get a node.",
 					"request": {
