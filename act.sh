@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="23df79765d17fb1754a82e4061bc2bafa23ff23a"
+ACT_LAST_COMMIT="d8aae5f88399cf79b0914e77ba2d903c135496a9"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -179,7 +179,7 @@ rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d
 dashboard_list() { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
 rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
 dashboard_update() { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
-rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the \`dashboard get\` command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the dashboard get command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
 doc dbmon << EOF
 Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
 EOF

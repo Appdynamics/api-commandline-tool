@@ -185,7 +185,7 @@ Import and export custom dashboards in the AppDynamics controller
 | get | Get a dashboard. Provide a dashboard id (-i) as parameter. | `act.sh dashboard get -i 2` |
 | import | Import a dashboard. Provide a dashboard file or json (-d) as parameter. | `act.sh dashboard import -d @examples/dashboard.json` |
 | list | List all dashboards. This command requires no further arguments. | `act.sh dashboard list ` |
-| update | Update a dashboard. Provide a dashboard file or json (-d) as parameter. Use the `dashboard get` command to retrieve the correct format for updating. | `act.sh dashboard update -d @dashboardUpdate.json` |
+| update | Update a dashboard. Provide a dashboard file or json (-d) as parameter. Use the dashboard get command to retrieve the correct format for updating. | `act.sh dashboard update -d @dashboardUpdate.json` |
 
 
 ## dbmon
