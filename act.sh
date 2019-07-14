@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="d8aae5f88399cf79b0914e77ba2d903c135496a9"
+ACT_LAST_COMMIT="31af6f818584e656d78e251ad8f76a48fa88c660"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -320,53 +320,6 @@ user_create() { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}
 rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
 user_update() { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
 rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
-dbmon_create() {
-  apiCall -X POST -d "{ \
-                      \"name\": \"{{i}}\",\
-                      \"username\": \"{{u}}\",\
-                      \"hostname\": \"{{h}}\",\
-                      \"agentName\": \"{{a}}\",\
-                      \"type\": \"{{t}}\",\
-                      \"orapkiSslEnabled\": false,\
-                      \"orasslTruststoreLoc\": null,\
-                      \"orasslTruststoreType\": null,\
-                      \"orasslTruststorePassword\": null,\
-                      \"orasslClientAuthEnabled\": false,\
-                      \"orasslKeystoreLoc\": null,\
-                      \"orasslKeystoreType\": null,\
-                      \"orasslKeystorePassword\": null,\
-                      \"databaseName\": \"{{n}}\",\
-                      \"port\": \"{{p}}\",\
-                      \"password\": \"{{s}}\",\
-                      \"excludedSchemas\": [],\
-                      \"enabled\": true\
-                    }" /controller/rest/databases/collectors/create "$@"
-}
-register dbmon_create Create a new database collector
-describe dbmon_create << EOF
-Create a new database collector. You need to provide the following parameters:
-  -i name
-  -u user name
-  -h host name
-  -a agent name
-  -t type
-  -d database name
-  -p port
-  -s password
-EOF
-example dbmon_create << EOF
--i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
-EOF
-dbmon_events() {
-  event_list -a '_dbmon' "$@"
-}
-register dbmon_events List all database agent events.
-describe dbmon_events << EOF
-List all database agent events. This is an alias for \`${SCRIPTNAME} event list -a '_dbmon'\`, so you can use the same parameters for querying the events.
-EOF
-example dbmon_events << EOF
--t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
-EOF
 _doc() {
 read -r -d '' COMMAND_RESULT <<- EOM
 # Usage
@@ -416,6 +369,372 @@ EOM
 register _doc Print the output of help in markdown
 doc "" << EOF
 The following commands in the global namespace can be called directly.
+EOF
+doc environment << EOF
+If you want to use ${SCRIPTNAME} to manage multiple controllers, you can use environments to add and manage them easily.
+Use \`${SCRIPTNAME} environment add\` to create an environment providing a name, controller url and credentials.
+Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
+EOF
+environment_get() {
+  COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
+}
+register environment_get Retrieve an environment
+describe environment_get << EOF
+Retrieve an environment. Provide the name of the environment as parameter.
+EOF
+example environment_get << EOF
+myaccount
+EOF
+environment_delete() {
+  rm "${HOME}/.appdynamics/act/config.$1.sh"
+  COMMAND_RESULT="${1} deleted"
+}
+register environment_delete "Delete an environment"
+describe environment_delete << EOF
+Delete an environment. Provide the name of the environment as parameter.
+EOF
+example environment_delete << EOF
+myaccount
+EOF
+environment_export() {
+  environment_source "${1}";
+  local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"
+  read -r -d '' COMMAND_RESULT << EOF
+  {
+  	"name": "${1:-default}",
+  	"values": [
+  		{
+  			"key": "controller_host",
+  			"value": "${CONFIG_CONTROLLER_HOST}",
+  			"description": "",
+  			"enabled": true
+  		},
+  		{
+  			"key": "controller_user",
+  			"value": "${USER_AND_ACCOUNT%%@*}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_account",
+  			"value": "${USER_AND_ACCOUNT##*@}",
+  			"description": "",
+  			"enabled": true
+  		},
+      {
+  			"key": "controller_password",
+  			"value": "${CONFIG_CONTROLLER_CREDENTIALS#*:}",
+  			"description": "",
+  			"enabled": true
+  		}
+  	],
+  	"_postman_variable_scope": "environment"
+  }
+EOF
+}
+register environment_export Export an environment into a postman environment
+describe environment_export << EOF
+Export an environment into a postman environment
+EOF
+example environment_export << EOF
+> output.json
+EOF
+environment_source() {
+  if [ "$1" == "" ] ; then
+    source "${HOME}/.appdynamics/act/config.sh"
+  else
+    source "${HOME}/.appdynamics/act/config.$1.sh"
+  fi
+}
+register environment_source Load environment variables
+describe environment_source << EOF
+Load environment variables
+EOF
+example environment_source << EOF
+myaccount
+EOF
+environment_add() {
+  local FORCE=0
+  local GLOBAL=0
+  local SHOW=0
+  local PORTAL=0
+  local DEFAULT=0
+  while getopts "gfspd" opt "$@";
+  do
+    case "${opt}" in
+      g)
+        GLOBAL=1
+      ;;
+      f)
+        FORCE=1
+      ;;
+      s)
+        SHOW=1
+      ;;
+      p)
+        PORTAL=1
+      ;;
+      d)
+        DEFAULT=1
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  local ENVIRONMENT=""
+  local CONTROLLER_HOST=""
+  local CONTROLLER_CREDENTIALS=""
+  local PORTAL_PASSWORD=""
+  local PORTAL_USER=""
+  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/act"
+  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/act/plugins"
+  local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
+  if [ $GLOBAL -eq 1 ] ; then
+    OUTPUT_DIRECTORY="/etc/appdynamics/act"
+    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-act-cookie.txt"
+  fi
+  if [ $SHOW -eq 1 ] ; then
+    if [ -r $OUTPUT_DIRECTORY/config.sh ] ; then
+      COMMAND_RESULT=$(<$OUTPUT_DIRECTORY/config.sh)
+    else
+      COMMAND_RESULT="act is not configured."
+    fi
+  else
+    if [ $DEFAULT -eq 0 ] ; then
+      echo -n "Environment name"
+      if [ -n "${CONFIG_ENVIRONMENT}" ] ; then
+        echo " [${CONFIG_ENVIRONMENT}]"
+      else
+        echo " []"
+      fi
+      read ENVIRONMENT
+    fi
+    if [ -z "$ENVIRONMENT" ] ; then
+      ENVIRONMENT=$CONFIG_ENVIRONMENT
+    fi
+    echo -n "Controller Host location (e.g. https://appdynamics.example.com:8090)"
+    if [ -n "${CONFIG_CONTROLLER_HOST}" ] ; then
+      echo " [${CONFIG_CONTROLLER_HOST}]"
+    else
+      echo " []"
+    fi
+    read CONTROLLER_HOST
+    if [ -z "$CONTROLLER_HOST" ] ; then
+      CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST
+    fi
+    echo -n "Controller Credentials (e.g. user@tenant:password)"
+    if [ -n "${CONFIG_CONTROLLER_CREDENTIALS}" ] ; then
+      echo " [${CONFIG_CONTROLLER_CREDENTIALS%%:*}:********]"
+    else
+      echo " []"
+    fi
+    read CONTROLLER_CREDENTIALS
+    if [ -z "$CONTROLLER_CREDENTIALS" ] ; then
+      CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS
+    fi
+    if [ $PORTAL -eq 1 ] ; then
+      echo -n "AppDynamics Portal Credentials (e.g. user@example.com:password)"
+      if [ -n "${CONFIG_PORTAL_CREDENTIALS}" ] ; then
+        echo " [${CONFIG_PORTAL_CREDENTIALS%%:*}:********]"
+      else
+        echo " []"
+      fi
+      read PORTAL_CREDENTIALS
+    fi
+    OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}\nCONFIG_PORTAL_CREDENTIALS=${PORTAL_CREDENTIALS}"
+    OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.${ENVIRONMENT}.sh"
+    if [ $DEFAULT -eq 1 ] ; then
+      OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.sh"
+    fi
+    if [ ! -s "${OUTPUT_FILE}" ] || [ $FORCE -eq 1 ]
+    then
+      mkdir -p $OUTPUT_DIRECTORY
+      echo -e "$OUTPUT" > "${OUTPUT_FILE}"
+      COMMAND_RESULT="Created ${OUTPUT_FILE} successfully"
+    else
+      error "Configuration file ${OUTPUT_FILE} already exists. Please use (-f) to force override"
+      COMMAND_RESULT=""
+    fi
+  fi
+}
+register environment_add Add a new environment.
+describe environment_add << EOF
+Add a new environment. To change the default environment, run with \`-d\`
+EOF
+example environment_add << EOF
+-d
+EOF
+environment_edit() {
+  if [ -x "${EDITOR}" ] || [ -x "`which "${EDITOR}"`" ] ; then
+    ${EDITOR} "${HOME}/.appdynamics/act/config.$1.sh"
+  else
+    error "No editor found. Please set \$EDITOR."
+  fi
+}
+register environment_edit Open an environment file in your editor
+describe environment_edit << EOF
+EOF
+example environment_edit << EOF
+myaccount
+EOF
+environment_list() {
+  local BASE
+  local TEMP
+  COMMAND_RESULT="(default)"
+  for file in "${HOME}/.appdynamics/act/config."*".sh"
+  do
+    BASE=$(bashBasename "${file}")
+    TEMP=${BASE#*.}
+    COMMAND_RESULT="${COMMAND_RESULT} ${TEMP%.*}"
+  done
+}
+register environment_list List all your environments
+describe environment_list << EOF
+List all your environments
+EOF
+example environment_list << EOF
+EOF
+event_list() {
+  # Add some "ALL" magic
+  local PREV=""
+  local ARGS=()
+  for ARG in "$@"; do
+    if [ "${PREV}" == "-s" ] && [ "${ARG}" == "ALL" ] ; then
+      ARG="INFO,WARN,ERROR"
+    fi;
+    if [ "${PREV}" == "-e" ] && [ "${ARG}" == "ALL" ] ; then
+      # DB_SERVER_PARAMETER_CHANGE
+      ARG="ACTIVITY_TRACE,ADJUDICATION_CANCELLED,AGENT_ADD_BLACKLIST_REG_LIMIT_REACHED,AGENT_ASYNC_ADD_REG_LIMIT_REACHED,AGENT_CONFIGURATION_ERROR,APPLICATION_CRASH,AGENT_DIAGNOSTICS,AGENT_ERROR_ADD_REG_LIMIT_REACHED,AGENT_EVENT,AGENT_METRIC_BLACKLIST_REG_LIMIT_REACHED,AGENT_METRIC_REG_LIMIT_REACHED,AGENT_STATUS,ALREADY_ADJUDICATED,APPDYNAMICS_DATA,APPDYNAMICS_INTERNAL_DIAGNOSTICS,APPLICATION_CONFIG_CHANGE,APPLICATION_DEPLOYMENT,APPLICATION_DISCOVERED,APPLICATION_ERROR,APP_SERVER_RESTART,AZURE_AUTO_SCALING,BACKEND_DISCOVERED,BT_DISCOVERED,BUSINESS_ERROR,CLR_CRASH,CONTROLLER_AGENT_VERSION_INCOMPATIBILITY,CONTROLLER_ASYNC_ADD_REG_LIMIT_REACHED,CONTROLLER_COLLECTIONS_ADD_REG_LIMIT_REACHED,CONTROLLER_ERROR_ADD_REG_LIMIT_REACHED,CONTROLLER_EVENT_UPLOAD_LIMIT_REACHED,CONTROLLER_MEMORY_ADD_REG_LIMIT_REACHED,CONTROLLER_METADATA_REGISTRATION_LIMIT_REACHED,CONTROLLER_METRIC_DATA_BUFFER_OVERFLOW,CONTROLLER_METRIC_REG_LIMIT_REACHED,CONTROLLER_PSD_UPLOAD_LIMIT_REACHED,CONTROLLER_RSD_UPLOAD_LIMIT_REACHED,CONTROLLER_SEP_ADD_REG_LIMIT_REACHED,CONTROLLER_STACKTRACE_ADD_REG_LIMIT_REACHED,CONTROLLER_TRACKED_OBJECT_ADD_REG_LIMIT_REACHED,CUSTOM,CUSTOM_ACTION_END,CUSTOM_ACTION_FAILED,CUSTOM_ACTION_STARTED,CUSTOM_EMAIL_ACTION_END,CUSTOM_EMAIL_ACTION_FAILED,CUSTOM_EMAIL_ACTION_STARTED,DEADLOCK,DEV_MODE_CONFIG_UPDATE,DIAGNOSTIC_SESSION,DISK_SPACE,EMAIL_ACTION_FAILED,EMAIL_SENT,EUM_CLOUD_BROWSER_EVENT,EUM_CLOUD_SYNTHETIC_BROWSER_EVENT,EUM_INTERNAL_ERROR,HTTP_REQUEST_ACTION_END,HTTP_REQUEST_ACTION_FAILED,HTTP_REQUEST_ACTION_STARTED,INFO_INSTRUMENTATION_VISIBILITY,INTERNAL_UI_EVENT,JIRA_ACTION_END,JIRA_ACTION_FAILED,JIRA_ACTION_STARTED,LICENSE,MACHINE_AGENT_LOG,MACHINE_DISCOVERED,MEMORY,MEMORY_LEAK_DIAGNOSTICS,MOBILE_CRASH_IOS_EVENT,MOBILE_CRASH_ANDROID_EVENT,NETWORK,NODE_DISCOVERED,NORMAL,OBJECT_CONTENT_SUMMARY,POLICY_CANCELED_CRITICAL,POLICY_CANCELED_WARNING,POLICY_CLOSE_CRITICAL,POLICY_CLOSE_WARNING,POLICY_CONTINUES_CRITICAL,POLICY_CONTINUES_WARNING,POLICY_DOWNGRADED,POLICY_OPEN_CRITICAL,POLICY_OPEN_WARNING,POLICY_UPGRADED,RESOURCE_POOL_LIMIT,RUNBOOK_DIAGNOSTIC_SESSION_END,RUNBOOK_DIAGNOSTIC_SESSION_FAILED,RUNBOOK_DIAGNOSTIC_SESSION_STARTED,RUN_LOCAL_SCRIPT_ACTION_END,RUN_LOCAL_SCRIPT_ACTION_FAILED,RUN_LOCAL_SCRIPT_ACTION_STARTED,SERVICE_ENDPOINT_DISCOVERED,SLOW,SMS_SENT,STALL,SYSTEM_LOG,THREAD_DUMP_ACTION_END,THREAD_DUMP_ACTION_FAILED,THREAD_DUMP_ACTION_STARTED,TIER_DISCOVERED,VERY_SLOW,WARROOM_NOTE"
+    fi;
+    PREV="${ARG}"
+    ARGS+=("${ARG}")
+  done;
+  apiCall '/controller/rest/applications/{{a}}/events?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}&event-types={{e}}&severities={{s}}' "${ARGS[@]}"
+}
+register event_list List all events for a given time range.
+describe event_list << EOF
+List all events for a given time range.
+EOF
+example event_list << EOF
+-a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
+EOF
+metric_get() {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local START_TIME=-1
+  local END_TIME=-1
+  local DURATION_IN_MINUTES=0
+  local TYPE="BEFORE_NOW"
+  local ROLLUP="true"
+  while getopts "a:s:e:d:t:r:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=`urlencode "${OPTARG}"`
+      ;;
+      s)
+        START_TIME=${OPTARG}
+      ;;
+      e)
+        END_TIME=${OPTARG}
+      ;;
+      d)
+        DURATION_IN_MINUTES=${OPTARG}
+      ;;
+      t)
+        TYPE=${OPTARG}
+      ;;
+      r)
+        ROLLUP=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  debug ${APPLICATION}
+  local METRIC_PATH=`urlencode "$*"`
+  controller_call -B -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}&rollup=${ROLLUP}"
+}
+register metric_get Get a specific metric
+describe metric_get << EOF
+Get a specific metric by providing the metric path. Provide the application with option -a
+EOF
+RECURSIVE_COMMAND_RESULT=""
+metric_tree() {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local DEPTH=0
+  declare -i DEPTH
+  local METRIC_PATH
+  local ROOT
+  local TABS=""
+  while getopts "a:d:t:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+      d)
+        DEPTH=${OPTARG}
+      ;;
+      t)
+          TABS=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  METRIC_PATH="$*"
+  metric_list -a $APPLICATION $METRIC_PATH
+  debug $COMMAND_RESULT
+  ROOT=$COMMAND_RESULT
+  COMMAND_RESULT=""
+  OLDIFS=$IFS
+  IFS=$'\n,{'
+  for I in $ROOT ; do
+    case "$I" in
+      *name*)
+        name=${I##*:}
+      ;;
+      *type*)
+        type=${I##*:}
+      ;;
+      *\}*)
+        name=${name:2}
+        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}${EOL}"
+        if [[ "$type" == *folder* ]] ; then
+          local SUB_PATH="${METRIC_PATH}|${name%\"}"
+          metric_tree -d ${DEPTH}+1 -t "${TABS} " -a $APPLICATION ${SUB_PATH#"|"}
+        fi
+      esac
+    done;
+    IFS=$OLDIFS
+    if [ $DEPTH -eq 0 ] ; then
+      echo -e $RECURSIVE_COMMAND_RESULT
+    fi
+}
+register metric_tree Build and return a metrics tree for one application
+describe metric_tree << EOF
+Create a metric tree for the given application (-a). Note that this will create a lot of requests towards your controller.
+EOF
+metric_list() {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local METRIC_PATH=""
+  while getopts "a:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  METRIC_PATH=`urlencode "$*"`
+  debug "Will call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}"
+  controller_call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}
+}
+register metric_list List metrics available for one application.
+describe metric_list << EOF
+List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
 EOF
 _help() {
   if [ "$1" = "" ] ; then
@@ -477,6 +796,220 @@ See '${SCRIPTNAME} help <namespace>' to read about a specific namespace and the 
 EOM
 }
 register _usage Display usage information.
+healthrule_copy() {
+  local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local TARGET_APPLICATION=""
+  local TARGET_ENVIRONMENT=""
+  while getopts "s:t:e:" opt "$@";
+  do
+    case "${opt}" in
+      s)
+        SOURCE_APPLICATION="${OPTARG}"
+      ;;
+      t)
+        TARGET_APPLICATION="${OPTARG}"
+      ;;
+      e)
+        TARGET_ENVIRONMENT="${OPTARG}"
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ -z "${SOURCE_APPLICATION}" ] ; then
+    COMMAND_RESULT=""
+    error "Source application is empty."
+    exit
+  fi
+  if [ -z "${TARGET_APPLICATION}" ] ; then
+    COMMAND_RESULT=""
+    error "Target application is empty."
+    exit
+  fi
+  OLD_CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}
+  CONFIG_OUTPUT_VERBOSITY="output"
+  healthrule_list -a ${SOURCE_APPLICATION}
+  CONFIG_OUTPUT_VERBOSITY="${OLD_CONFIG_OUTPUT_VERBOSITY}"
+  SOURCE_HEALTHRULE=${COMMAND_RESULT}
+  COMMAND_RESULT=""
+  if [ "${SOURCE_HEALTHRULE:1:12}" == "health-rules" ]
+  then
+    local R=${RANDOM}
+    echo "$SOURCE_HEALTHRULE" > "/tmp/act-output-${R}"
+    if [ -n "${TARGET_ENVIRONMENT}" ] ; then
+      debug "Copy to target environment $TARGET_ENVIRONMENT, target application $TARGET_APPLICATION."
+      $0 -E ${TARGET_ENVIRONMENT} healthrule import -a ${TARGET_APPLICATION} "/tmp/act-output-${R}"
+    else
+      debug "Copy to target application $TARGET_APPLICATION"
+      healthrule_import -a "${TARGET_APPLICATION}" "/tmp/act-output-${R}"
+    fi
+    rm "/tmp/act-output-${R}"
+  else
+    COMMAND_RESULT="Could not export health rules from source application: ${COMMAND_RESULT}"
+  fi
+}
+register healthrule_copy Copy healthrules from one application to another.
+describe healthrule_list << EOF
+Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
+If you provide ("-n") only the named health rule will be copied.
+EOF
+healthrule_import() {
+  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
+  local FILE=""
+  while getopts "a:" opt "$@";
+  do
+    case "${opt}" in
+      a)
+        APPLICATION=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    controller_call -X POST -F file="@$FILE" "/controller/healthrules/${APPLICATION}"
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register healthrule_import Import a health rule
+describe healthrule_import << EOF
+Import a health rule.
+EOF
+dbmon_create() {
+  apiCall -X POST -d "{ \
+                      \"name\": \"{{i}}\",\
+                      \"username\": \"{{u}}\",\
+                      \"hostname\": \"{{h}}\",\
+                      \"agentName\": \"{{a}}\",\
+                      \"type\": \"{{t}}\",\
+                      \"orapkiSslEnabled\": false,\
+                      \"orasslTruststoreLoc\": null,\
+                      \"orasslTruststoreType\": null,\
+                      \"orasslTruststorePassword\": null,\
+                      \"orasslClientAuthEnabled\": false,\
+                      \"orasslKeystoreLoc\": null,\
+                      \"orasslKeystoreType\": null,\
+                      \"orasslKeystorePassword\": null,\
+                      \"databaseName\": \"{{n}}\",\
+                      \"port\": \"{{p}}\",\
+                      \"password\": \"{{s}}\",\
+                      \"excludedSchemas\": [],\
+                      \"enabled\": true\
+                    }" /controller/rest/databases/collectors/create "$@"
+}
+register dbmon_create Create a new database collector
+describe dbmon_create << EOF
+Create a new database collector. You need to provide the following parameters:
+  -i name
+  -u user name
+  -h host name
+  -a agent name
+  -t type
+  -d database name
+  -p port
+  -s password
+EOF
+example dbmon_create << EOF
+-i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password
+EOF
+dbmon_events() {
+  event_list -a '_dbmon' "$@"
+}
+register dbmon_events List all database agent events.
+describe dbmon_events << EOF
+List all database agent events. This is an alias for \`${SCRIPTNAME} event list -a '_dbmon'\`, so you can use the same parameters for querying the events.
+EOF
+example dbmon_events << EOF
+-t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT
+EOF
+actiontemplate_delete() {
+  local TYPE="httprequest"
+  local ID=0
+  while getopts "t:i:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+      i)
+        ID=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ "${ID}" -eq 0 ] ; then
+    error "actiontemplate id is not set"
+    COMMAND_RESULT=""
+  elif [ "$TYPE" == "httprequest" ] ; then
+    controller_call -X POST -d "${ID}" '/controller/restui/httpaction/deleteHttpRequestActionPlan' "$@"
+  else
+    controller_call -X POST -d "${ID}" '/controller/restui/emailaction/deleteCustomEmailActionPlan' "$@"
+  fi;
+}
+register actiontemplate_delete "Delete an action template"
+describe actiontemplate_delete << EOF
+Delete an action template. Provide an id (-i) and a type (-t) as parameters.
+EOF
+example actiontemplate_export << EOF
+-t httprequest
+EOF
+actiontemplate_import() {
+  local FILE=""
+  local TYPE="httprequest"
+  while getopts "t:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  FILE="$*"
+  if [ -r $FILE ] ; then
+    controller_call -X POST -F file="@$FILE" "/controller/actiontemplate/${TYPE}"
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register actiontemplate_import "Import an action template of a given type (email, httprequest)"
+describe actiontemplate_import << EOF
+Import an action template of a given type (email, httprequest)
+EOF
+example actiontemplate_import << EOF
+template.json
+EOF
+actiontemplate_list() {
+  local TYPE="httprequest"
+  while getopts "t:" opt "$@";
+  do
+    case "${opt}" in
+      t)
+        TYPE=${OPTARG}
+      ;;
+    esac
+  done;
+  shiftOptInd
+  shift $SHIFTS
+  if [ "$TYPE" == "httprequest" ] ; then
+    controller_call '/controller/restui/httpaction/getHttpRequestActionPlanList'
+  else
+    controller_call 'controller/restui/emailaction/getCustomEmailActionPlanList'
+  fi;
+}
+register actiontemplate_list "List all actiontemplates."
+describe actiontemplate_list << EOF
+List all actiontemplates. Provide a type (-t) as parameter.
+EOF
+example actiontemplate_export << EOF
+-t httprequest
+EOF
 controller_isup() {
   local START
   local END
@@ -498,6 +1031,23 @@ This command will pause until the controller is up. Use this to get notified aft
 EOF
 example controller_isup << EOF
 ; ${SCRIPTNAME} application list
+EOF
+controller_ping() {
+  debug "Ping $CONFIG_CONTROLLER_HOST"
+  local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
+  debug "RESPONSE: ${PING_RESPONSE}"
+  if [ -n "$PING_RESPONSE" ] && [[ "${PING_RESPONSE/200 OK}" != "$PING_RESPONSE" ]]; then
+    local TIME=${PING_RESPONSE##*TIME_TOTAL=}
+    COMMAND_RESULT="Pong! Time: ${TIME}"
+  else
+    COMMAND_RESULT="Error"
+  fi
+}
+register controller_ping Check the availability of an appdynamics controller
+describe controller_ping << EOF
+Check the availability of an appdynamics controller. On success the response time will be provided.
+EOF
+example controller_ping << EOF
 EOF
 controller_call() {
   debug "Calling $CONFIG_CONTROLLER_HOST"
@@ -620,23 +1170,6 @@ Check if the login with your appdynamics controller works properly. If the login
 EOF
 example controller_login << EOF
 EOF
-controller_ping() {
-  debug "Ping $CONFIG_CONTROLLER_HOST"
-  local PING_RESPONSE=$(httpClient -sI $CONFIG_CONTROLLER_HOST  -w "RESPONSE=%{http_code} TIME_TOTAL=%{time_total}")
-  debug "RESPONSE: ${PING_RESPONSE}"
-  if [ -n "$PING_RESPONSE" ] && [[ "${PING_RESPONSE/200 OK}" != "$PING_RESPONSE" ]]; then
-    local TIME=${PING_RESPONSE##*TIME_TOTAL=}
-    COMMAND_RESULT="Pong! Time: ${TIME}"
-  else
-    COMMAND_RESULT="Error"
-  fi
-}
-register controller_ping Check the availability of an appdynamics controller
-describe controller_ping << EOF
-Check the availability of an appdynamics controller. On success the response time will be provided.
-EOF
-example controller_ping << EOF
-EOF
 controller_version() {
   controller_call -X GET /controller/rest/serverstatus
   COMMAND_RESULT=`echo -e $COMMAND_RESULT | sed -n -e 's/.*Controller v\(.*\) Build.*/\1/p'`
@@ -647,112 +1180,13 @@ Get installed version from controller
 EOF
 example controller_version << EOF
 EOF
-actiontemplate_delete() {
-  local TYPE="httprequest"
-  local ID=0
-  while getopts "t:i:" opt "$@";
-  do
-    case "${opt}" in
-      t)
-        TYPE=${OPTARG}
-      ;;
-      i)
-        ID=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  if [ "${ID}" -eq 0 ] ; then
-    error "actiontemplate id is not set"
-    COMMAND_RESULT=""
-  elif [ "$TYPE" == "httprequest" ] ; then
-    controller_call -X POST -d "${ID}" '/controller/restui/httpaction/deleteHttpRequestActionPlan' "$@"
-  else
-    controller_call -X POST -d "${ID}" '/controller/restui/emailaction/deleteCustomEmailActionPlan' "$@"
-  fi;
+eum_getapps() {
+  apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
 }
-register actiontemplate_delete "Delete an action template"
-describe actiontemplate_delete << EOF
-Delete an action template. Provide an id (-i) and a type (-t) as parameters.
+register eum_getapps Get EUM App Keys
+describe eum_getapps << EOF
+Get EUM Apps.
 EOF
-example actiontemplate_export << EOF
--t httprequest
-EOF
-actiontemplate_import() {
-  local FILE=""
-  local TYPE="httprequest"
-  while getopts "t:" opt "$@";
-  do
-    case "${opt}" in
-      t)
-        TYPE=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  FILE="$*"
-  if [ -r $FILE ] ; then
-    controller_call -X POST -F file="@$FILE" "/controller/actiontemplate/${TYPE}"
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register actiontemplate_import "Import an action template of a given type (email, httprequest)"
-describe actiontemplate_import << EOF
-Import an action template of a given type (email, httprequest)
-EOF
-example actiontemplate_import << EOF
-template.json
-EOF
-actiontemplate_list() {
-  local TYPE="httprequest"
-  while getopts "t:" opt "$@";
-  do
-    case "${opt}" in
-      t)
-        TYPE=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  if [ "$TYPE" == "httprequest" ] ; then
-    controller_call '/controller/restui/httpaction/getHttpRequestActionPlanList'
-  else
-    controller_call 'controller/restui/emailaction/getCustomEmailActionPlanList'
-  fi;
-}
-register actiontemplate_list "List all actiontemplates."
-describe actiontemplate_list << EOF
-List all actiontemplates. Provide a type (-t) as parameter.
-EOF
-example actiontemplate_export << EOF
--t httprequest
-EOF
-PORTAL_LOGIN_STATUS=0
-PORTAL_LOGIN_TOKEN=""
-download_login() {
-  if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
-    USERNAME=${CONFIG_PORTAL_CREDENTIALS%%:*}
-    PASSWORD=${CONFIG_PORTAL_CREDENTIALS#*:}
-    debug "Login at 'https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token' with $USERNAME and $PASSWORD"
-    LOGIN_RESPONSE=$(httpClient -s -X POST -d "{\"username\": \"${USERNAME}\",\"password\": \"${PASSWORD}\",\"scopes\": [\"download\"]}" https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token)
-    if [[ "${LOGIN_RESPONSE/\"error\"}" != "${LOGIN_RESPONSE}" ]]; then
-      COMMAND_RESULT="Login Error! Please check your portal credentials."
-    else
-      PORTAL_LOGIN_STATUS=1
-      PORTAL_LOGIN_TOKEN="${LOGIN_RESPONSE#*"access_token\": \""}"
-      PORTAL_LOGIN_TOKEN=${PORTAL_LOGIN_TOKEN%%\"*}
-      COMMAND_RESULT="Login Successful! Token: ${PORTAL_LOGIN_TOKEN}"
-    fi
-  else
-    COMMAND_RESULT="Please run $1 config -p to setup portal credentials."
-  fi
-}
-rde download_login "Login with AppDynamics to retrieve an OAUTH token for downloads." "You can use the provided token for downloads from https://download.appdynamics.com/" ""
 download_get() {
   local WORKING_DIRECTORY="."
   local DOWNLOAD_DRYRUN=0
@@ -818,6 +1252,27 @@ download_get() {
   fi
 }
 rde download_get "Download an agent." "You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches." "-d /tmp golang"
+PORTAL_LOGIN_STATUS=0
+PORTAL_LOGIN_TOKEN=""
+download_login() {
+  if [ -n "$CONFIG_PORTAL_CREDENTIALS" ] ; then
+    USERNAME=${CONFIG_PORTAL_CREDENTIALS%%:*}
+    PASSWORD=${CONFIG_PORTAL_CREDENTIALS#*:}
+    debug "Login at 'https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token' with $USERNAME and $PASSWORD"
+    LOGIN_RESPONSE=$(httpClient -s -X POST -d "{\"username\": \"${USERNAME}\",\"password\": \"${PASSWORD}\",\"scopes\": [\"download\"]}" https://identity.msrv.saas.appdynamics.com/v2.0/oauth/token)
+    if [[ "${LOGIN_RESPONSE/\"error\"}" != "${LOGIN_RESPONSE}" ]]; then
+      COMMAND_RESULT="Login Error! Please check your portal credentials."
+    else
+      PORTAL_LOGIN_STATUS=1
+      PORTAL_LOGIN_TOKEN="${LOGIN_RESPONSE#*"access_token\": \""}"
+      PORTAL_LOGIN_TOKEN=${PORTAL_LOGIN_TOKEN%%\"*}
+      COMMAND_RESULT="Login Successful! Token: ${PORTAL_LOGIN_TOKEN}"
+    fi
+  else
+    COMMAND_RESULT="Please run $1 config -p to setup portal credentials."
+  fi
+}
+rde download_login "Login with AppDynamics to retrieve an OAUTH token for downloads." "You can use the provided token for downloads from https://download.appdynamics.com/" ""
 download_list() {
   local FILES
   local DELIMITER='"filename":'
@@ -896,6 +1351,52 @@ download_versionlist() {
   done;
 }
 rde download_versionlist "" "" ""
+analyticssearch_import() {
+  FILE="$*"
+  if [ -r "${FILE}" ] ; then
+    DATA="$(<${FILE})"
+    regex='("id" *: *[0-9]+,)'
+    if [[ ${DATA} =~ $regex ]]; then
+      DATA=${DATA/${BASH_REMATCH[0]}/}
+    fi
+    if [[ $DATA == '['* ]]
+    then
+      COMMAND_RESULT=""
+      error "File contains multiple saved searches. Please provide only a single element."
+    else
+      controller_call -X POST -d "${DATA}" '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch'
+    fi
+  else
+    COMMAND_RESULT=""
+    error "File not found or not readable: $FILE"
+  fi
+}
+register analyticssearch_import Import an analytics search. Provide a json file as parameter.
+describe analyticssearch_import << EOF
+Import an analytics search. Provide a json file as parameter.
+EOF
+example analyticssearch_import << EOF
+search.json
+EOF
+_config() {
+  environment_add -d "$@"
+}
+register _config "Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`"
+describe _config << EOF
+Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`
+EOF
+example _config << EOF
+EOF
+_version() {
+  # shellcheck disable=SC2034
+  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
+}
+register _version Print the current version of $SCRIPTNAME
+describe _version << EOF
+Print the current version of $SCRIPTNAME
+EOF
+example _version << EOF
+EOF
 federation_setup() {
   local FRIEND_CONTROLLER_CREDENTIALS=""
   local FRIEND_CONTROLLER_HOST=""
@@ -941,13 +1442,6 @@ register federation_setup Setup a controller federation: Generates a key and est
 describe federation_setup << EOF
 Setup a controller federation: Generates a key and establishes the mutal friendship.
 EOF
-eum_getapps() {
-  apiCall  "/controller/restui/eumApplications/getAllEumApplicationsData?time-range=last_1_hour.BEFORE_NOW.-1.-1.60"
-}
-register eum_getapps Get EUM App Keys
-describe eum_getapps << EOF
-Get EUM Apps.
-EOF
 timerange_delete() {
   local TIMERANGE_ID=$*
   if [[ $TIMERANGE_ID =~ ^[0-9]+$ ]]; then
@@ -966,7 +1460,9 @@ timerange_create() {
   local END_TIME=-1
   local DURATION_IN_MINUTES=0
   local TYPE="BETWEEN_TIMES"
-  while getopts "s:e:d:" opt "$@";
+  local DESCRIPTION
+  local SHARED=false
+  while getopts "s:e:d:SD:" opt "$@";
   do
     case "${opt}" in
       s)
@@ -979,12 +1475,18 @@ timerange_create() {
         DURATION_IN_MINUTES=${OPTARG}
         TYPE="BEFORE_NOW"
       ;;
+      S)
+        SHARED="true"
+      ;;
+      D)
+        DESCRIPTION=${OPTARG}
+      ;;
     esac
   done;
   shiftOptInd
   shift $SHIFTS
   TIMERANGE_NAME=$*
-  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
+  controller_call -X POST -d "{\"name\":\"$TIMERANGE_NAME\",\"description\":\"$DESCRIPTION\",\"shared\":$SHARED,\"timeRange\":{\"type\":\"$TYPE\",\"durationInMinutes\":$DURATION_IN_MINUTES,\"startTime\":$START_TIME,\"endTime\":$END_TIME}}" /controller/restui/user/createCustomRange
 }
 register timerange_create Create a custom time range
 describe timerange_create << EOF
@@ -997,513 +1499,6 @@ register timerange_list List all custom timeranges available on the controller
 describe timerange_list << EOF
 List all custom timeranges available on the controller
 EOF
-doc environment << EOF
-If you want to use ${SCRIPTNAME} to manage multiple controllers, you can use environments to add and manage them easily.
-Use \`${SCRIPTNAME} environment add\` to create an environment providing a name, controller url and credentials.
-Afterwards you can use \`${SCRIPTNAME} -E <name>\` to call the given controller.
-EOF
-environment_source() {
-  if [ "$1" == "" ] ; then
-    source "${HOME}/.appdynamics/act/config.sh"
-  else
-    source "${HOME}/.appdynamics/act/config.$1.sh"
-  fi
-}
-register environment_source Load environment variables
-describe environment_source << EOF
-Load environment variables
-EOF
-example environment_source << EOF
-myaccount
-EOF
-environment_get() {
-  COMMAND_RESULT=`cat "${HOME}/.appdynamics/act/config.$1.sh"`
-}
-register environment_get Retrieve an environment
-describe environment_get << EOF
-Retrieve an environment. Provide the name of the environment as parameter.
-EOF
-example environment_get << EOF
-myaccount
-EOF
-environment_delete() {
-  rm "${HOME}/.appdynamics/act/config.$1.sh"
-  COMMAND_RESULT="${1} deleted"
-}
-register environment_delete "Delete an environment"
-describe environment_delete << EOF
-Delete an environment. Provide the name of the environment as parameter.
-EOF
-example environment_delete << EOF
-myaccount
-EOF
-environment_add() {
-  local FORCE=0
-  local GLOBAL=0
-  local SHOW=0
-  local PORTAL=0
-  local DEFAULT=0
-  while getopts "gfspd" opt "$@";
-  do
-    case "${opt}" in
-      g)
-        GLOBAL=1
-      ;;
-      f)
-        FORCE=1
-      ;;
-      s)
-        SHOW=1
-      ;;
-      p)
-        PORTAL=1
-      ;;
-      d)
-        DEFAULT=1
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  local ENVIRONMENT=""
-  local CONTROLLER_HOST=""
-  local CONTROLLER_CREDENTIALS=""
-  local PORTAL_PASSWORD=""
-  local PORTAL_USER=""
-  local OUTPUT_DIRECTORY="${HOME}/.appdynamics/act"
-  local USER_PLUGIN_DIRECTORY="${HOME}/.appdynamics/act/plugins"
-  local CONTROLLER_COOKIE_LOCATION="${OUTPUT_DIRECTORY}/cookie.txt"
-  if [ $GLOBAL -eq 1 ] ; then
-    OUTPUT_DIRECTORY="/etc/appdynamics/act"
-    CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-act-cookie.txt"
-  fi
-  if [ $SHOW -eq 1 ] ; then
-    if [ -r $OUTPUT_DIRECTORY/config.sh ] ; then
-      COMMAND_RESULT=$(<$OUTPUT_DIRECTORY/config.sh)
-    else
-      COMMAND_RESULT="act is not configured."
-    fi
-  else
-    if [ $DEFAULT -eq 0 ] ; then
-      echo -n "Environment name"
-      if [ -n "${CONFIG_ENVIRONMENT}" ] ; then
-        echo " [${CONFIG_ENVIRONMENT}]"
-      else
-        echo " []"
-      fi
-      read ENVIRONMENT
-    fi
-    if [ -z "$ENVIRONMENT" ] ; then
-      ENVIRONMENT=$CONFIG_ENVIRONMENT
-    fi
-    echo -n "Controller Host location (e.g. https://appdynamics.example.com:8090)"
-    if [ -n "${CONFIG_CONTROLLER_HOST}" ] ; then
-      echo " [${CONFIG_CONTROLLER_HOST}]"
-    else
-      echo " []"
-    fi
-    read CONTROLLER_HOST
-    if [ -z "$CONTROLLER_HOST" ] ; then
-      CONTROLLER_HOST=$CONFIG_CONTROLLER_HOST
-    fi
-    echo -n "Controller Credentials (e.g. user@tenant:password)"
-    if [ -n "${CONFIG_CONTROLLER_CREDENTIALS}" ] ; then
-      echo " [${CONFIG_CONTROLLER_CREDENTIALS%%:*}:********]"
-    else
-      echo " []"
-    fi
-    read CONTROLLER_CREDENTIALS
-    if [ -z "$CONTROLLER_CREDENTIALS" ] ; then
-      CONTROLLER_CREDENTIALS=$CONFIG_CONTROLLER_CREDENTIALS
-    fi
-    if [ $PORTAL -eq 1 ] ; then
-      echo -n "AppDynamics Portal Credentials (e.g. user@example.com:password)"
-      if [ -n "${CONFIG_PORTAL_CREDENTIALS}" ] ; then
-        echo " [${CONFIG_PORTAL_CREDENTIALS%%:*}:********]"
-      else
-        echo " []"
-      fi
-      read PORTAL_CREDENTIALS
-    fi
-    OUTPUT="CONFIG_CONTROLLER_HOST=${CONTROLLER_HOST}\nCONFIG_CONTROLLER_CREDENTIALS=${CONTROLLER_CREDENTIALS}\nCONFIG_CONTROLLER_COOKIE_LOCATION=${CONTROLLER_COOKIE_LOCATION}\nCONFIG_USER_PLUGIN_DIRECTORY=${USER_PLUGIN_DIRECTORY}\nCONFIG_PORTAL_CREDENTIALS=${PORTAL_CREDENTIALS}"
-    OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.${ENVIRONMENT}.sh"
-    if [ $DEFAULT -eq 1 ] ; then
-      OUTPUT_FILE="${OUTPUT_DIRECTORY}/config.sh"
-    fi
-    if [ ! -s "${OUTPUT_FILE}" ] || [ $FORCE -eq 1 ]
-    then
-      mkdir -p $OUTPUT_DIRECTORY
-      echo -e "$OUTPUT" > "${OUTPUT_FILE}"
-      COMMAND_RESULT="Created ${OUTPUT_FILE} successfully"
-    else
-      error "Configuration file ${OUTPUT_FILE} already exists. Please use (-f) to force override"
-      COMMAND_RESULT=""
-    fi
-  fi
-}
-register environment_add Add a new environment.
-describe environment_add << EOF
-Add a new environment. To change the default environment, run with \`-d\`
-EOF
-example environment_add << EOF
--d
-EOF
-environment_list() {
-  local BASE
-  local TEMP
-  COMMAND_RESULT="(default)"
-  for file in "${HOME}/.appdynamics/act/config."*".sh"
-  do
-    BASE=$(bashBasename "${file}")
-    TEMP=${BASE#*.}
-    COMMAND_RESULT="${COMMAND_RESULT} ${TEMP%.*}"
-  done
-}
-register environment_list List all your environments
-describe environment_list << EOF
-List all your environments
-EOF
-example environment_list << EOF
-EOF
-environment_export() {
-  environment_source "${1}";
-  local USER_AND_ACCOUNT="${CONFIG_CONTROLLER_CREDENTIALS%%:*}"
-  read -r -d '' COMMAND_RESULT << EOF
-  {
-  	"name": "${1:-default}",
-  	"values": [
-  		{
-  			"key": "controller_host",
-  			"value": "${CONFIG_CONTROLLER_HOST}",
-  			"description": "",
-  			"enabled": true
-  		},
-  		{
-  			"key": "controller_user",
-  			"value": "${USER_AND_ACCOUNT%%@*}",
-  			"description": "",
-  			"enabled": true
-  		},
-      {
-  			"key": "controller_account",
-  			"value": "${USER_AND_ACCOUNT##*@}",
-  			"description": "",
-  			"enabled": true
-  		},
-      {
-  			"key": "controller_password",
-  			"value": "${CONFIG_CONTROLLER_CREDENTIALS#*:}",
-  			"description": "",
-  			"enabled": true
-  		}
-  	],
-  	"_postman_variable_scope": "environment"
-  }
-EOF
-}
-register environment_export Export an environment into a postman environment
-describe environment_export << EOF
-Export an environment into a postman environment
-EOF
-example environment_export << EOF
-> output.json
-EOF
-environment_edit() {
-  if [ -x "${EDITOR}" ] || [ -x "`which "${EDITOR}"`" ] ; then
-    ${EDITOR} "${HOME}/.appdynamics/act/config.$1.sh"
-  else
-    error "No editor found. Please set \$EDITOR."
-  fi
-}
-register environment_edit Open an environment file in your editor
-describe environment_edit << EOF
-EOF
-example environment_edit << EOF
-myaccount
-EOF
-_config() {
-  environment_add -d "$@"
-}
-register _config "Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`"
-describe _config << EOF
-Initialize the default environment. This is an alias for \`${SCRIPTNAME} environment add -d\`
-EOF
-example _config << EOF
-EOF
-_version() {
-  # shellcheck disable=SC2034
-  COMMAND_RESULT="$ACT_VERSION ~ $ACT_LAST_COMMIT (${GLOBAL_COMMANDS_COUNTER} commands)"
-}
-register _version Print the current version of $SCRIPTNAME
-describe _version << EOF
-Print the current version of $SCRIPTNAME
-EOF
-example _version << EOF
-EOF
-metric_get() {
-  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local START_TIME=-1
-  local END_TIME=-1
-  local DURATION_IN_MINUTES=0
-  local TYPE="BEFORE_NOW"
-  local ROLLUP="true"
-  while getopts "a:s:e:d:t:r:" opt "$@";
-  do
-    case "${opt}" in
-      a)
-        APPLICATION=`urlencode "${OPTARG}"`
-      ;;
-      s)
-        START_TIME=${OPTARG}
-      ;;
-      e)
-        END_TIME=${OPTARG}
-      ;;
-      d)
-        DURATION_IN_MINUTES=${OPTARG}
-      ;;
-      t)
-        TYPE=${OPTARG}
-      ;;
-      r)
-        ROLLUP=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  debug ${APPLICATION}
-  local METRIC_PATH=`urlencode "$*"`
-  controller_call -B -X GET "/controller/rest/applications/${APPLICATION}/metric-data?metric-path=${METRIC_PATH}&time-range-type=${TYPE}&duration-in-mins=${DURATION_IN_MINUTES}&start-time=${START_TIME}&end-time=${END_TIME}&rollup=${ROLLUP}"
-}
-register metric_get Get a specific metric
-describe metric_get << EOF
-Get a specific metric by providing the metric path. Provide the application with option -a
-EOF
-RECURSIVE_COMMAND_RESULT=""
-metric_tree() {
-  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local DEPTH=0
-  declare -i DEPTH
-  local METRIC_PATH
-  local ROOT
-  local TABS=""
-  while getopts "a:d:t:" opt "$@";
-  do
-    case "${opt}" in
-      a)
-        APPLICATION=${OPTARG}
-      ;;
-      d)
-        DEPTH=${OPTARG}
-      ;;
-      t)
-          TABS=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  METRIC_PATH="$*"
-  metric_list -a $APPLICATION $METRIC_PATH
-  debug $COMMAND_RESULT
-  ROOT=$COMMAND_RESULT
-  COMMAND_RESULT=""
-  OLDIFS=$IFS
-  IFS=$'\n,{'
-  for I in $ROOT ; do
-    case "$I" in
-      *name*)
-        name=${I##*:}
-      ;;
-      *type*)
-        type=${I##*:}
-      ;;
-      *\}*)
-        name=${name:2}
-        RECURSIVE_COMMAND_RESULT="${RECURSIVE_COMMAND_RESULT}${TABS}${name%\"}${EOL}"
-        if [[ "$type" == *folder* ]] ; then
-          local SUB_PATH="${METRIC_PATH}|${name%\"}"
-          metric_tree -d ${DEPTH}+1 -t "${TABS} " -a $APPLICATION ${SUB_PATH#"|"}
-        fi
-      esac
-    done;
-    IFS=$OLDIFS
-    if [ $DEPTH -eq 0 ] ; then
-      echo -e $RECURSIVE_COMMAND_RESULT
-    fi
-}
-register metric_tree Build and return a metrics tree for one application
-describe metric_tree << EOF
-Create a metric tree for the given application (-a). Note that this will create a lot of requests towards your controller.
-EOF
-metric_list() {
-  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local METRIC_PATH=""
-  while getopts "a:" opt "$@";
-  do
-    case "${opt}" in
-      a)
-        APPLICATION=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  METRIC_PATH=`urlencode "$*"`
-  debug "Will call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}"
-  controller_call /controller/rest/applications/${APPLICATION}/metrics?output=JSON\&metric-path=${METRIC_PATH}
-}
-register metric_list List metrics available for one application.
-describe metric_list << EOF
-List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree.
-EOF
-healthrule_import() {
-  local APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local FILE=""
-  while getopts "a:" opt "$@";
-  do
-    case "${opt}" in
-      a)
-        APPLICATION=${OPTARG}
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  FILE="$*"
-  if [ -r $FILE ] ; then
-    controller_call -X POST -F file="@$FILE" "/controller/healthrules/${APPLICATION}"
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register healthrule_import Import a health rule
-describe healthrule_import << EOF
-Import a health rule.
-EOF
-healthrule_copy() {
-  local SOURCE_APPLICATION=${CONFIG_CONTROLLER_DEFAULT_APPLICATION}
-  local TARGET_APPLICATION=""
-  local TARGET_ENVIRONMENT=""
-  while getopts "s:t:e:" opt "$@";
-  do
-    case "${opt}" in
-      s)
-        SOURCE_APPLICATION="${OPTARG}"
-      ;;
-      t)
-        TARGET_APPLICATION="${OPTARG}"
-      ;;
-      e)
-        TARGET_ENVIRONMENT="${OPTARG}"
-      ;;
-    esac
-  done;
-  shiftOptInd
-  shift $SHIFTS
-  if [ -z "${SOURCE_APPLICATION}" ] ; then
-    COMMAND_RESULT=""
-    error "Source application is empty."
-    exit
-  fi
-  if [ -z "${TARGET_APPLICATION}" ] ; then
-    COMMAND_RESULT=""
-    error "Target application is empty."
-    exit
-  fi
-  OLD_CONFIG_OUTPUT_VERBOSITY=${CONFIG_OUTPUT_VERBOSITY}
-  CONFIG_OUTPUT_VERBOSITY="output"
-  healthrule_list -a ${SOURCE_APPLICATION}
-  CONFIG_OUTPUT_VERBOSITY="${OLD_CONFIG_OUTPUT_VERBOSITY}"
-  SOURCE_HEALTHRULE=${COMMAND_RESULT}
-  COMMAND_RESULT=""
-  if [ "${SOURCE_HEALTHRULE:1:12}" == "health-rules" ]
-  then
-    local R=${RANDOM}
-    echo "$SOURCE_HEALTHRULE" > "/tmp/act-output-${R}"
-    if [ -n "${TARGET_ENVIRONMENT}" ] ; then
-      debug "Copy to target environment $TARGET_ENVIRONMENT, target application $TARGET_APPLICATION."
-      $0 -E ${TARGET_ENVIRONMENT} healthrule import -a ${TARGET_APPLICATION} "/tmp/act-output-${R}"
-    else
-      debug "Copy to target application $TARGET_APPLICATION"
-      healthrule_import -a "${TARGET_APPLICATION}" "/tmp/act-output-${R}"
-    fi
-    rm "/tmp/act-output-${R}"
-  else
-    COMMAND_RESULT="Could not export health rules from source application: ${COMMAND_RESULT}"
-  fi
-}
-register healthrule_copy Copy healthrules from one application to another.
-describe healthrule_list << EOF
-Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
-If you provide ("-n") only the named health rule will be copied.
-EOF
-event_list() {
-  # Add some "ALL" magic
-  local PREV=""
-  local ARGS=()
-  for ARG in "$@"; do
-    if [ "${PREV}" == "-s" ] && [ "${ARG}" == "ALL" ] ; then
-      ARG="INFO,WARN,ERROR"
-    fi;
-    if [ "${PREV}" == "-e" ] && [ "${ARG}" == "ALL" ] ; then
-      # DB_SERVER_PARAMETER_CHANGE
-      ARG="ACTIVITY_TRACE,ADJUDICATION_CANCELLED,AGENT_ADD_BLACKLIST_REG_LIMIT_REACHED,AGENT_ASYNC_ADD_REG_LIMIT_REACHED,AGENT_CONFIGURATION_ERROR,APPLICATION_CRASH,AGENT_DIAGNOSTICS,AGENT_ERROR_ADD_REG_LIMIT_REACHED,AGENT_EVENT,AGENT_METRIC_BLACKLIST_REG_LIMIT_REACHED,AGENT_METRIC_REG_LIMIT_REACHED,AGENT_STATUS,ALREADY_ADJUDICATED,APPDYNAMICS_DATA,APPDYNAMICS_INTERNAL_DIAGNOSTICS,APPLICATION_CONFIG_CHANGE,APPLICATION_DEPLOYMENT,APPLICATION_DISCOVERED,APPLICATION_ERROR,APP_SERVER_RESTART,AZURE_AUTO_SCALING,BACKEND_DISCOVERED,BT_DISCOVERED,BUSINESS_ERROR,CLR_CRASH,CONTROLLER_AGENT_VERSION_INCOMPATIBILITY,CONTROLLER_ASYNC_ADD_REG_LIMIT_REACHED,CONTROLLER_COLLECTIONS_ADD_REG_LIMIT_REACHED,CONTROLLER_ERROR_ADD_REG_LIMIT_REACHED,CONTROLLER_EVENT_UPLOAD_LIMIT_REACHED,CONTROLLER_MEMORY_ADD_REG_LIMIT_REACHED,CONTROLLER_METADATA_REGISTRATION_LIMIT_REACHED,CONTROLLER_METRIC_DATA_BUFFER_OVERFLOW,CONTROLLER_METRIC_REG_LIMIT_REACHED,CONTROLLER_PSD_UPLOAD_LIMIT_REACHED,CONTROLLER_RSD_UPLOAD_LIMIT_REACHED,CONTROLLER_SEP_ADD_REG_LIMIT_REACHED,CONTROLLER_STACKTRACE_ADD_REG_LIMIT_REACHED,CONTROLLER_TRACKED_OBJECT_ADD_REG_LIMIT_REACHED,CUSTOM,CUSTOM_ACTION_END,CUSTOM_ACTION_FAILED,CUSTOM_ACTION_STARTED,CUSTOM_EMAIL_ACTION_END,CUSTOM_EMAIL_ACTION_FAILED,CUSTOM_EMAIL_ACTION_STARTED,DEADLOCK,DEV_MODE_CONFIG_UPDATE,DIAGNOSTIC_SESSION,DISK_SPACE,EMAIL_ACTION_FAILED,EMAIL_SENT,EUM_CLOUD_BROWSER_EVENT,EUM_CLOUD_SYNTHETIC_BROWSER_EVENT,EUM_INTERNAL_ERROR,HTTP_REQUEST_ACTION_END,HTTP_REQUEST_ACTION_FAILED,HTTP_REQUEST_ACTION_STARTED,INFO_INSTRUMENTATION_VISIBILITY,INTERNAL_UI_EVENT,JIRA_ACTION_END,JIRA_ACTION_FAILED,JIRA_ACTION_STARTED,LICENSE,MACHINE_AGENT_LOG,MACHINE_DISCOVERED,MEMORY,MEMORY_LEAK_DIAGNOSTICS,MOBILE_CRASH_IOS_EVENT,MOBILE_CRASH_ANDROID_EVENT,NETWORK,NODE_DISCOVERED,NORMAL,OBJECT_CONTENT_SUMMARY,POLICY_CANCELED_CRITICAL,POLICY_CANCELED_WARNING,POLICY_CLOSE_CRITICAL,POLICY_CLOSE_WARNING,POLICY_CONTINUES_CRITICAL,POLICY_CONTINUES_WARNING,POLICY_DOWNGRADED,POLICY_OPEN_CRITICAL,POLICY_OPEN_WARNING,POLICY_UPGRADED,RESOURCE_POOL_LIMIT,RUNBOOK_DIAGNOSTIC_SESSION_END,RUNBOOK_DIAGNOSTIC_SESSION_FAILED,RUNBOOK_DIAGNOSTIC_SESSION_STARTED,RUN_LOCAL_SCRIPT_ACTION_END,RUN_LOCAL_SCRIPT_ACTION_FAILED,RUN_LOCAL_SCRIPT_ACTION_STARTED,SERVICE_ENDPOINT_DISCOVERED,SLOW,SMS_SENT,STALL,SYSTEM_LOG,THREAD_DUMP_ACTION_END,THREAD_DUMP_ACTION_FAILED,THREAD_DUMP_ACTION_STARTED,TIER_DISCOVERED,VERY_SLOW,WARROOM_NOTE"
-    fi;
-    PREV="${ARG}"
-    ARGS+=("${ARG}")
-  done;
-  apiCall '/controller/rest/applications/{{a}}/events?time-range-type={{t}}&duration-in-mins={{d?}}&start-time={{b?}}&end-time={{f?}}&event-types={{e}}&severities={{s}}' "${ARGS[@]}"
-}
-register event_list List all events for a given time range.
-describe event_list << EOF
-List all events for a given time range.
-EOF
-example event_list << EOF
--a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
-EOF
-analyticssearch_import() {
-  FILE="$*"
-  if [ -r "${FILE}" ] ; then
-    DATA="$(<${FILE})"
-    regex='("id" *: *[0-9]+,)'
-    if [[ ${DATA} =~ $regex ]]; then
-      DATA=${DATA/${BASH_REMATCH[0]}/}
-    fi
-    if [[ $DATA == '['* ]]
-    then
-      COMMAND_RESULT=""
-      error "File contains multiple saved searches. Please provide only a single element."
-    else
-      controller_call -X POST -d "${DATA}" '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch'
-    fi
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register analyticssearch_import Import an analytics search. Provide a json file as parameter.
-describe analyticssearch_import << EOF
-Import an analytics search. Provide a json file as parameter.
-EOF
-example analyticssearch_import << EOF
-search.json
-EOF
-recursiveSource() {
-  if [ -d "$*" ]; then
-    debug "Sourcing plugins from $*"
-    for file in $*/* ; do
-      if [ -f "$file" ] && [ "${file##*.}" == "sh" ] ; then
-        . "$file"
-      fi
-      if [ -d "$file" ] ; then
-        recursiveSource $file
-      fi
-    done
-  fi
-}
 # Helper function to expand multiple files that are provided as payload
 apiCallExpand() {
   debug "Calling apiCallExpand"
@@ -1735,20 +1730,18 @@ output() {
     echo -e "$*"
   fi
 }
-# from https://gist.github.com/cdown/1163649
-urlencode() {
-    # urlencode <string>
-    old_lc_collate=$LC_COLLATE
-    LC_COLLATE=C
-    local length="${#1}"
-    for (( i = 0; i < length; i++ )); do
-        local c="${1:i:1}"
-        case $c in
-            [a-zA-Z0-9.~_-]) printf "$c" ;;
-            *) printf '%%%02X' "'$c" ;;
-        esac
+recursiveSource() {
+  if [ -d "$*" ]; then
+    debug "Sourcing plugins from $*"
+    for file in $*/* ; do
+      if [ -f "$file" ] && [ "${file##*.}" == "sh" ] ; then
+        . "$file"
+      fi
+      if [ -d "$file" ] ; then
+        recursiveSource $file
+      fi
     done
-    LC_COLLATE=$old_lc_collate
+  fi
 }
 # Source: https://github.com/dylanaraps/pure-bash-bible#get-the-base-name-of-a-file-path
 bashBasename() {
@@ -1763,6 +1756,21 @@ httpClient() {
  fi
  debug "curl -L --connect-timeout ${TIMEOUT} $*"
  curl -L --connect-timeout ${TIMEOUT} "$@"
+}
+# from https://gist.github.com/cdown/1163649
+urlencode() {
+    # urlencode <string>
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+    LC_COLLATE=$old_lc_collate
 }
 #script_placeholder
 if [ -f "${GLOBAL_CONFIG}" ]; then
