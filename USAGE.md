@@ -168,9 +168,9 @@ Basic calls against an AppDynamics controller.
 | auth | Authenticate. | `act.sh controller auth ` |
 | status | Get the server status. This command will return a XML containing status information about the controller. | `act.sh controller status ` |
 | isup | This command will pause until the controller is up. Use this to get notified after the controller is booted successfully. | `act.sh controller isup ; act.sh application list` |
-| ping | Check the availability of an appdynamics controller. On success the response time will be provided. | `act.sh controller ping ` |
 | call | Send a custom HTTP call to an AppDynamics controller. Provide the endpoint you want to call as parameter. You can modify the http method with option -X and add payload with option -d. | `act.sh controller call /controller/rest/serverstatus` |
 | login | Check if the login with your appdynamics controller works properly. If the login fails, use `act.sh controller ping` to check if the controller is running and check your credentials if they are correct. | `act.sh controller login ` |
+| ping | Check the availability of an appdynamics controller. On success the response time will be provided. | `act.sh controller ping ` |
 | version | Get installed version from controller | `act.sh controller version ` |
 
 
@@ -200,7 +200,7 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 | list | List all collectors. No further arguments required. | `act.sh dbmon list ` |
 | queries | Get queries for a server. Requires a server id (-i), a start time (-b) and an end time (-f) as parameters. | `act.sh dbmon queries -i 2 -b 1545237000000 -f 1545238602` |
 | servers | List all servers. No further arguments required. | `act.sh dbmon servers ` |
-| create | Create a new database collector. You need to provide the following parameters:<br>/  -i name<br>/  -u user name<br>/  -h host name<br>/  -a agent name<br>/  -t type<br>/  -d database name<br>/  -p port<br>/  -s password | `act.sh dbmon create -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password` |
+| create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password | `act.sh dbmon create -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password` |
 | events | List all database agent events. This is an alias for `act.sh event list -a '_dbmon'`, so you can use the same parameters for querying the events. | `act.sh dbmon events -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT` |
 
 
@@ -208,8 +208,8 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
 | login | Login with AppDynamics to retrieve an OAUTH token for downloads. You can use the provided token for downloads from https://download.appdynamics.com/ | `act.sh download login ` |
+| get | Download an agent. You need to provide a partial name of an agent you want to download. Optionally, you can provide a directory (-d) as download location. By default only the first match is downloaded, you can provide parameter -a to download all matches. | `act.sh download get -d /tmp golang` |
 | list | List agent files. You can provide a filter (-f) to filter for specific agent files. Or you can provide a search query (-s) to execute . Provide parameter -d to get the full download path | `act.sh download list -d -f golang` |
 | versionlist |  | `act.sh download versionlist ` |
 
@@ -222,13 +222,13 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| source | Load environment variables | `act.sh environment source myaccount` |
 | get | Retrieve an environment. Provide the name of the environment as parameter. | `act.sh environment get myaccount` |
 | delete | Delete an environment. Provide the name of the environment as parameter. | `act.sh environment delete myaccount` |
-| export | Export an environment into a postman environment | `act.sh environment export > output.json` |
-| source | Load environment variables | `act.sh environment source myaccount` |
 | add | Add a new environment. To change the default environment, run with `-d` | `act.sh environment add -d` |
-| edit |  | `act.sh environment edit myaccount` |
 | list | List all your environments | `act.sh environment list ` |
+| export | Export an environment into a postman environment | `act.sh environment export > output.json` |
+| edit |  | `act.sh environment edit myaccount` |
 
 
 ## eum
@@ -278,8 +278,8 @@ Configure and retrieve health rules and their violates.
 | get | Get a healthrule. Provide an application (-a) and a health rule name (-n) as parameters. | `act.sh healthrule get -a 29` |
 | list | List all healthrules. Provide an application (-a) as parameter | `act.sh healthrule list -a 29` |
 | violations | Get all healthrule violations. Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f) | `act.sh healthrule violations -a 29 -t BEFORE_NOW -d 120` |
-| list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").<br>/If you provide ("-n") only the named health rule will be copied. | `act.sh healthrule list -a 29` |
 | import | Import a health rule. |  |
+| list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. | `act.sh healthrule list -a 29` |
 
 
 ## licenserule

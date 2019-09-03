@@ -6,7 +6,8 @@ controller_login() {
   debug "Login at ${CONFIG_CONTROLLER_HOST} with ${CONFIG_CONTROLLER_CREDENTIALS}"
   LOGIN_RESPONSE=$(httpClient -sI -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login")
   debug "RESPONSE: ${LOGIN_RESPONSE}"
-  if [[ "${LOGIN_RESPONSE/200 OK}" != "${LOGIN_RESPONSE}" ]]; then
+  # The section option is for supporting HTTP2 (#12)
+  if [[ "${LOGIN_RESPONSE/200 OK}" != "${LOGIN_RESPONSE}" ]] || [[ "${LOGIN_RESPONSE/HTTP\/2 200}" != "${LOGIN_RESPONSE}" ]]; then
     COMMAND_RESULT="Controller Login Successful"
     CONTROLLER_LOGIN_STATUS=1
   else
