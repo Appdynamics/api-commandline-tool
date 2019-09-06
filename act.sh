@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="2ab19c1b5c4353f24b90b75d18b929d11f99db0b"
+ACT_LAST_COMMIT="d38ee322bce61effda9869d2636aabfcded75776"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -277,8 +277,10 @@ rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
 doc server << EOF
 List servers, their properties and metrics
 EOF
+server_delete() { apiCall -X DELETE '/controller/sim/v2/user/machines/deleteMachines?ids={{m:machine}}' "$@" ; }
+rde server_delete "Delete a machine." "Provide a machine id (-m) as parameter." "-m 244"
 server_get() { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
-rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-i 244"
+rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 244"
 server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
 rde server_list "List all machines." "No additional argument required." ""
 doc snapshot << EOF

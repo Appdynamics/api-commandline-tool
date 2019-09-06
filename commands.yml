@@ -511,7 +511,7 @@ server:
   get:
     title: Get a machine.
     description: Provide a machine id (-m) as parameter.
-    example: -i 244
+    example: -m 244
     method: GET
     endpoint: /controller/sim/v2/user/machines/{{m:machine}}
   list:
@@ -520,6 +520,12 @@ server:
     example:
     method: GET
     endpoint: /controller/sim/v2/user/machines
+  delete:
+    title: Delete a machine.
+    description: Provide a machine id (-m) as parameter.
+    example: -m 244
+    method: DELETE
+    endpoint: /controller/sim/v2/user/machines/deleteMachines?ids={{m:machine}}
 snapshot:
   title: Snapshot API
   description: List APM snapshots.

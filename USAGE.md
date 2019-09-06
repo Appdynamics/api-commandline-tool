@@ -369,7 +369,8 @@ List servers, their properties and metrics
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -i 244` |
+| delete | Delete a machine. Provide a machine id (-m) as parameter. | `act.sh server delete -m 244` |
+| get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -m 244` |
 | list | List all machines. No additional argument required. | `act.sh server list ` |
 
 
