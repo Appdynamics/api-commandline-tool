@@ -2128,6 +2128,36 @@
 						},
             "description": "No additional argument required."
 					}
+				},{
+					"name": "Query a machineagent by hostname",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"filter\":{\"appIds\":[],\"nodeIds\":[],\"tierIds\":[],\"types\":[\"PHYSICAL\",\"CONTAINER_AWARE\"],\"timeRangeStart\":0,\"timeRangeEnd\":0},\"search\":{\"query\":\"{{machine}}\"},\"sorter\":{\"field\":\"HEALTH\",\"direction\":\"ASC\"}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/sim/v2/user/machines/keys",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","sim","v2","user","machines","keys"],
+              "query": []
+						},
+            "description": "provide a machine name (-m) as parameter"
+					}
 				}]},{"name": "snapshot","item": [{
 					"name": "Retrieve a list of snapshots",
 					"request": {

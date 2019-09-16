@@ -372,6 +372,7 @@ List servers, their properties and metrics
 | delete | Delete a machine. Provide a machine id (-m) as parameter. | `act.sh server delete -m 244` |
 | get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -m 244` |
 | list | List all machines. No additional argument required. | `act.sh server list ` |
+| query | Query a machineagent by hostname provide a machine name (-m) as parameter | `act.sh server query -m Myserver or if you want to query your own name -m NEUMANNS-M-55CU on Linux` |
 
 
 ## snapshot
@@ -421,8 +422,8 @@ Import and export transaction detection rules.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| export | Export transaction detection rules. Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection export -a 29 -t custom -e servlet` |
-| import | Import transaction detection rules. Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection import -a 29 -t custom -e servlet -d @rules.xml` |
+| export | Export transaction detection rules. Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection export -a 29 -r custom -e servlet` |
+| import | Import transaction detection rules. Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter. | `act.sh transactiondetection import -a 29 -r custom -e servlet -d @rules.xml` |
 
 
 ## user

@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="d38ee322bce61effda9869d2636aabfcded75776"
+ACT_LAST_COMMIT="b3062d500688550286c148bd133eff0cfbaa0086"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -283,6 +283,8 @@ server_get() { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
 rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 244"
 server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
 rde server_list "List all machines." "No additional argument required." ""
+server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m NEUMANNS-M-55CU on Linux"
 doc snapshot << EOF
 List APM snapshots.
 EOF
@@ -312,9 +314,9 @@ doc transactiondetection << EOF
 Import and export transaction detection rules.
 EOF
 transactiondetection_export() { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
-rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet"
+rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet"
 transactiondetection_import() { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
-rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -t custom -e servlet -d @rules.xml"
+rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet -d @rules.xml"
 doc user << EOF
 Create and Modify AppDynamics Users.
 EOF
