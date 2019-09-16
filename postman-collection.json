@@ -1768,6 +1768,36 @@
 						},
             "description": "Provide a comma separated list of node ids."
 					}
+				},{
+					"name": "Move node.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}https://achim.saas.appdynamics.com/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": [https:","","achim.saas.appdynamics.com","controller","restui","nodeUiService","moveNode","{{node}}","{{tier}}"],
+              "query": []
+						},
+            "description": "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier."
+					}
 				}]},{"name": "policy","item": [{
 					"name": "List all policies.",
 					"request": {

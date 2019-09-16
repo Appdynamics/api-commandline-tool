@@ -437,6 +437,12 @@ node:
     example: -n 45,46
     method: POST
     endpoint: /controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}
+  move:
+    title: Move node.
+    description: Provide a node id (-n) and a tier id (-t) to move the given node to the given tier.
+    example: -n 1782418 -t 187811
+    method: POST
+    endpoint: https://achim.saas.appdynamics.com/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}
 policy:
   title: Policies API
   description: Import and export policies

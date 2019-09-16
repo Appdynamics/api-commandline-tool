@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="b3062d500688550286c148bd133eff0cfbaa0086"
+ACT_LAST_COMMIT="5d1bfd4b6b22f48e711b12c5767aa0fbd4eb8608"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -244,6 +244,8 @@ node_list() { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$
 rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
 node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
+node_move() { apiCall -X POST 'https://achim.saas.appdynamics.com/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
+rde node_move "Move node." "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier." "-n 1782418 -t 187811"
 doc policy << EOF
 Import and export policies
 EOF

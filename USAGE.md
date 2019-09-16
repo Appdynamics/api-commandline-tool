@@ -320,6 +320,7 @@ Retrieve nodes within a business application
 | get | Get a node. Provide the application (-a) and the node (-n) as parameters | `act.sh node get -a 29 -n 45` |
 | list | List all nodes. Provide the application id as parameter (-a). | `act.sh node list -a 29` |
 | markhistorical | Mark nodes as historical. Provide a comma separated list of node ids. | `act.sh node markhistorical -n 45,46` |
+| move | Move node. Provide a node id (-n) and a tier id (-t) to move the given node to the given tier. | `act.sh node move -n 1782418 -t 187811` |
 
 
 ## policy
