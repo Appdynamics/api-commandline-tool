@@ -526,6 +526,13 @@ server:
     example: -m 244
     method: DELETE
     endpoint: /controller/sim/v2/user/machines/deleteMachines?ids={{m:machine}}
+  query:
+    title: Query a machineagent by hostname
+    description: provide a machine name (-m) as parameter
+    example: -m Myserver or if you want to query your own name -m $HOSTNAME on Linux
+    method: POST
+    endpoint: /controller/sim/v2/user/machines/keys
+    payload: {\"filter\":{\"appIds\":[],\"nodeIds\":[],\"tierIds\":[],\"types\":[\"PHYSICAL\",\"CONTAINER_AWARE\"],\"timeRangeStart\":0,\"timeRangeEnd\":0},\"search\":{\"query\":\"{{m:machine}}\"},\"sorter\":{\"field\":\"HEALTH\",\"direction\":\"ASC\"}}
 snapshot:
   title: Snapshot API
   description: List APM snapshots.
