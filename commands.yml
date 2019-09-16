@@ -601,13 +601,13 @@ transactiondetection:
   export:
     title: Export transaction detection rules.
     description: Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter.
-    example: -a 29 -t custom -e servlet
+    example: -a 29 -r custom -e servlet
     method: GET
     endpoint: /controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}
   import:
     title: Import transaction detection rules.
     description: Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter.
-    example: -a 29 -t custom -e servlet -d @rules.xml
+    example: -a 29 -r custom -e servlet -d @rules.xml
     method: POST
     endpoint: /controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}
     form: file={{d:transaction_detection_rules}}
