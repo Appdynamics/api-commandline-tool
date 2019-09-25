@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="5d1bfd4b6b22f48e711b12c5767aa0fbd4eb8608"
+ACT_LAST_COMMIT="2a009f56a1bd3fb23628dd2a10dffeed042106fa"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -276,6 +276,8 @@ List service endpoints
 EOF
 sep_list() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
 rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
+sep_update() { apiCall -X POST '/controller/api/accounts/{{i:accountid}}/applications/{a:application}/sep' "$@" ; }
+rde sep_update "Insert or Update SEPs." "Provide an application id (-a) and a jason string or a @file (-d) as parameter." "-a 29 -d @examples/sep.json"
 doc server << EOF
 List servers, their properties and metrics
 EOF

@@ -511,6 +511,12 @@ sep:
     description: Provide an application id (-a).
     example: -a 29
     endpoint: /controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep
+  update:
+    title: Insert or Update SEPs.
+    description: Provide an application id (-a) and a jason string or a @file (-d) as parameter.
+    example: -a 29 -d @examples/sep.json
+    method: POST
+    endpoint: /controller/api/accounts/{{i:accountid}}/applications/{a:application}/sep
 server:
   title: Server & Infrastructure Monitoring API
   description: List servers, their properties and metrics

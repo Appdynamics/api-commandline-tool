@@ -2068,6 +2068,36 @@
 						},
             "description": "Provide an application id (-a)."
 					}
+				},{
+					"name": "Insert or Update SEPs.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/api/accounts/{{i:accountid}}/applications/{a:application}/sep",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","api","accounts","{{accountid}}","applications","{a:application}","sep"],
+              "query": []
+						},
+            "description": "Provide an application id (-a) and a jason string or a @file (-d) as parameter."
+					}
 				}]},{"name": "server","item": [{
 					"name": "Delete a machine.",
 					"request": {
