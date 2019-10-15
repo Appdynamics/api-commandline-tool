@@ -121,6 +121,15 @@ analyticsmetric:
     method: POST
     endpoint: /controller/restui/analyticsMetric/create
     payload: {\"adqlQueryString\":\"{{q:query}}\",\"eventType\":\"{{e:eventType}}\",\"enabled\":true,\"queryType\":\"ADQL_QUERY\",\"queryName\":\"{{n:queryname}}\",\"queryDescription\":\"{{d:querydescription?}}\"}
+analyticsschema:
+  title: Analytics Schemas
+  description: These commands allow you to manage analytics schemas.
+  list:
+    title: List all analytics schemas.
+    description: This command requires no further arguments
+    example:
+    method: GET
+    endpoint: /controller/restui/analytics/schema
 audit:
   title: Controller Audit History
   description: The Controller audit history is a record of the configuration and user activities in the Controller configuration.

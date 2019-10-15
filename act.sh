@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="2a009f56a1bd3fb23628dd2a10dffeed042106fa"
+ACT_LAST_COMMIT="4b1db5aa618d4a3cccd93e11360660b38e53a2eb"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -95,6 +95,11 @@ Manage custom analytics metrics
 EOF
 analyticsmetric_create() { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
 rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+analyticsschema_list() { apiCall '/controller/restui/analytics/schema' "$@" ; }
+rde analyticsschema_list "List all analytics schemas." "This command requires no further arguments" ""
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF

@@ -268,6 +268,36 @@
 						},
             "description": "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional."
 					}
+				}]},{"name": "analyticsschema","item": [{
+					"name": "List all analytics schemas.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analytics/schema",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analytics","schema"],
+              "query": []
+						},
+            "description": "This command requires no further arguments"
+					}
 				}]},{"name": "analyticssearch","item": [{
 					"name": "Get an analytics search by id.",
 					"request": {
