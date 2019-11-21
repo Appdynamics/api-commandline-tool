@@ -298,6 +298,7 @@ Configure and retrieve health rules and their violates.
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | create | Create a license rule. Provide a json string or a @file (-d) as parameter. | `act.sh licenserule create -d examples/licenserule.json` |
+| detailview | Get detail view for a license rule Provide a license id (-l) as parameter. | `act.sh licenserule detailview -l ff0fb8ff-d2ef-446d-83bd-8f8e5b8c0d20` |
 | list | List all license rules. This command requires no further arguments | `act.sh licenserule list ` |
 
 

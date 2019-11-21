@@ -409,6 +409,13 @@ licenserule:
     example: -d examples/licenserule.json
     method: POST
     endpoint: /controller/mds/v1/license/rules
+  detailview:
+    title: Get detail view for a license rule
+    description: Provide a license id (-l) as parameter.
+    example: -l ff0fb8ff-d2ef-446d-83bd-8f8e5b8c0d20
+    method: POST
+    endpoint: /controller/restui/licenseRule/getApmLicenseRuleDetailViewData/{{l:licenserule}}
+    payload: {\"type\":\"BEFORE_NOW\",\"durationInMinutes\":60}
 logsources:
   title: Log Analytics Configuration
   descripion: API to manage log analytics sources

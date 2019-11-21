@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="8706c0b89707ebdc36628a80aeedcd32d3336c0b"
+ACT_LAST_COMMIT="5a6d252f76898b17bc683271831c6e1ff8d4bc83"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -232,6 +232,8 @@ doc licenserule << EOF
 EOF
 licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ; }
 rde licenserule_create "Create a license rule." "Provide a json string or a @file (-d) as parameter." "-d examples/licenserule.json"
+licenserule_detailview() { apiCall -X POST -d '{"type":"BEFORE_NOW","durationInMinutes":60}' '/controller/restui/licenseRule/getApmLicenseRuleDetailViewData/{{l:licenserule}}' "$@" ; }
+rde licenserule_detailview "Get detail view for a license rule" "Provide a license id (-l) as parameter." "-l ff0fb8ff-d2ef-446d-83bd-8f8e5b8c0d20"
 licenserule_list() { apiCall '/controller/mds/v1/license/rules' "$@" ; }
 rde licenserule_list "List all license rules." "This command requires no further arguments" ""
 doc logsources << EOF

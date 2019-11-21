@@ -1619,6 +1619,36 @@
             "description": "Provide a json string or a @file (-d) as parameter."
 					}
 				},{
+					"name": "Get detail view for a license rule",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"type\":\"BEFORE_NOW\",\"durationInMinutes\":60}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/licenseRule/getApmLicenseRuleDetailViewData/{{l:licenserule}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","licenseRule","getApmLicenseRuleDetailViewData","{{licenserule}}"],
+              "query": []
+						},
+            "description": "Provide a license id (-l) as parameter."
+					}
+				},{
 					"name": "List all license rules.",
 					"request": {
 						"method": "GET",
