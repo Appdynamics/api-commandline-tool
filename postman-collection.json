@@ -2039,6 +2039,36 @@
             "description": "This command requires no further arguments."
 					}
 				}]},{"name": "scope","item": [{
+					"name": "Create a new scope.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{scope_definition}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/transactionConfigProto/createScope?applicationId={{a:application}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","transactionConfigProto","createScope"],
+              "query": [{"key": "applicationId","value": "{{application}}"}]
+						},
+            "description": "Provide an application id (-a) as parameter"
+					}
+				},{
 					"name": "List all scopes.",
 					"request": {
 						"method": "GET",

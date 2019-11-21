@@ -512,6 +512,13 @@ scope:
     example: -a 25
     method: GET
     endpoint: /controller/restui/transactionConfigProto/getScopes/{{a:application}}
+  create:
+    title: Create a new scope.
+    description: Provide an application id (-a) as parameter
+    example -a 25 -d @scope.json
+    method: POST
+    endpoint: /controller/restui/transactionConfigProto/createScope?applicationId={{a:application}}
+    payload: {{d:scope_definition}}
 sep:
   title: Service Endpoints
   description: List service endpoints

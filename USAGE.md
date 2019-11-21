@@ -361,6 +361,7 @@ Manage scopes for instrumentation
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| create | Create a new scope. Provide an application id (-a) as parameter | `act.sh scope create ` |
 | list | List all scopes. Provide an application id (-a) as parameter | `act.sh scope list -a 25` |
 
 

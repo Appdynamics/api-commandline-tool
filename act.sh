@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="4b1db5aa618d4a3cccd93e11360660b38e53a2eb"
+ACT_LAST_COMMIT="8706c0b89707ebdc36628a80aeedcd32d3336c0b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -274,6 +274,8 @@ rde sam_list "List monitors." "This command requires no further arguments." ""
 doc scope << EOF
 Manage scopes for instrumentation
 EOF
+scope_create() { apiCall -X POST -d '{{d:scope_definition}}' '/controller/restui/transactionConfigProto/createScope?applicationId={{a:application}}' "$@" ; }
+rde scope_create "Create a new scope." "Provide an application id (-a) as parameter" ""
 scope_list() { apiCall '/controller/restui/transactionConfigProto/getScopes/{{a:application}}' "$@" ; }
 rde scope_list "List all scopes." "Provide an application id (-a) as parameter" "-a 25"
 doc sep << EOF
