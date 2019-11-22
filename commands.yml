@@ -101,16 +101,29 @@ analyticssearch:
   description: These commands allow you to import and export email/http saved analytics searches.
   get:
     title: Get an analytics search by id.
-    description: Provide the id as parameter (-i)
+    description: Provide the id as parameter (-i).
     example: -i 6
     method: GET
     endpoint: /controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}
   list:
     title: List all analytics searches.
-    description: This command requires no further arguments
+    description: This command requires no further arguments.
     example:
     method: GET
     endpoint: /controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches
+  delete:
+    title: Delete an analytics search by id.
+    description: Provide the id as parameter (-i).
+    example: -i 6
+    method: POST
+    endpoint: /controller/restui/analyticsSavedSearches/deleteAnalyticsSavedSearch/{{i:analytics_search_id}}
+  import:
+    title: Import an analytics search.
+    description: Provide a json string or a file (with @ as prefix) as parameter (-d).
+    example: -d search.json
+    method: POST
+    endpoint: /controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch
+    payload: {{d:analytics_search}}
 analyticsmetric:
   title: Analytics metrics
   description: Manage custom analytics metrics

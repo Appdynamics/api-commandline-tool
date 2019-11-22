@@ -96,9 +96,10 @@ These commands allow you to import and export email/http saved analytics searche
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| get | Get an analytics search by id. Provide the id as parameter (-i) | `act.sh analyticssearch get -i 6` |
-| list | List all analytics searches. This command requires no further arguments | `act.sh analyticssearch list ` |
-| import | Import an analytics search. Provide a json file as parameter. | `act.sh analyticssearch import search.json` |
+| delete | Delete an analytics search by id. Provide the id as parameter (-i). | `act.sh analyticssearch delete -i 6` |
+| get | Get an analytics search by id. Provide the id as parameter (-i). | `act.sh analyticssearch get -i 6` |
+| import | Import an analytics search. Provide a json string or a file (with @ as prefix) as parameter (-d). | `act.sh analyticssearch import -d search.json` |
+| list | List all analytics searches. This command requires no further arguments. | `act.sh analyticssearch list ` |
 
 
 ## application

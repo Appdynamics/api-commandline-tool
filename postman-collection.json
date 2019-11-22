@@ -299,6 +299,36 @@
             "description": "This command requires no further arguments"
 					}
 				}]},{"name": "analyticssearch","item": [{
+					"name": "Delete an analytics search by id.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/deleteAnalyticsSavedSearch/{{i:analytics_search_id}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analyticsSavedSearches","deleteAnalyticsSavedSearch","{{analytics_search_id}}"],
+              "query": []
+						},
+            "description": "Provide the id as parameter (-i)."
+					}
+				},{
 					"name": "Get an analytics search by id.",
 					"request": {
 						"method": "GET",
@@ -326,7 +356,37 @@
 							"path": ["controller","restui","analyticsSavedSearches","getAnalyticsSavedSearchById","{{analytics_search_id}}"],
               "query": []
 						},
-            "description": "Provide the id as parameter (-i)"
+            "description": "Provide the id as parameter (-i)."
+					}
+				},{
+					"name": "Import an analytics search.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{analytics_search}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","analyticsSavedSearches","createAnalyticsSavedSearch"],
+              "query": []
+						},
+            "description": "Provide a json string or a file (with @ as prefix) as parameter (-d)."
 					}
 				},{
 					"name": "List all analytics searches.",
@@ -356,7 +416,7 @@
 							"path": ["controller","restui","analyticsSavedSearches","getAllAnalyticsSavedSearches"],
               "query": []
 						},
-            "description": "This command requires no further arguments"
+            "description": "This command requires no further arguments."
 					}
 				}]},{"name": "application","item": [{
 					"name": "Create a new application.",

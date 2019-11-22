@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="5a6d252f76898b17bc683271831c6e1ff8d4bc83"
+ACT_LAST_COMMIT="6630a07da02f01b8a872b194aba2f3927ef35c8d"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -103,10 +103,14 @@ rde analyticsschema_list "List all analytics schemas." "This command requires no
 doc analyticssearch << EOF
 These commands allow you to import and export email/http saved analytics searches.
 EOF
+analyticssearch_delete() { apiCall -X POST '/controller/restui/analyticsSavedSearches/deleteAnalyticsSavedSearch/{{i:analytics_search_id}}' "$@" ; }
+rde analyticssearch_delete "Delete an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
 analyticssearch_get() { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
-rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)" "-i 6"
+rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
+analyticssearch_import() { apiCall -X POST -d '{{d:analytics_search}}' '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch' "$@" ; }
+rde analyticssearch_import "Import an analytics search." "Provide a json string or a file (with @ as prefix) as parameter (-d)." "-d search.json"
 analyticssearch_list() { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
-rde analyticssearch_list "List all analytics searches." "This command requires no further arguments" ""
+rde analyticssearch_list "List all analytics searches." "This command requires no further arguments." ""
 doc application << EOF
 The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
 EOF
@@ -1489,33 +1493,6 @@ List all events for a given time range.
 EOF
 example event_list << EOF
 -a 15 -t BEFORE_NOW -d 60 -s ALL -e ALL
-EOF
-analyticssearch_import() {
-  FILE="$*"
-  if [ -r "${FILE}" ] ; then
-    DATA="$(<${FILE})"
-    regex='("id" *: *[0-9]+,)'
-    if [[ ${DATA} =~ $regex ]]; then
-      DATA=${DATA/${BASH_REMATCH[0]}/}
-    fi
-    if [[ $DATA == '['* ]]
-    then
-      COMMAND_RESULT=""
-      error "File contains multiple saved searches. Please provide only a single element."
-    else
-      controller_call -X POST -d "${DATA}" '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch'
-    fi
-  else
-    COMMAND_RESULT=""
-    error "File not found or not readable: $FILE"
-  fi
-}
-register analyticssearch_import Import an analytics search. Provide a json file as parameter.
-describe analyticssearch_import << EOF
-Import an analytics search. Provide a json file as parameter.
-EOF
-example analyticssearch_import << EOF
-search.json
 EOF
 recursiveSource() {
   if [ -d "$*" ]; then
