@@ -26,6 +26,13 @@ action:
     method: POST
     endpoint: /controller/restui/policy/deleteActions
     payload: [{{i:action_id}}]
+  create:
+    Title: Create an action.
+    description: Provide a json string or a file (with @ as prefix) as parameter (-d)
+    example: -d @actions.json
+    method: POST
+    endpoint: /controller/restui/httpaction/createHttpRequestAction
+    payload: {{d:actions}}
 account:
   title: Account API
   description: Query the Account API
