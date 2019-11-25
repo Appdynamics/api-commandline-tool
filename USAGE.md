@@ -374,7 +374,7 @@ List service endpoints
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | list | List all SEPs. Provide an application id (-a). | `act.sh sep list -a 29` |
-| update | Insert or Update SEPs. Provide an application id (-a) and a jason string or a @file (-d) as parameter. | `act.sh sep update -a 29 -d @examples/sep.json` |
+| update | Insert or Update SEPs. Provide an application id (-a) and a json string or a @file (-d) as parameter. | `act.sh sep update -a 29 -d @examples/sep.json` |
 
 
 ## server

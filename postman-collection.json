@@ -2236,17 +2236,17 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{{sep_json}}"
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/api/accounts/{{i:accountid}}/applications/{a:application}/sep",
+							"raw": "{{controller_host}}/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","api","accounts","{{accountid}}","applications","{a:application}","sep"],
+							"path": ["controller","api","accounts","{{accountid}}","applications","{{application}}","sep"],
               "query": []
 						},
-            "description": "Provide an application id (-a) and a jason string or a @file (-d) as parameter."
+            "description": "Provide an application id (-a) and a json string or a @file (-d) as parameter."
 					}
 				}]},{"name": "server","item": [{
 					"name": "Delete a machine.",
