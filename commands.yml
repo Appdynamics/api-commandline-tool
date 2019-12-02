@@ -93,6 +93,12 @@ actiontemplate:
     example: -t httprequest
     method: GET
     endpoint: /controller/actiontemplate/{{t:action_template_type}}/
+  exportHttpActionPlanList:
+    title: Export the Http Action Plan List
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/restui/httpaction/getHttpRequestActionPlanList
 adql:
   title: Run ADQL Queries
   description: These commands allow you to run ADQL queries agains the controller (not the event service!)
