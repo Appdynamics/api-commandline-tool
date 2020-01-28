@@ -1943,7 +1943,7 @@
               "host": [
 								"{{controller_host}}"
 							],
-							"path": [https:","","achim.saas.appdynamics.com","controller","restui","nodeUiService","moveNode","{{node}}","{{tier}}"],
+							"path": ["https:","achim.saas.appdynamics.com","controller","restui","nodeUiService","moveNode","{{node}}","{{tier}}"],
               "query": []
 						},
             "description": "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier."
