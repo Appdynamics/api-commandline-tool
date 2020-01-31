@@ -238,6 +238,36 @@
 						},
             "description": "Provide the type (-t email or httprequest) as parameter."
 					}
+				},{
+					"name": "Export the Http Action Plan List",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/httpaction/getHttpRequestActionPlanList",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","httpaction","getHttpRequestActionPlanList"],
+              "query": []
+						},
+            "description": "This command requires no further arguments."
+					}
 				}]},{"name": "adql","item": [{
 					"name": "Run an ADQL query",
 					"request": {
@@ -1939,11 +1969,11 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}https://achim.saas.appdynamics.com/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}",
+							"raw": "{{controller_host}}/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["https:","achim.saas.appdynamics.com","controller","restui","nodeUiService","moveNode","{{node}}","{{tier}}"],
+							"path": ["controller","restui","nodeUiService","moveNode","{{node}}","{{tier}}"],
               "query": []
 						},
             "description": "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier."

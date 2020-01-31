@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="fc19e825855dc13921e014f700f2c63adbfc3b5b"
+ACT_LAST_COMMIT="c3a1118a71fce876b65fe56b9e71ba790ea97c75"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -87,6 +87,8 @@ actiontemplate_createmediatype() { apiCall -X POST -d '{"name":"{{n:media_type_n
 rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
 actiontemplate_export() { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
 rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+actiontemplate_exportHttpActionPlanList() { apiCall '/controller/restui/httpaction/getHttpRequestActionPlanList' "$@" ; }
+rde actiontemplate_exportHttpActionPlanList "Export the Http Action Plan List" "This command requires no further arguments." ""
 doc adql << EOF
 These commands allow you to run ADQL queries agains the controller (not the event service!)
 EOF
@@ -257,7 +259,7 @@ node_list() { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$
 rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
 node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
-node_move() { apiCall -X POST 'https://achim.saas.appdynamics.com/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
+node_move() { apiCall -X POST '/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
 rde node_move "Move node." "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier." "-n 1782418 -t 187811"
 doc policy << EOF
 Import and export policies

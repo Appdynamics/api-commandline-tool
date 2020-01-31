@@ -59,6 +59,7 @@ These commands allow you to import and export email/http action templates. A com
 | ------- | ----------- | ------- |
 | createmediatype | Create a custom media type. Provide the name of the media type as parameter (-n) | `act.sh actiontemplate createmediatype -n 'application/vnd.appd.events+json'` |
 | export | Export all templates of a given type. Provide the type (-t email or httprequest) as parameter. | `act.sh actiontemplate export -t httprequest` |
+| exportHttpActionPlanList | Export the Http Action Plan List This command requires no further arguments. | `act.sh actiontemplate exportHttpActionPlanList ` |
 | delete | Delete an action template. Provide an id (-i) and a type (-t) as parameters. |  |
 | import | Import an action template of a given type (email, httprequest) | `act.sh actiontemplate import template.json` |
 | list | List all actiontemplates. Provide a type (-t) as parameter. |  |
