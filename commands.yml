@@ -289,6 +289,13 @@ dbmon:
     example: -c 17
     method: GET
     endpoint: /controller/rest/databases/collectors/{{c:database_collector}}
+  update:
+    title: Update a specific collector.
+    description: Provide a json string or a @file (-d) as parameter.
+    example: -d @collector.json
+    method: POST
+    endpoint: /controller/rest/databases/collectors/update
+    payload: {{d:database_collector_update_definition}}
   delete:
     title: Delete multiple collectors.
     description: Provide a comma seperated list of collector analyticsSavedSearches

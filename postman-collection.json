@@ -1468,6 +1468,36 @@
 						},
             "description": "No further arguments required."
 					}
+				},{
+					"name": "Update a specific collector.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{database_collector_update_definition}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/rest/databases/collectors/update",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","rest","databases","collectors","update"],
+              "query": []
+						},
+            "description": "Provide a json string or a @file (-d) as parameter."
+					}
 				}]},{"name": "event","item": [{
 					"name": "Create an event.",
 					"request": {

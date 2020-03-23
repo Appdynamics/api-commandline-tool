@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="c3a1118a71fce876b65fe56b9e71ba790ea97c75"
+ACT_LAST_COMMIT="91179b9156d77853cf0dda9358fcdbc10ac3e4dd"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -208,6 +208,8 @@ dbmon_queries() { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}
 rde dbmon_queries "Get queries for a server." "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters." "-i 2 -b 1545237000000 -f 1545238602"
 dbmon_servers() { apiCall '/controller/rest/databases/servers' "$@" ; }
 rde dbmon_servers "List all servers." "No further arguments required." ""
+dbmon_update() { apiCall -X POST -d '{{d:database_collector_update_definition}}' '/controller/rest/databases/collectors/update' "$@" ; }
+rde dbmon_update "Update a specific collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
 doc event << EOF
 Create and list events in your business applications.
 EOF

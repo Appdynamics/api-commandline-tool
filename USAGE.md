@@ -212,6 +212,7 @@ Use the Database Visibility API to get, create, update, and delete Database Visi
 | list | List all collectors. No further arguments required. | `act.sh dbmon list ` |
 | queries | Get queries for a server. Requires a server id (-i), a start time (-b) and an end time (-f) as parameters. | `act.sh dbmon queries -i 2 -b 1545237000000 -f 1545238602` |
 | servers | List all servers. No further arguments required. | `act.sh dbmon servers ` |
+| update | Update a specific collector. Provide a json string or a @file (-d) as parameter. | `act.sh dbmon update -d @collector.json` |
 | create | Create a new database collector. You need to provide the following parameters:"<br>"/  -i name"<br>"/  -u user name"<br>"/  -h host name"<br>"/  -a agent name"<br>"/  -t type"<br>"/  -d database name"<br>"/  -p port"<br>"/  -s password | `act.sh dbmon create -i MyTestDB -h localhost -n db -u user -a "Default Database Agent" -t DB2 -p 1555 -s password` |
 | events | List all database agent events. This is an alias for `act.sh event list -a '_dbmon'`, so you can use the same parameters for querying the events. | `act.sh dbmon events -t BEFORE_NOW -d 60 -s INFO,WARN,ERROR -e AGENT_EVENT` |
 
