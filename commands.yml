@@ -42,6 +42,26 @@ account:
     example:
     method: GET
     endpoint: /controller/api/accounts/myaccount
+agents:
+  title: Agents API
+  description: List, Reset, Disable AppDynamics Agents
+  list:
+    title: List all agents of a specific type
+    description: Provide a type as parameter (-t). Possible types are appserver, machine, cluster.
+    method: POST
+    endpoint: /controller/restui/agents/list/{{t:type}}
+    payload: {\"requestFilter\":{\"queryParams\":{\"applicationAssociationType\":\"ALL\"},\"filters\":[]},\"resultColumns\":[],\"offset\":0,\"limit\":-1,\"searchFilters\":[],\"columnSorts\":[{\"column\":\"HOST_NAME\",\"direction\":\"ASC\"}]}
+  ids:
+    title: Get more details on agents of a specific type by providing their ids
+    description: Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster.
+    method: POST
+    endpoint: /controller/restui/agents/list/{{t:type}}/ids
+    payload: {\"requestFilter\":[{{i:ids}}],\"resultColumns\":[\"HOST_NAME\",\"AGENT_VERSION\",\"NODE_NAME\",\"COMPONENT_NAME\",\"APPLICATION_NAME\",\"DISABLED\",\"ALL_MONITORING_DISABLED\"],\"offset\":0,\"limit\":-1,\"searchFilters\":[],\"columnSorts\":[{\"column\":\"HOST_NAME\",\"direction\":\"ASC\"}]}
+  disable:
+    title: Disable an agent by id
+    description: Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter.
+    method: POST
+    endpoint: /controller/restui/agent/setting/disableAppServerAgentForNode/{{i:id}}?disableMonitoring={{m:disableMonitoring}}
 application:
   title: Application Model API
   description: The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.

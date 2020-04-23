@@ -74,6 +74,17 @@ These commands allow you to run ADQL queries agains the controller (not the even
 | query | Run an ADQL query | `act.sh adql query ` |
 
 
+## agents
+
+List, Reset, Disable AppDynamics Agents
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| disable | Disable an agent by id Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter. | `act.sh agents disable ` |
+| ids | Get more details on agents of a specific type by providing their ids Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster. | `act.sh agents ids ` |
+| list | List all agents of a specific type Provide a type as parameter (-t). Possible types are appserver, machine, cluster. | `act.sh agents list ` |
+
+
 ## analyticsmetric
 
 Manage custom analytics metrics
