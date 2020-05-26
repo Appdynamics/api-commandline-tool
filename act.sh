@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="91179b9156d77853cf0dda9358fcdbc10ac3e4dd"
+ACT_LAST_COMMIT="50c26f2f004b022d28d3dcd2cabd5cdd7dd75418"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -307,7 +307,1749 @@ rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 24
 server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
 rde server_list "List all machines." "No additional argument required." ""
 server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
-rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m NEUMANNS-M-55CU on Linux"
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux"
+doc snapshot << EOF
+List APM snapshots.
+EOF
+snapshot_list() { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
+rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+synthetic_import() { apiCallExpand -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
+rde synthetic_import "Import a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/syntheticjob.json"
+synthetic_list() { apiCall -X POST -d '{"applicationId":{{a:application}},"timeRangeString":"{{t:time_range}}"}' '/controller/restui/synthetic/schedule/getJobList' "$@" ; }
+rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
+rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
+synthetic_update() { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch' "$@" ; }
+rde synthetic_update "Update a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/updatesyntheticjob.json"
+doc tier << EOF
+List all tiers.
+EOF
+tier_get() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}' "$@" ; }
+rde tier_get "Get a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+tier_list() { apiCall '/controller/rest/applications/{{a:application}}/tiers' "$@" ; }
+rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
+tier_nodes() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
+rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+transactiondetection_export() { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet"
+transactiondetection_import() { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet -d @rules.xml"
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+user_create() { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
+user_update() { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
+doc account << EOF
+Query the Account API
+EOF
+account_my() { apiCall '/controller/api/accounts/myaccount' "$@" ; }
+rde account_my "Get details about the current account" "This command requires no further arguments." ""
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+action_create() { apiCall -X POST -d '{{d:actions}}' '/controller/restui/httpaction/createHttpRequestAction' "$@" ; }
+rde action_create "" "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @actions.json"
+action_delete() { apiCall -X POST -d '[{{i:action_id}}]' '/controller/restui/policy/deleteActions' "$@" ; }
+rde action_delete "" "Provide an action id (-i) as parameter." ""
+action_export() { apiCall '/controller/actions/{{a:application}}' "$@" ; }
+rde action_export "Export actions." "Provide an application id or name as parameter (-a)." "-a 15"
+action_import() { apiCall -X POST -F 'file={{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
+rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -d @actions.json"
+action_list() { apiCall '/controller/restui/policy/getActionsListViewData/{{a:application}}' "$@" ; }
+rde action_list "List actions." "Provide an application id or name as parameter (-a)." "-a 15"
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+actiontemplate_createmediatype() { apiCall -X POST -d '{"name":"{{n:media_type_name}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
+actiontemplate_export() { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
+rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+actiontemplate_exportHttpActionPlanList() { apiCall '/controller/restui/httpaction/getHttpRequestActionPlanList' "$@" ; }
+rde actiontemplate_exportHttpActionPlanList "Export the Http Action Plan List" "This command requires no further arguments." ""
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
+rde adql_query "Run an ADQL query" "" ""
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+analyticsmetric_create() { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
+rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+analyticsschema_list() { apiCall '/controller/restui/analytics/schema' "$@" ; }
+rde analyticsschema_list "List all analytics schemas." "This command requires no further arguments" ""
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+analyticssearch_delete() { apiCall -X POST '/controller/restui/analyticsSavedSearches/deleteAnalyticsSavedSearch/{{i:analytics_search_id}}' "$@" ; }
+rde analyticssearch_delete "Delete an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
+analyticssearch_get() { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
+rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
+analyticssearch_import() { apiCall -X POST -d '{{d:analytics_search}}' '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch' "$@" ; }
+rde analyticssearch_import "Import an analytics search." "Provide a json string or a file (with @ as prefix) as parameter (-d)." "-d search.json"
+analyticssearch_list() { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
+rde analyticssearch_list "List all analytics searches." "This command requires no further arguments." ""
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+application_create() { apiCall -X POST -d '{"name": "{{n:application_name}}", "description": "{{d:application_description?}}"}' '/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}' "$@" ; }
+rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
+application_delete() { apiCall -X POST -d '{{a:application}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
+application_export() { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}' "$@" ; }
+rde application_export "Export an application." "Provide an application id as parameter (-a)" "-a 29"
+application_get() { apiCall '/controller/rest/applications/{{a:application}}' "$@" ; }
+rde application_get "Get an application." "Provide an application id or name as parameter (-a)." "-a 15"
+application_list() { apiCall '/controller/rest/applications' "$@" ; }
+rde application_list "List all applications." "This command requires no further arguments." ""
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+audit_get() { apiCall '/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}' "$@" ; }
+rde audit_get "Get audit history." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+backend_list() { apiCall '/controller/rest/applications/{{a:application}}/backends' "$@" ; }
+rde backend_list "List all backends." "Provide the application id as parameter (-a)" "-a 29"
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+bizjourney_disable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable' "$@" ; }
+rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
+bizjourney_enable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable' "$@" ; }
+rde bizjourney_enable "Enable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
+bizjourney_import() { apiCall -X POST -d '{{d:business_journey_draft}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
+rde bizjourney_import "Import a business journey." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
+bizjourney_list() { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
+rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+bt_creategroup() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}' "$@" ; }
+rde bt_creategroup "Create a BT group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
+bt_delete() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+rde bt_delete "Delete a BT." "Provide the bt id as parameter (-b)" "-b 13"
+bt_get() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}' "$@" ; }
+rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
+bt_list() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
+rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
+bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
+rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+configuration_get() { apiCall '/controller/rest/configuration?name={{n:controller_setting_name}}' "$@" ; }
+rde configuration_get "Get a controller setting by name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
+configuration_list() { apiCall '/controller/rest/configuration' "$@" ; }
+rde configuration_list "List all controller settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
+configuration_set() { apiCall -X POST '/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}' "$@" ; }
+rde configuration_set "Set a controller setting." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+controller_auth() { apiCall '/controller/auth?action=login' "$@" ; }
+rde controller_auth "Authenticate." "" ""
+controller_status() { apiCall '/controller/rest/serverstatus' "$@" ; }
+rde controller_status "Get the server status." "This command will return a XML containing status information about the controller." ""
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+dashboard_delete() { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
+rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+dashboard_export() { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
+rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+dashboard_get() { apiCall '/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1' "$@" ; }
+rde dashboard_get "Get a dashboard." "Provide a dashboard id (-i) as parameter." "-i 2"
+dashboard_import() { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
+rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d) as parameter." "-d @examples/dashboard.json"
+dashboard_list() { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
+rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
+dashboard_update() { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the dashboard get command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+dbmon_delete() { apiCall -X POST -d '[{{c:database_collectors}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
+rde dbmon_delete "Delete multiple collectors." "Provide a comma seperated list of collector analyticsSavedSearches" "-c 17,18"
+dbmon_get() { apiCall '/controller/rest/databases/collectors/{{c:database_collector}}' "$@" ; }
+rde dbmon_get "Get a specifc collector." "Provide the collector id as parameter (-c)." "-c 17"
+dbmon_import() { apiCall -X POST -d '{{d:database_collector_definition}}' '/controller/rest/databases/collectors/create' "$@" ; }
+rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+dbmon_list() { apiCall '/controller/rest/databases/collectors' "$@" ; }
+rde dbmon_list "List all collectors." "No further arguments required." ""
+dbmon_queries() { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
+rde dbmon_queries "Get queries for a server." "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters." "-i 2 -b 1545237000000 -f 1545238602"
+dbmon_servers() { apiCall '/controller/rest/databases/servers' "$@" ; }
+rde dbmon_servers "List all servers." "No further arguments required." ""
+dbmon_update() { apiCall -X POST -d '{{d:database_collector_update_definition}}' '/controller/rest/databases/collectors/update' "$@" ; }
+rde dbmon_update "Update a specific collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+doc event << EOF
+Create and list events in your business applications.
+EOF
+event_create() { apiCall -X POST '/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}' "$@" ; }
+rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+federation_createkey() { apiCall -X POST -d '{"apiKeyName": "{{n:federation_api_key_name}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
+rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
+federation_establish() { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
+rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+flowmap_application() { apiCall '/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false' "$@" ; }
+rde flowmap_application "Get an application flowmap" "Provide an application (-a) and a time range string (-t) as parameter." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+flowmap_component() { apiCall '/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1' "$@" ; }
+rde flowmap_component "Get an component flowmap" "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter" "-c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60"
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+healthrule_disable() { apiCall -X PUT -d '{"enabled": "false"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_disable "Disable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
+healthrule_enable() { apiCall -X PUT -d '{"enabled": "true"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_enable "Enable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
+healthrule_get() { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
+rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
+healthrule_list() { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; }
+rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
+healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
+rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc licenserule << EOF
+EOF
+licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_create "Create a license rule." "Provide a json string or a @file (-d) as parameter." "-d examples/licenserule.json"
+licenserule_detailview() { apiCall -X POST -d '{"type":"BEFORE_NOW","durationInMinutes":60}' '/controller/restui/licenseRule/getApmLicenseRuleDetailViewData/{{l:licenserule}}' "$@" ; }
+rde licenserule_detailview "Get detail view for a license rule" "Provide a license id (-l) as parameter." "-l ff0fb8ff-d2ef-446d-83bd-8f8e5b8c0d20"
+licenserule_list() { apiCall '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_list "List all license rules." "This command requires no further arguments" ""
+doc logsources << EOF
+EOF
+logsources_import() { apiCall -X POST -d 'payload: {{d:logsourcerule}}' '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_import "Import a source rule." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @examples/logsources.json"
+logsources_list() { apiCall '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_list "List all sources." "This command requires no further arguments." ""
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+node_get() { apiCall '/controller/rest/applications/{{a:application}}/nodes/{{n:node}}' "$@" ; }
+rde node_get "Get a node." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
+node_list() { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$@" ; }
+rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
+node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
+rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
+node_move() { apiCall -X POST '/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
+rde node_move "Move node." "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier." "-n 1782418 -t 187811"
+doc policy << EOF
+Import and export policies
+EOF
+policy_export() { apiCall '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_export "List all policies." "Provide an application (-a) as parameter." "-a 29"
+policy_import() { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+sam_create() { apiCall -X POST -d '{"name":"{{n:name}}","description":"","protocol":"HTTP","machineId":{{i:machineId}},"configs":{"target":"{{u:url}}","pingIntervalSeconds":{{p:pingInterval}},"failureThreshold":{{f:failureThreshold}},"successThreshold":{{s:successThreshold}},"thresholdWindow":{{w:thresholdWindow}},"connectTimeoutMillis":{{c:connectTimeout}},"socketTimeoutMillis":{{t:socketTimeout}},"method":"{{m:method}}","downloadSize":{{d:downloadSize}},"followRedirects":true,"headers":[{{h:headers?}}],"body":"{{b:body?}}","validationRules":[{{v:validationRules}}]}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_create "Create a monitor." "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)" "-n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000"
+sam_delete() { apiCall -X DELETE '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+rde sam_delete "Delete a monitor" "Provide a monitor id (-i) as parameter" "-i 29"
+sam_get() { apiCall '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+rde sam_get "Get a monitor." "Provide a monitor id (-i) as parameter" "-i 29"
+sam_import() { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_import "Import a monitor." "Provide a json string or a @file (-d) as parameter." "-d @examples/sam.json"
+sam_list() { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_list "List monitors." "This command requires no further arguments." ""
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+scope_create() { apiCall -X POST -d '{{d:scope_definition}}' '/controller/restui/transactionConfigProto/createScope?applicationId={{a:application}}' "$@" ; }
+rde scope_create "Create a new scope." "Provide an application id (-a) as parameter" ""
+scope_list() { apiCall '/controller/restui/transactionConfigProto/getScopes/{{a:application}}' "$@" ; }
+rde scope_list "List all scopes." "Provide an application id (-a) as parameter" "-a 25"
+doc sep << EOF
+List service endpoints
+EOF
+sep_list() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
+sep_update() { apiCall -X POST -d '{{d:sep_json}}' '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_update "Insert or Update SEPs." "Provide an application id (-a) and a json string or a @file (-d) as parameter." "-a 29 -d @examples/sep.json"
+doc server << EOF
+List servers, their properties and metrics
+EOF
+server_delete() { apiCall -X DELETE '/controller/sim/v2/user/machines/deleteMachines?ids={{m:machine}}' "$@" ; }
+rde server_delete "Delete a machine." "Provide a machine id (-m) as parameter." "-m 244"
+server_get() { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
+rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 244"
+server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
+rde server_list "List all machines." "No additional argument required." ""
+server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux"
+doc snapshot << EOF
+List APM snapshots.
+EOF
+snapshot_list() { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
+rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+synthetic_import() { apiCallExpand -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
+rde synthetic_import "Import a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/syntheticjob.json"
+synthetic_list() { apiCall -X POST -d '{"applicationId":{{a:application}},"timeRangeString":"{{t:time_range}}"}' '/controller/restui/synthetic/schedule/getJobList' "$@" ; }
+rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
+rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
+synthetic_update() { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch' "$@" ; }
+rde synthetic_update "Update a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/updatesyntheticjob.json"
+doc tier << EOF
+List all tiers.
+EOF
+tier_get() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}' "$@" ; }
+rde tier_get "Get a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+tier_list() { apiCall '/controller/rest/applications/{{a:application}}/tiers' "$@" ; }
+rde tier_list "List all tiers for a given application." "Provide the application id as parameter (-a)." "-a 29"
+tier_nodes() { apiCall '/controller/rest/applications/{{a:application}}/tiers/{{t:tier}}/nodes' "$@" ; }
+rde tier_nodes "List nodes for a tier." "Provide the application (-a) and the tier (-t) as parameters" "-a 29 -t 45"
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+transactiondetection_export() { apiCall '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_export "Export transaction detection rules." "Provide the application (-a) and the rule type (-r) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet"
+transactiondetection_import() { apiCall -X POST -F 'file={{d:transaction_detection_rules}}' '/controller/transactiondetection/{{a:application}}/{{r:ruletype}}/{{e:entrypointtype?}}' "$@" ; }
+rde transactiondetection_import "Import transaction detection rules." "Provide the application (-a), the rule type (-r) and an xml file (with @ as prefix) containing the rules (-d) as parameters. Provide an entry point type (-e) as optional parameter." "-a 29 -r custom -e servlet -d @rules.xml"
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+user_create() { apiCall -X POST '/controller/rest/users?user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+rde user_create "Create a new user." "Provide a name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
+user_update() { apiCall -X POST '/controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}' "$@" ; }
+rde user_update "Update an existing user." "Provide an id (-i), name (-n), a display name (-d), a list of roles (-r), a password (-p) and a mail address (-m) as parameters." "-n myadmin -d Administrator -r "Account Administrator,Administrator" -p ******** -m admin@localhost"
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+doc event << EOF
+Create and list events in your business applications.
+EOF
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+doc licenserule << EOF
+EOF
+doc logsources << EOF
+EOF
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+doc policy << EOF
+Import and export policies
+EOF
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+doc sep << EOF
+List service endpoints
+EOF
+doc server << EOF
+List servers, their properties and metrics
+EOF
+doc snapshot << EOF
+List APM snapshots.
+EOF
+doc synthetic << EOF
+Create synthetic snapshots or jobs
+EOF
+doc tier << EOF
+List all tiers.
+EOF
+doc transactiondetection << EOF
+Import and export transaction detection rules.
+EOF
+doc user << EOF
+Create and Modify AppDynamics Users.
+EOF
+doc account << EOF
+Query the Account API
+EOF
+account_my() { apiCall '/controller/api/accounts/myaccount' "$@" ; }
+rde account_my "Get details about the current account" "This command requires no further arguments." ""
+doc action << EOF
+Import or export all actions in the specified application to a JSON file.
+EOF
+action_create() { apiCall -X POST -d '{{d:actions}}' '/controller/restui/httpaction/createHttpRequestAction' "$@" ; }
+rde action_create "" "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @actions.json"
+action_delete() { apiCall -X POST -d '[{{i:action_id}}]' '/controller/restui/policy/deleteActions' "$@" ; }
+rde action_delete "" "Provide an action id (-i) as parameter." ""
+action_export() { apiCall '/controller/actions/{{a:application}}' "$@" ; }
+rde action_export "Export actions." "Provide an application id or name as parameter (-a)." "-a 15"
+action_import() { apiCall -X POST -F 'file={{d:actions}}' '/controller/actions/{{a:application}}' "$@" ; }
+rde action_import "Import actions." "Provide an application id or name as parameter (-a) and a json string or a file (with @ as prefix) as parameter (-d)" "-a 15 -d @actions.json"
+action_list() { apiCall '/controller/restui/policy/getActionsListViewData/{{a:application}}' "$@" ; }
+rde action_list "List actions." "Provide an application id or name as parameter (-a)." "-a 15"
+doc actiontemplate << EOF
+These commands allow you to import and export email/http action templates. A common use pattern is exporting the commands from one controller and importing into another. Please note that the export is a list of templates and the import expects a single object, so you need to split the json inbetween.
+EOF
+actiontemplate_createmediatype() { apiCall -X POST -d '{"name":"{{n:media_type_name}}","builtIn":false}' '/controller/restui/httpaction/createHttpRequestActionMediaType' "$@" ; }
+rde actiontemplate_createmediatype "Create a custom media type." "Provide the name of the media type as parameter (-n)" "-n 'application/vnd.appd.events+json'"
+actiontemplate_export() { apiCall '/controller/actiontemplate/{{t:action_template_type}}/' "$@" ; }
+rde actiontemplate_export "Export all templates of a given type." "Provide the type (-t email or httprequest) as parameter." "-t httprequest"
+actiontemplate_exportHttpActionPlanList() { apiCall '/controller/restui/httpaction/getHttpRequestActionPlanList' "$@" ; }
+rde actiontemplate_exportHttpActionPlanList "Export the Http Action Plan List" "This command requires no further arguments." ""
+doc adql << EOF
+These commands allow you to run ADQL queries agains the controller (not the event service!)
+EOF
+adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
+rde adql_query "Run an ADQL query" "" ""
+doc analyticsmetric << EOF
+Manage custom analytics metrics
+EOF
+analyticsmetric_create() { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
+rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
+doc analyticsschema << EOF
+These commands allow you to manage analytics schemas.
+EOF
+analyticsschema_list() { apiCall '/controller/restui/analytics/schema' "$@" ; }
+rde analyticsschema_list "List all analytics schemas." "This command requires no further arguments" ""
+doc analyticssearch << EOF
+These commands allow you to import and export email/http saved analytics searches.
+EOF
+analyticssearch_delete() { apiCall -X POST '/controller/restui/analyticsSavedSearches/deleteAnalyticsSavedSearch/{{i:analytics_search_id}}' "$@" ; }
+rde analyticssearch_delete "Delete an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
+analyticssearch_get() { apiCall '/controller/restui/analyticsSavedSearches/getAnalyticsSavedSearchById/{{i:analytics_search_id}}' "$@" ; }
+rde analyticssearch_get "Get an analytics search by id." "Provide the id as parameter (-i)." "-i 6"
+analyticssearch_import() { apiCall -X POST -d '{{d:analytics_search}}' '/controller/restui/analyticsSavedSearches/createAnalyticsSavedSearch' "$@" ; }
+rde analyticssearch_import "Import an analytics search." "Provide a json string or a file (with @ as prefix) as parameter (-d)." "-d search.json"
+analyticssearch_list() { apiCall '/controller/restui/analyticsSavedSearches/getAllAnalyticsSavedSearches' "$@" ; }
+rde analyticssearch_list "List all analytics searches." "This command requires no further arguments." ""
+doc application << EOF
+The applications API lets you retrieve information about the monitored environment as modeled in AppDynamics.
+EOF
+application_create() { apiCall -X POST -d '{"name": "{{n:application_name}}", "description": "{{d:application_description?}}"}' '/controller/restui/allApplications/createApplication?applicationType={{t:application_type}}' "$@" ; }
+rde application_create "Create a new application." "Provide a name and a type (APM or WEB) as parameter." "-t APM -n MyNewApplication"
+application_delete() { apiCall -X POST -d '{{a:application}}' '/controller/restui/allApplications/deleteApplication' "$@" ; }
+rde application_delete "Delete an application." "Provide an application id as parameter (-a)" "-a 29"
+application_export() { apiCall '/controller/ConfigObjectImportExportServlet?applicationId={{a:application}}' "$@" ; }
+rde application_export "Export an application." "Provide an application id as parameter (-a)" "-a 29"
+application_get() { apiCall '/controller/rest/applications/{{a:application}}' "$@" ; }
+rde application_get "Get an application." "Provide an application id or name as parameter (-a)." "-a 15"
+application_list() { apiCall '/controller/rest/applications' "$@" ; }
+rde application_list "List all applications." "This command requires no further arguments." ""
+doc audit << EOF
+The Controller audit history is a record of the configuration and user activities in the Controller configuration.
+EOF
+audit_get() { apiCall '/controller/ControllerAuditHistory?startTime={{b:start_time}}&endTime={{f:end_time}}' "$@" ; }
+rde audit_get "Get audit history." "Provide a start time (-b) and an end time (-f) as parameter." "-b 2015-12-19T10:50:03.607-700 -f 2015-12-19T17:50:03.607-0700"
+doc backend << EOF
+Retrieve information about backends within a given business application
+EOF
+backend_list() { apiCall '/controller/rest/applications/{{a:application}}/backends' "$@" ; }
+rde backend_list "List all backends." "Provide the application id as parameter (-a)" "-a 29"
+doc bizjourney << EOF
+Manage business journeys in AppDynamics Analytics
+EOF
+bizjourney_disable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/userDisable' "$@" ; }
+rde bizjourney_disable "Disable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
+bizjourney_enable() { apiCall -X PUT '/controller/restui/analytics/biz_outcome/definitions/{{i:business_journey_id}}/actions/enable' "$@" ; }
+rde bizjourney_enable "Enable a business journey." "Provide the journey id (-i) as parameter." "-i 6"
+bizjourney_import() { apiCall -X POST -d '{{d:business_journey_draft}}' '/controller/restui/analytics/biz_outcome/definitions/saveAsValidDraft' "$@" ; }
+rde bizjourney_import "Import a business journey." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @journey.json"
+bizjourney_list() { apiCall '/controller/restui/analytics/biz_outcome/definitions/summary' "$@" ; }
+rde bizjourney_list "List all business journeys." "This command requires no further arguments." ""
+doc bt << EOF
+Retrieve information about business transactions within a given business application
+EOF
+bt_creategroup() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}' "$@" ; }
+rde bt_creategroup "Create a BT group." "Provide the application id (-a), name (-n) and a comma separeted list of bt ids (-b)" "-b 13,14 -n MyGroup"
+bt_delete() { apiCall -X POST -d '[{{b:business_transactions}}]' '/controller/restui/bt/deleteBTs' "$@" ; }
+rde bt_delete "Delete a BT." "Provide the bt id as parameter (-b)" "-b 13"
+bt_get() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions/{{b:business_transaction}}' "$@" ; }
+rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
+bt_list() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
+rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
+bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
+rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
+doc configuration << EOF
+The configuration API enables you read and modify selected Controller configuration settings programmatically.
+EOF
+configuration_get() { apiCall '/controller/rest/configuration?name={{n:controller_setting_name}}' "$@" ; }
+rde configuration_get "Get a controller setting by name." "Provide a name (-n) as parameter." "-n metrics.min.retention.period"
+configuration_list() { apiCall '/controller/rest/configuration' "$@" ; }
+rde configuration_list "List all controller settings" "The Controller global configuration values are made up of the Controller settings that are presented in the Administration Console." ""
+configuration_set() { apiCall -X POST '/controller/rest/configuration?name={{n:controller_setting_name}}&value={{v:controller_setting_value}}' "$@" ; }
+rde configuration_set "Set a controller setting." "Set a Controller setting to a specified value. Provide a name (-n) and a value (-v) as parameters" "-n metrics.min.retention.period -v 550"
+doc controller << EOF
+Basic calls against an AppDynamics controller.
+EOF
+controller_auth() { apiCall '/controller/auth?action=login' "$@" ; }
+rde controller_auth "Authenticate." "" ""
+controller_status() { apiCall '/controller/rest/serverstatus' "$@" ; }
+rde controller_status "Get the server status." "This command will return a XML containing status information about the controller." ""
+doc dashboard << EOF
+Import and export custom dashboards in the AppDynamics controller
+EOF
+dashboard_delete() { apiCall -X POST -d '[{{i:dashboard_id}}]' '/controller/restui/dashboards/deleteDashboards' "$@" ; }
+rde dashboard_delete "Delete a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+dashboard_export() { apiCall '/controller/CustomDashboardImportExportServlet?dashboardId={{i:dashboard_id}}' "$@" ; }
+rde dashboard_export "Export a dashboard." "Provide a dashboard id (-i) as parameter" "-i 2"
+dashboard_get() { apiCall '/controller/restui/dashboards/dashboardIfUpdated/{{i:dashboard_id}}/-1' "$@" ; }
+rde dashboard_get "Get a dashboard." "Provide a dashboard id (-i) as parameter." "-i 2"
+dashboard_import() { apiCallExpand -X POST -F 'file={{d:dashboard}}' '/controller/CustomDashboardImportExportServlet' "$@" ; }
+rde dashboard_import "Import a dashboard." "Provide a dashboard file or json (-d) as parameter." "-d @examples/dashboard.json"
+dashboard_list() { apiCall '/controller/restui/dashboards/getAllDashboardsByType/false' "$@" ; }
+rde dashboard_list "List all dashboards." "This command requires no further arguments." ""
+dashboard_update() { apiCall -X POST -d '{{d:dashboard_definition}}' '/controller/restui/dashboards/updateDashboard' "$@" ; }
+rde dashboard_update "Update a dashboard." "Provide a dashboard file or json (-d) as parameter. Use the dashboard get command to retrieve the correct format for updating." "-d @dashboardUpdate.json"
+doc dbmon << EOF
+Use the Database Visibility API to get, create, update, and delete Database Visibility Collectors.
+EOF
+dbmon_delete() { apiCall -X POST -d '[{{c:database_collectors}}]' '/controller/rest/databases/collectors/batchDelete' "$@" ; }
+rde dbmon_delete "Delete multiple collectors." "Provide a comma seperated list of collector analyticsSavedSearches" "-c 17,18"
+dbmon_get() { apiCall '/controller/rest/databases/collectors/{{c:database_collector}}' "$@" ; }
+rde dbmon_get "Get a specifc collector." "Provide the collector id as parameter (-c)." "-c 17"
+dbmon_import() { apiCall -X POST -d '{{d:database_collector_definition}}' '/controller/rest/databases/collectors/create' "$@" ; }
+rde dbmon_import "Import a collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+dbmon_list() { apiCall '/controller/rest/databases/collectors' "$@" ; }
+rde dbmon_list "List all collectors." "No further arguments required." ""
+dbmon_queries() { apiCall -X POST -d '{"cluster":false,"serverId":{{i:server_id}},"field":"query-id","size":100,"filterBy":"time","startTime":{{b:start_time}},"endTime":{{f:end_time}},"waitStateIds":[],"useTimeBasedCorrelation":false}' '/controller/databasesui/databases/queryListData' "$@" ; }
+rde dbmon_queries "Get queries for a server." "Requires a server id (-i), a start time (-b) and an end time (-f) as parameters." "-i 2 -b 1545237000000 -f 1545238602"
+dbmon_servers() { apiCall '/controller/rest/databases/servers' "$@" ; }
+rde dbmon_servers "List all servers." "No further arguments required." ""
+dbmon_update() { apiCall -X POST -d '{{d:database_collector_update_definition}}' '/controller/rest/databases/collectors/update' "$@" ; }
+rde dbmon_update "Update a specific collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+doc event << EOF
+Create and list events in your business applications.
+EOF
+event_create() { apiCall -X POST '/controller/rest/applications/{{a:application}}/events?summary={{s:event_summary}}&comment={{c:event_comment?}}&eventtype={{e:event_type}}&severity={{l:event_severity}}&bt={{b:business_transaction?}}&node={{n:node?}}&tier={{t:tier?}}' "$@" ; }
+rde event_create "Create an event." "Provide an application (-a), a summary (-s), an event type (-e) and a severity level (-l). Optional parameters are bt (-b), node (-n) and tier (-t)" "-l INFO -c 'New bug fix release.' -e APPLICATION_DEPLOYMENT -a 29 -s 'Version 3.1.3'"
+doc federation << EOF
+Establish a federation between two AppDynamics Controllers.
+EOF
+federation_createkey() { apiCall -X POST -d '{"apiKeyName": "{{n:federation_api_key_name}}"}' '/controller/rest/federation/apikeyforfederation' "$@" ; }
+rde federation_createkey "Create a key." "Provide a name for the api key (-n) as parameter." "-n saas2onprem"
+federation_establish() { apiCall -X POST -d '{"accountName": "{{controller_account}}","controllerUrl": "{{controller_url}}","friendAccountName": "{{a:federation_friend_account}}", "friendAccountApiKey": "{{k:federation_friend_api_key}}", "friendAccountControllerUrl": "{{c:federation_friend_controller_url}}"}' '/controller/rest/federation/establishmutualfriendship' "$@" ; }
+rde federation_establish "Establish a federation" "Provide an account name (-a), an api key (-k) and a controller url (-c) for the friend account." "-a customer1 -k NGEzNzlhNTctNzQ1Yy00ZWM3LTkzNmItYTVkYmY0NWVkYzZjOjA0Nzk0ZjI5NzU1OWM0Zjk4YzYxN2E0Y2I2ODkwMDMyZjdjMDhhZTY= -c http://localhost:8090"
+doc flowmap << EOF
+Retrieve flowmaps
+EOF
+flowmap_application() { apiCall '/controller/restui/applicationFlowMapUiService/application/{{a:application}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1&forceFetch=false' "$@" ; }
+rde flowmap_application "Get an application flowmap" "Provide an application (-a) and a time range string (-t) as parameter." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+flowmap_component() { apiCall '/controller/restui/componentFlowMapUiService/component/{{c:component}}?time-range={{t:timerange}}&mapId=-1&baselineId=-1' "$@" ; }
+rde flowmap_component "Get an component flowmap" "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter" "-c 108 -t last_1_hour.BEFOREW_NOW.-1.-1.60"
+doc healthrule << EOF
+Configure and retrieve health rules and their violates.
+EOF
+healthrule_disable() { apiCall -X PUT -d '{"enabled": "false"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_disable "Disable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
+healthrule_enable() { apiCall -X PUT -d '{"enabled": "true"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_enable "Enable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
+healthrule_get() { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
+rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
+healthrule_list() { apiCall '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules' "$@" ; }
+rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
+healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
+rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc licenserule << EOF
+EOF
+licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_create "Create a license rule." "Provide a json string or a @file (-d) as parameter." "-d examples/licenserule.json"
+licenserule_detailview() { apiCall -X POST -d '{"type":"BEFORE_NOW","durationInMinutes":60}' '/controller/restui/licenseRule/getApmLicenseRuleDetailViewData/{{l:licenserule}}' "$@" ; }
+rde licenserule_detailview "Get detail view for a license rule" "Provide a license id (-l) as parameter." "-l ff0fb8ff-d2ef-446d-83bd-8f8e5b8c0d20"
+licenserule_list() { apiCall '/controller/mds/v1/license/rules' "$@" ; }
+rde licenserule_list "List all license rules." "This command requires no further arguments" ""
+doc logsources << EOF
+EOF
+logsources_import() { apiCall -X POST -d 'payload: {{d:logsourcerule}}' '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_import "Import a source rule." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @examples/logsources.json"
+logsources_list() { apiCall '/controller/restui/analytics/logsources' "$@" ; }
+rde logsources_list "List all sources." "This command requires no further arguments." ""
+doc node << EOF
+Retrieve nodes within a business application
+EOF
+node_get() { apiCall '/controller/rest/applications/{{a:application}}/nodes/{{n:node}}' "$@" ; }
+rde node_get "Get a node." "Provide the application (-a) and the node (-n) as parameters" "-a 29 -n 45"
+node_list() { apiCall '/controller/rest/applications/{{a:application}}/nodes' "$@" ; }
+rde node_list "List all nodes." "Provide the application id as parameter (-a)." "-a 29"
+node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?application-component-node-ids={{n:nodes}}' "$@" ; }
+rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
+node_move() { apiCall -X POST '/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
+rde node_move "Move node." "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier." "-n 1782418 -t 187811"
+doc policy << EOF
+Import and export policies
+EOF
+policy_export() { apiCall '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_export "List all policies." "Provide an application (-a) as parameter." "-a 29"
+policy_import() { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
+rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
+doc sam << EOF
+Manage service monitoring configurations
+EOF
+sam_create() { apiCall -X POST -d '{"name":"{{n:name}}","description":"","protocol":"HTTP","machineId":{{i:machineId}},"configs":{"target":"{{u:url}}","pingIntervalSeconds":{{p:pingInterval}},"failureThreshold":{{f:failureThreshold}},"successThreshold":{{s:successThreshold}},"thresholdWindow":{{w:thresholdWindow}},"connectTimeoutMillis":{{c:connectTimeout}},"socketTimeoutMillis":{{t:socketTimeout}},"method":"{{m:method}}","downloadSize":{{d:downloadSize}},"followRedirects":true,"headers":[{{h:headers?}}],"body":"{{b:body?}}","validationRules":[{{v:validationRules}}]}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_create "Create a monitor." "This command takes the following arguments. Those with '?' are optional: name (-n), machineId (-i), url (-u), interval (-i), failureThreshold (-f), successThreshold (-s), thresholdWindow (-w), connectTimeout (-c), socketTimeout (-t), method (-m), downloadSize (-d), headers (-h), body (-b), validationRules (-v)" "-n 'Checkout' -i 42 -u https://www.example.com/checkout -p 10 -f 1 -s 3 -w 5 -c 30000 -t 30000 -m POST -d 5000"
+sam_delete() { apiCall -X DELETE '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+rde sam_delete "Delete a monitor" "Provide a monitor id (-i) as parameter" "-i 29"
+sam_get() { apiCall '/controller/sim/v2/user/sam/targets/http/{{i:monitorId}}' "$@" ; }
+rde sam_get "Get a monitor." "Provide a monitor id (-i) as parameter" "-i 29"
+sam_import() { apiCall -X POST -d '{{d:monitor_definition}}' '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_import "Import a monitor." "Provide a json string or a @file (-d) as parameter." "-d @examples/sam.json"
+sam_list() { apiCall '/controller/sim/v2/user/sam/targets/http' "$@" ; }
+rde sam_list "List monitors." "This command requires no further arguments." ""
+doc scope << EOF
+Manage scopes for instrumentation
+EOF
+scope_create() { apiCall -X POST -d '{{d:scope_definition}}' '/controller/restui/transactionConfigProto/createScope?applicationId={{a:application}}' "$@" ; }
+rde scope_create "Create a new scope." "Provide an application id (-a) as parameter" ""
+scope_list() { apiCall '/controller/restui/transactionConfigProto/getScopes/{{a:application}}' "$@" ; }
+rde scope_list "List all scopes." "Provide an application id (-a) as parameter" "-a 25"
+doc sep << EOF
+List service endpoints
+EOF
+sep_list() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
+sep_update() { apiCall -X POST -d '{{d:sep_json}}' '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_update "Insert or Update SEPs." "Provide an application id (-a) and a json string or a @file (-d) as parameter." "-a 29 -d @examples/sep.json"
+doc server << EOF
+List servers, their properties and metrics
+EOF
+server_delete() { apiCall -X DELETE '/controller/sim/v2/user/machines/deleteMachines?ids={{m:machine}}' "$@" ; }
+rde server_delete "Delete a machine." "Provide a machine id (-m) as parameter." "-m 244"
+server_get() { apiCall '/controller/sim/v2/user/machines/{{m:machine}}' "$@" ; }
+rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 244"
+server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
+rde server_list "List all machines." "No additional argument required." ""
+server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux"
 doc snapshot << EOF
 List APM snapshots.
 EOF

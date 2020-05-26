@@ -415,7 +415,7 @@ healthrule:
     description: Provide an application (-a) as parameter
     example: -a 29
     method: GET
-    endpoint: /controller/healthrules/{{a:application}}/
+    endpoint: /controller/alerting/rest/v1/applications/{{a:application}}/health-rules
   get:
     title: Get a healthrule.
     description: Provide an application (-a) and a health rule name (-n) as parameters.
@@ -428,6 +428,20 @@ healthrule:
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
     endpoint: /controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}
+  enable:
+    title: Enable a healthrule.
+    description:  Provide an application (-a) and a health rule id (-i) as parameters.
+    example: -a 29 -i 54
+    method: PUT
+    endpoint: /controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration
+    payload: {\"enabled\": \"true\"}
+  disable:
+    title: Disable a healthrule.
+    description:  Provide an application (-a) and a health rule id (-i) as parameters.
+    example: -a 29 -i 54
+    method: PUT
+    endpoint: /controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration
+    payload: {\"enabled\": \"false\"}
 licenserule:
   title: License Rules API
   list:
