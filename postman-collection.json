@@ -298,6 +298,96 @@
 						},
             "description": ""
 					}
+				}]},{"name": "agents","item": [{
+					"name": "Disable an agent by id",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/agent/setting/disableAppServerAgentForNode/{{i:id}}?disableMonitoring={{m:disableMonitoring}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","agent","setting","disableAppServerAgentForNode","{{id}}"],
+              "query": [{"key": "disableMonitoring","value": "{{disableMonitoring}}"}]
+						},
+            "description": "Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter."
+					}
+				},{
+					"name": "Get more details on agents of a specific type by providing their ids",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"requestFilter\":[{{ids}}],\"resultColumns\":[\"HOST_NAME\",\"AGENT_VERSION\",\"NODE_NAME\",\"COMPONENT_NAME\",\"APPLICATION_NAME\",\"DISABLED\",\"ALL_MONITORING_DISABLED\"],\"offset\":0,\"limit\":-1,\"searchFilters\":[],\"columnSorts\":[{\"column\":\"HOST_NAME\",\"direction\":\"ASC\"}]}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/agents/list/{{t:type}}/ids",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","agents","list","{{type}}","ids"],
+              "query": []
+						},
+            "description": "Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster."
+					}
+				},{
+					"name": "List all agents of a specific type",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"requestFilter\":{\"queryParams\":{\"applicationAssociationType\":\"ALL\"},\"filters\":[]},\"resultColumns\":[],\"offset\":0,\"limit\":-1,\"searchFilters\":[],\"columnSorts\":[{\"column\":\"HOST_NAME\",\"direction\":\"ASC\"}]}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/agents/list/{{t:type}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","agents","list","{{type}}"],
+              "query": []
+						},
+            "description": "Provide a type as parameter (-t). Possible types are appserver, machine, cluster."
+					}
 				}]},{"name": "analyticsmetric","item": [{
 					"name": "Create analytics metric",
 					"request": {

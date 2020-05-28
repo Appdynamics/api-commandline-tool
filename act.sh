@@ -94,6 +94,15 @@ These commands allow you to run ADQL queries agains the controller (not the even
 EOF
 adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
 rde adql_query "Run an ADQL query" "" ""
+doc agents << EOF
+List, Reset, Disable AppDynamics Agents
+EOF
+agents_disable() { apiCall -X POST '/controller/restui/agent/setting/disableAppServerAgentForNode/{{i:id}}?disableMonitoring={{m:disableMonitoring}}' "$@" ; }
+rde agents_disable "Disable an agent by id" "Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter." ""
+agents_ids() { apiCall -X POST -d '{"requestFilter":[{{i:ids}}],"resultColumns":["HOST_NAME","AGENT_VERSION","NODE_NAME","COMPONENT_NAME","APPLICATION_NAME","DISABLED","ALL_MONITORING_DISABLED"],"offset":0,"limit":-1,"searchFilters":[],"columnSorts":[{"column":"HOST_NAME","direction":"ASC"}]}' '/controller/restui/agents/list/{{t:type}}/ids' "$@" ; }
+rde agents_ids "Get more details on agents of a specific type by providing their ids" "Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster." ""
+agents_list() { apiCall -X POST -d '{"requestFilter":{"queryParams":{"applicationAssociationType":"ALL"},"filters":[]},"resultColumns":[],"offset":0,"limit":-1,"searchFilters":[],"columnSorts":[{"column":"HOST_NAME","direction":"ASC"}]}' '/controller/restui/agents/list/{{t:type}}' "$@" ; }
+rde agents_list "List all agents of a specific type" "Provide a type as parameter (-t). Possible types are appserver, machine, cluster." ""
 doc analyticsmetric << EOF
 Manage custom analytics metrics
 EOF
