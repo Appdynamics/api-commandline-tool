@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="ad9bd4e4fc8b81c1814f58b97162e8e613eb7308"
+ACT_LAST_COMMIT="e01185cecd026a67715282d859694128b534fdf2"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -320,7 +320,7 @@ rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 24
 server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
 rde server_list "List all machines." "No additional argument required." ""
 server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
-rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux"
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m \${HOSTNAME} on Linux"
 doc snapshot << EOF
 List APM snapshots.
 EOF

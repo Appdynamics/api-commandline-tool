@@ -402,7 +402,7 @@ List servers, their properties and metrics
 | delete | Delete a machine. Provide a machine id (-m) as parameter. | `act.sh server delete -m 244` |
 | get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -m 244` |
 | list | List all machines. No additional argument required. | `act.sh server list ` |
-| query | Query a machineagent by hostname provide a machine name (-m) as parameter | `act.sh server query -m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux` |
+| query | Query a machineagent by hostname provide a machine name (-m) as parameter | `act.sh server query -m Myserver or if you want to query your own name -m ${HOSTNAME} on Linux` |
 
 
 ## snapshot
