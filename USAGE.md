@@ -421,7 +421,7 @@ Create synthetic snapshots or jobs
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | import | Import a synthetic job. Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d) | `act.sh synthetic import -a 41 -d @examples/syntheticjob.json` |
-| list | List all synthetic jobs. Provide an EUM application id (-a) as parameter, as well as an time range string (-t). | `act.sh synthetic list -a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60` |
+| list | List all synthetic jobs. Provide an EUM application id (-a) as parameter. | `act.sh synthetic list -a 41` |
 | snapshot | Generate synthetic snapshot. Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter. | `act.sh synthetic snapshot -u http://www.appdynmics.com -l AMS -b Chrome -a 128` |
 | update | Update a synthetic job. Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d) | `act.sh synthetic update -a 41 -d @examples/updatesyntheticjob.json` |
 

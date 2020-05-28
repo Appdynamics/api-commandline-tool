@@ -2686,17 +2686,17 @@
             ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"applicationId\":{{application}},\"timeRangeString\":\"{{time_range}}\"}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/synthetic/schedule/getJobList",
+							"raw": "{{controller_host}}/controller/restui/synthetic/schedule/getJobList/{{a:application}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","synthetic","schedule","getJobList"],
+							"path": ["controller","restui","synthetic","schedule","getJobList","{{application}}"],
               "query": []
 						},
-            "description": "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)."
+            "description": "Provide an EUM application id (-a) as parameter."
 					}
 				},{
 					"name": "Generate synthetic snapshot.",
