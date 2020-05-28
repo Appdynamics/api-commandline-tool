@@ -1739,6 +1739,66 @@
             "description": "Provide an component (tier, node, ...) id (-c) and a time range string (-t) as parameter"
 					}
 				}]},{"name": "healthrule","item": [{
+					"name": "Disable a healthrule.",
+					"request": {
+						"method": "PUT",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"enabled\": \"false\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","applications","{{application}}","health-rules","{{healthrule_id}}","configuration"],
+              "query": []
+						},
+            "description": "Provide an application (-a) and a health rule id (-i) as parameters."
+					}
+				},{
+					"name": "Enable a healthrule.",
+					"request": {
+						"method": "PUT",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"enabled\": \"true\"}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","applications","{{application}}","health-rules","{{healthrule_id}}","configuration"],
+              "query": []
+						},
+            "description": "Provide an application (-a) and a health rule id (-i) as parameters."
+					}
+				},{
 					"name": "Get a healthrule.",
 					"request": {
 						"method": "GET",
@@ -1789,11 +1849,11 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/healthrules/{{a:application}}/",
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/applications/{{a:application}}/health-rules",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","healthrules","{{application}}",""],
+							"path": ["controller","alerting","rest","v1","applications","{{application}}","health-rules"],
               "query": []
 						},
             "description": "Provide an application (-a) as parameter"

@@ -299,6 +299,8 @@ Configure and retrieve health rules and their violates.
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
+| disable | Disable a healthrule. Provide an application (-a) and a health rule id (-i) as parameters. | `act.sh healthrule disable -a 29 -i 54` |
+| enable | Enable a healthrule. Provide an application (-a) and a health rule id (-i) as parameters. | `act.sh healthrule enable -a 29 -i 54` |
 | get | Get a healthrule. Provide an application (-a) and a health rule name (-n) as parameters. | `act.sh healthrule get -a 29` |
 | list | List all healthrules. Provide an application (-a) as parameter | `act.sh healthrule list -a 29` |
 | violations | Get all healthrule violations. Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f) | `act.sh healthrule violations -a 29 -t BEFORE_NOW -d 120` |
@@ -400,7 +402,7 @@ List servers, their properties and metrics
 | delete | Delete a machine. Provide a machine id (-m) as parameter. | `act.sh server delete -m 244` |
 | get | Get a machine. Provide a machine id (-m) as parameter. | `act.sh server get -m 244` |
 | list | List all machines. No additional argument required. | `act.sh server list ` |
-| query | Query a machineagent by hostname provide a machine name (-m) as parameter | `act.sh server query -m Myserver or if you want to query your own name -m NEUMANNS-M-55CU on Linux` |
+| query | Query a machineagent by hostname provide a machine name (-m) as parameter | `act.sh server query -m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux` |
 
 
 ## snapshot

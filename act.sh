@@ -1,6 +1,6 @@
 #!/bin/bash
-ACT_VERSION="v0.5.0"
-ACT_LAST_COMMIT="50c26f2f004b022d28d3dcd2cabd5cdd7dd75418"
+ACT_VERSION="v20.3.0"
+ACT_LAST_COMMIT="ad9bd4e4fc8b81c1814f58b97162e8e613eb7308"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -241,9 +241,13 @@ rde flowmap_component "Get an component flowmap" "Provide an component (tier, no
 doc healthrule << EOF
 Configure and retrieve health rules and their violates.
 EOF
+healthrule_disable() { apiCall -X PUT -d '{"enabled": "false"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_disable "Disable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
+healthrule_enable() { apiCall -X PUT -d '{"enabled": "true"}' '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules/{{i:healthrule_id}}/configuration' "$@" ; }
+rde healthrule_enable "Enable a healthrule." "Provide an application (-a) and a health rule id (-i) as parameters." "-a 29 -i 54"
 healthrule_get() { apiCall '/controller/healthrules/{{a:application}}/?name={{n:healthrule_name?}}' "$@" ; }
 rde healthrule_get "Get a healthrule." "Provide an application (-a) and a health rule name (-n) as parameters." "-a 29"
-healthrule_list() { apiCall '/controller/healthrules/{{a:application}}/' "$@" ; }
+healthrule_list() { apiCall '/controller/alerting/rest/v1/applications/{{a:application}}/health-rules' "$@" ; }
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
 healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
 rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
@@ -316,7 +320,7 @@ rde server_get "Get a machine." "Provide a machine id (-m) as parameter." "-m 24
 server_list() { apiCall '/controller/sim/v2/user/machines' "$@" ; }
 rde server_list "List all machines." "No additional argument required." ""
 server_query() { apiCall -X POST -d '{"filter":{"appIds":[],"nodeIds":[],"tierIds":[],"types":["PHYSICAL","CONTAINER_AWARE"],"timeRangeStart":0,"timeRangeEnd":0},"search":{"query":"{{m:machine}}"},"sorter":{"field":"HEALTH","direction":"ASC"}}' '/controller/sim/v2/user/machines/keys' "$@" ; }
-rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m NEUMANNS-M-55CU on Linux"
+rde server_query "Query a machineagent by hostname" "provide a machine name (-m) as parameter" "-m Myserver or if you want to query your own name -m ewetstone-mac.lan on Linux"
 doc snapshot << EOF
 List APM snapshots.
 EOF
