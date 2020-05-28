@@ -305,7 +305,7 @@ Configure and retrieve health rules and their violates.
 | list | List all healthrules. Provide an application (-a) as parameter | `act.sh healthrule list -a 29` |
 | violations | Get all healthrule violations. Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f) | `act.sh healthrule violations -a 29 -t BEFORE_NOW -d 120` |
 | import | Import a health rule. |  |
-| list | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. | `act.sh healthrule list -a 29` |
+| copy | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. |  |
 
 
 ## licenserule

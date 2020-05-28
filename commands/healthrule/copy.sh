@@ -55,7 +55,7 @@ healthrule_copy() {
 
 register healthrule_copy Copy healthrules from one application to another.
 
-describe healthrule_list << EOF
+describe healthrule_copy << EOF
 Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
 If you provide ("-n") only the named health rule will be copied.
 EOF

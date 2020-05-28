@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="e01185cecd026a67715282d859694128b534fdf2"
+ACT_LAST_COMMIT="85b776b67a7979aef76f852788c85b5b20cab207"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -1485,7 +1485,7 @@ healthrule_copy() {
   fi
 }
 register healthrule_copy Copy healthrules from one application to another.
-describe healthrule_list << EOF
+describe healthrule_copy << EOF
 Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t").
 If you provide ("-n") only the named health rule will be copied.
 EOF
