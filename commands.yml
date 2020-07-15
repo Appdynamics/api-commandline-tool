@@ -665,11 +665,10 @@ synthetic:
   description: Create synthetic snapshots or jobs
   list:
     title: List all synthetic jobs.
-    description: Provide an EUM application id (-a) as parameter, as well as an time range string (-t).
-    example: -a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60
+    description: Provide an EUM application id (-a) as parameter.
+    example: -a 41 
     method: POST
-    endpoint: /controller/restui/synthetic/schedule/getJobList
-    payload: {\"applicationId\":{{a:application}},\"timeRangeString\":\"{{t:time_range}}\"}
+    endpoint: /controller/restui/synthetic/schedule/getJobList/{{a:application}}
   import:
     title: Import a synthetic job.
     description: Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)

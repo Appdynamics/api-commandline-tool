@@ -335,8 +335,8 @@ Create synthetic snapshots or jobs
 EOF
 synthetic_import() { apiCallExpand -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
 rde synthetic_import "Import a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/syntheticjob.json"
-synthetic_list() { apiCall -X POST -d '{"applicationId":{{a:application}},"timeRangeString":"{{t:time_range}}"}' '/controller/restui/synthetic/schedule/getJobList' "$@" ; }
-rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter, as well as an time range string (-t)." "-a 41 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+synthetic_list() { apiCall -X POST '/controller/restui/synthetic/schedule/getJobList/{{a:application}}' "$@" ; }
+rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter." "-a 41 "
 synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
 rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
 synthetic_update() { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch' "$@" ; }
