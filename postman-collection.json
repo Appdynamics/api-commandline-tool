@@ -299,7 +299,7 @@
             "description": ""
 					}
 				}]},{"name": "agents","item": [{
-					"name": "Disable an agent by id",
+					"name": "Disable an app agent by id",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -327,6 +327,36 @@
               "query": [{"key": "disableMonitoring","value": "{{disableMonitoring}}"}]
 						},
             "description": "Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter."
+					}
+				},{
+					"name": "Enable an app agent by id",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/agent/setting/enableAppServerAgentForNode/{{i:id}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","agent","setting","enableAppServerAgentForNode","{{id}}"],
+              "query": []
+						},
+            "description": "Provide an agent id (-i) as parameter."
 					}
 				},{
 					"name": "Get more details on agents of a specific type by providing their ids",
@@ -387,6 +417,36 @@
               "query": []
 						},
             "description": "Provide a type as parameter (-t). Possible types are appserver, machine, cluster."
+					}
+				},{
+					"name": "Enable or Disable an machine agent by id",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{id}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/agent/setting/toggleMachineAgentEnable?enabledFlag={{m:enabledFlag}}&entityType=MACHINE_INSTANCE",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","agent","setting","toggleMachineAgentEnable"],
+              "query": [{"key": "enabledFlag","value": "{{enabledFlag}}"},{"key":"entityType","value": "MACHINE_INSTANCE"}]
+						},
+            "description": "Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter."
 					}
 				}]},{"name": "analyticsmetric","item": [{
 					"name": "Create analytics metric",

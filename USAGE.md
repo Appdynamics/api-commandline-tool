@@ -80,9 +80,11 @@ List, Reset, Disable AppDynamics Agents
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| disable | Disable an agent by id Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter. | `act.sh agents disable ` |
-| ids | Get more details on agents of a specific type by providing their ids Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster. | `act.sh agents ids ` |
+| disable | Disable an app agent by id Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter. | `act.sh agents disable -i 15 -m true` |
+| enable | Enable an app agent by id Provide an agent id (-i) as parameter. | `act.sh agents enable -i 15` |
+| ids | Get more details on agents of a specific type by providing their ids Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster. | `act.sh agents ids -t appserver -i 1,2,3` |
 | list | List all agents of a specific type Provide a type as parameter (-t). Possible types are appserver, machine, cluster. | `act.sh agents list ` |
+| toggleMachineAgent | Enable or Disable an machine agent by id Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter. | `act.sh agents toggleMachineAgent -i 15 -m false` |
 
 
 ## analyticsmetric

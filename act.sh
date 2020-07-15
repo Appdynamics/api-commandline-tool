@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="85b776b67a7979aef76f852788c85b5b20cab207"
+ACT_LAST_COMMIT="b85750b39900ed8ae4f45cd4408db0e4055a3359"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -98,11 +98,15 @@ doc agents << EOF
 List, Reset, Disable AppDynamics Agents
 EOF
 agents_disable() { apiCall -X POST '/controller/restui/agent/setting/disableAppServerAgentForNode/{{i:id}}?disableMonitoring={{m:disableMonitoring}}' "$@" ; }
-rde agents_disable "Disable an agent by id" "Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter." ""
+rde agents_disable "Disable an app agent by id" "Provide an agent id (-i) and the disableMonitoring (-m) flag (true/false) as parameter." "-i 15 -m true"
+agents_enable() { apiCall -X POST '/controller/restui/agent/setting/enableAppServerAgentForNode/{{i:id}}' "$@" ; }
+rde agents_enable "Enable an app agent by id" "Provide an agent id (-i) as parameter." "-i 15"
 agents_ids() { apiCall -X POST -d '{"requestFilter":[{{i:ids}}],"resultColumns":["HOST_NAME","AGENT_VERSION","NODE_NAME","COMPONENT_NAME","APPLICATION_NAME","DISABLED","ALL_MONITORING_DISABLED"],"offset":0,"limit":-1,"searchFilters":[],"columnSorts":[{"column":"HOST_NAME","direction":"ASC"}]}' '/controller/restui/agents/list/{{t:type}}/ids' "$@" ; }
-rde agents_ids "Get more details on agents of a specific type by providing their ids" "Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster." ""
+rde agents_ids "Get more details on agents of a specific type by providing their ids" "Provide a type as parameter (-t) and a comma separated list of ids (-i). Possible types are appserver, machine, cluster." "-t appserver -i 1,2,3"
 agents_list() { apiCall -X POST -d '{"requestFilter":{"queryParams":{"applicationAssociationType":"ALL"},"filters":[]},"resultColumns":[],"offset":0,"limit":-1,"searchFilters":[],"columnSorts":[{"column":"HOST_NAME","direction":"ASC"}]}' '/controller/restui/agents/list/{{t:type}}' "$@" ; }
 rde agents_list "List all agents of a specific type" "Provide a type as parameter (-t). Possible types are appserver, machine, cluster." ""
+agents_toggleMachineAgent() { apiCall -X POST -d '[{{i:id}}]' '/controller/restui/agent/setting/toggleMachineAgentEnable?enabledFlag={{m:enabledFlag}}&entityType=MACHINE_INSTANCE' "$@" ; }
+rde agents_toggleMachineAgent "Enable or Disable an machine agent by id" "Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter." "-i 15 -m false"
 doc analyticsmetric << EOF
 Manage custom analytics metrics
 EOF
