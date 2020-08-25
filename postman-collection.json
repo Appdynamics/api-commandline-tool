@@ -2689,12 +2689,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}",
+							"raw": "{{controller_host}}/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}&need-props=true&need-exit-calls=true",
               "host": [
 								"{{controller_host}}"
 							],
 							"path": ["controller","rest","applications","{{application}}","request-snapshots"],
-              "query": [{"key": "time-range-type","value": "{{time_range_type}}"},{"key":"duration-in-mins","value": "{{duration_in_minutes}}"},{"key":"start-time","value": "{{start_time}}"},{"key":"end-time","value": "{{end_time}}"}]
+              "query": [{"key": "time-range-type","value": "{{time_range_type}}"},{"key":"duration-in-mins","value": "{{duration_in_minutes}}"},{"key":"start-time","value": "{{start_time}}"},{"key":"end-time","value": "{{end_time}}"},{"key":"need-props","value": "true"},{"key":"need-exit-calls","value": "true"}]
 						},
             "description": "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)"
 					}
