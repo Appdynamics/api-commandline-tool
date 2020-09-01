@@ -659,14 +659,14 @@ snapshot:
     description: Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)
     example: -a 29 -t BEFORE_NOW -d 120
     method: GET
-    endpoint: /controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}
+    endpoint: /controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}&need-props=true&need-exit-calls=true
 synthetic:
   title: Synthetic
   description: Create synthetic snapshots or jobs
   list:
     title: List all synthetic jobs.
     description: Provide an EUM application id (-a) as parameter.
-    example: -a 41 
+    example: -a 41
     method: POST
     endpoint: /controller/restui/synthetic/schedule/getJobList/{{a:application}}
   import:

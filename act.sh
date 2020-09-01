@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="7fd3beb751de397eef346f0bbb5a6b4184124c91"
+ACT_LAST_COMMIT="a04325ed0dcdd7c46f7c8c3ca06e7731a75d1721"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -328,7 +328,7 @@ rde server_query "Query a machineagent by hostname" "provide a machine name (-m)
 doc snapshot << EOF
 List APM snapshots.
 EOF
-snapshot_list() { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}' "$@" ; }
+snapshot_list() { apiCall '/controller/rest/applications/{{a:application}}/request-snapshots?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{f:end_time?}}&need-props=true&need-exit-calls=true' "$@" ; }
 rde snapshot_list "Retrieve a list of snapshots" "Provide an application (-a) as parameter, as well as a time range (-t), the duration in minutes (-d) or start (-b) and end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
 doc synthetic << EOF
 Create synthetic snapshots or jobs
@@ -336,7 +336,7 @@ EOF
 synthetic_import() { apiCallExpand -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateSchedule' "$@" ; }
 rde synthetic_import "Import a synthetic job." "Provide an EUM application id (-a) as parameter and a json string or a file (with @ as prefix) as parameter (-d)" "-a 41 -d @examples/syntheticjob.json"
 synthetic_list() { apiCall -X POST '/controller/restui/synthetic/schedule/getJobList/{{a:application}}' "$@" ; }
-rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter." "-a 41 "
+rde synthetic_list "List all synthetic jobs." "Provide an EUM application id (-a) as parameter." "-a 41"
 synthetic_snapshot() { apiCall -X POST -d '{"url":"{{u:url}}","location":"{{l:location}}","browser":"{{b:browser}}","applicationId":{{a:application}},"timeRangeString":null,"timeoutSeconds":30,"script":null}' '/controller/restui/synthetic/launch/generateLoad' "$@" ; }
 rde synthetic_snapshot "Generate synthetic snapshot." "Provide an EUM application (-a), a brower (-b) and an URL (-u) as parameter." "-u http://www.appdynmics.com -l AMS -b Chrome -a 128"
 synthetic_update() { apiCall -X POST -d '{{d:synthetic_job}}' '/controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch' "$@" ; }
