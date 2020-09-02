@@ -3,8 +3,6 @@
 ################################################################################
 # Gets extra node info from an applications node list
 #
-#   NB; review SOURCE_API_NODEINFO setup, for version of controller
-#
 # Useful output lines for debug;
 #   echo "lines: ${#app_list_array[@]} | entries: ${#app_array[@]}"
 #   for key in "${!app_array[@]}"; do echo "key   : $key"; echo "value : ${app_array[$key]}"; done
@@ -42,12 +40,6 @@ usage () {
 ################################################################################
 # Setup Variables, etc
 ################################################################################
-# RESTUI API call
-# TODO: Find exact version api calls changed
-# NB; this api call is valid on > mid-4.5 controller...
-SOURCE_API_NODEINFO="/controller/restui/v1/nodes/list/health/ids"
-# ...before which it was
-#SOURCE_API_NODEINFO="/controller/restui/nodes/list/health/ids"
 
 # Set default input params
 LEVEL="0" #This means -A is mandatory unless -L is changed
@@ -127,6 +119,19 @@ runChecks () {
     if [[ -z ${ENVIRONMENT} ]]; then echo "No -E param passed."; usage; exit 1; fi
     # If we have an app LEVEL, but no APP_ID, we cant continue
     if [[ ${LEVEL} == "0" && -z ${APP_ID} ]]; then echo "No -A param passed for -L=0."; usage;  exit 1; fi
+}
+
+# Gets the controllers version, to switch the restui API format
+# TODO: Find exact version api calls changed, assumed 4.5.15 at present
+getControllerVer () {
+    VER=$(../act.sh -E ${ENVIRONMENT} controller version)
+    if [[ -z ${VER} ]]; then echo "Unable to get controllers version."; exit 1; fi
+    # If controller version is less than 4.5.15, then use old restui API format
+    if [[ ${VER} =~ ^4.5.([0-9]*) && ${BASH_REMATCH[1]} -lt 15 ]]; then 
+        SOURCE_API_NODEINFO="/controller/restui/nodes/list/health/ids"
+    else
+        SOURCE_API_NODEINFO="/controller/restui/v1/nodes/list/health/ids"
+    fi
 }
 
 # Setup our data sources
@@ -348,6 +353,7 @@ getNodeInfo () {
 
 # Lets get ready
 runChecks
+getControllerVer
 setupSources
 
 # Output header line
