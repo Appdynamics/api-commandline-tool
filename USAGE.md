@@ -340,6 +340,15 @@ Configure and retrieve health rules and their violates.
 | list | List all metrics available for one application (-a). Provide a metric path like "Overall Application Performance" to walk the metrics tree. |  |
 
 
+## mobileCrash
+
+API to list and retrieve mobile crashes
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| get | Get crash details Provide an application ID (-a) and crash ID (-c) as parameters | `act.sh mobileCrash get -a 41 -c d65fff8f-6ff0-4765-8ff4-2ffcbd0441bd` |
+
+
 ## node
 
 Retrieve nodes within a business application

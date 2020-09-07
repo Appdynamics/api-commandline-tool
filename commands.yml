@@ -514,6 +514,15 @@ logsources:
     method: POST
     endpoint: /controller/restui/analytics/logsources
     payload: payload: {{d:logsourcerule}}
+mobileCrash:
+  title: Mobile Crashes
+  description: API to list and retrieve mobile crashes
+  get:
+    title: Get crash details
+    description: Provide an application ID (-a) and crash ID (-c) as parameters
+    example: -a 41 -c d65fff8f-6ff0-4765-8ff4-2ffcbd0441bd
+    method: GET
+    endpoint: /controller/restui/crashDetails/download/{{a:application}}/{{c:crash}}
 node:
   title: Nodes
   description: Retrieve nodes within a business application

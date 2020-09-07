@@ -2098,6 +2098,36 @@
 						},
             "description": "This command requires no further arguments."
 					}
+				}]},{"name": "mobileCrash","item": [{
+					"name": "Get crash details",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/crashDetails/download/{{a:application}}/{{c:crash}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","crashDetails","download","{{application}}","{{crash}}"],
+              "query": []
+						},
+            "description": "Provide an application ID (-a) and crash ID (-c) as parameters"
+					}
 				}]},{"name": "node","item": [{
 					"name": "Get a node.",
 					"request": {

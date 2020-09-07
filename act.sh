@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="a04325ed0dcdd7c46f7c8c3ca06e7731a75d1721"
+ACT_LAST_COMMIT="3bd5817c8aa788838c686c37ffe1fea56c39e90b"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -269,6 +269,11 @@ logsources_import() { apiCall -X POST -d 'payload: {{d:logsourcerule}}' '/contro
 rde logsources_import "Import a source rule." "Provide a json string or a file (with @ as prefix) as parameter (-d)" "-d @examples/logsources.json"
 logsources_list() { apiCall '/controller/restui/analytics/logsources' "$@" ; }
 rde logsources_list "List all sources." "This command requires no further arguments." ""
+doc mobileCrash << EOF
+API to list and retrieve mobile crashes
+EOF
+mobileCrash_get() { apiCall '/controller/restui/crashDetails/download/{{a:application}}/{{c:crash}}' "$@" ; }
+rde mobileCrash_get "Get crash details" "Provide an application ID (-a) and crash ID (-c) as parameters" "-a 41 -c d65fff8f-6ff0-4765-8ff4-2ffcbd0441bd"
 doc node << EOF
 Retrieve nodes within a business application
 EOF
