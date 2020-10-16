@@ -44,7 +44,7 @@ COMMENT=$3
 
 ## Config
 
-### EUM Verficiation
+### EUM Verification
 
 Use the following script to verify the values configured in your on-premise EUM installation
 
