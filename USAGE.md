@@ -264,6 +264,15 @@ Afterwards you can use `act.sh -E <name>` to call the given controller.
 | getapps | Get EUM Apps. |  |
 
 
+## eumCorrelation
+
+Manage correlation cookies for APM and EUM integration
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| disable | Disable all EUM correlation cookies. | `act.sh eumCorrelation disable -a 41` |
+
+
 ## event
 
 Create and list events in your business applications.

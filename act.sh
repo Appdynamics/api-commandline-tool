@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="3bd5817c8aa788838c686c37ffe1fea56c39e90b"
+ACT_LAST_COMMIT="2d76e711095ed5c5b6cd7affa9e55de9a91330d0"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -223,6 +223,11 @@ dbmon_servers() { apiCall '/controller/rest/databases/servers' "$@" ; }
 rde dbmon_servers "List all servers." "No further arguments required." ""
 dbmon_update() { apiCall -X POST -d '{{d:database_collector_update_definition}}' '/controller/rest/databases/collectors/update' "$@" ; }
 rde dbmon_update "Update a specific collector." "Provide a json string or a @file (-d) as parameter." "-d @collector.json"
+doc eumCorrelation << EOF
+Manage correlation cookies for APM and EUM integration
+EOF
+eumCorrelation_disable() { apiCall -X POST -d '{"isEnabled":false,"includeRules":[],"excludeRules":[],"btHeaderInjectionForSafeAgentsEnabled":false}' '/controller/restui/configuration/userExperienceAppIntegration/businessTransactionEumCorrelation/saveConfiguration/{{a:application}}' "$@" ; }
+rde eumCorrelation_disable "Disable all EUM correlation cookies." "" "-a 41"
 doc event << EOF
 Create and list events in your business applications.
 EOF

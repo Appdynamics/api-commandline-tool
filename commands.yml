@@ -700,6 +700,15 @@ synthetic:
     method: POST
     endpoint: /controller/restui/synthetic/schedule/{{a:application}}/updateScheduleBatch
     payload: {{d:synthetic_job}}
+eumCorrelation:
+  title: User Experience App Integration
+  description: Manage correlation cookies for APM and EUM integration
+  disable:
+    title: Disable all EUM correlation cookies.
+    example: -a 41
+    method: POST
+    endpoint: /controller/restui/configuration/userExperienceAppIntegration/businessTransactionEumCorrelation/saveConfiguration/{{a:application}}
+    payload: {\"isEnabled\":false,\"includeRules\":[],\"excludeRules\":[],\"btHeaderInjectionForSafeAgentsEnabled\":false}
 tier:
   title: Tiers
   description: List all tiers.
