@@ -409,8 +409,10 @@ List service endpoints
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| list | List all SEPs. Provide an application id (-a). | `act.sh sep list -a 29` |
-| update | Insert or Update SEPs. Provide an application id (-a) and a json string or a @file (-d) as parameter. | `act.sh sep update -a 29 -d @examples/sep.json` |
+| config | List all SEP configurations. Provide an application id (-a). | `act.sh sep config -a 29` |
+| delete | Delete SEPs Provide an id or an list of ids of service end points (-s) as parameter. | `act.sh sep delete -s 11705717,11705424` |
+| list | List all SEPs Provide an application id (-a), a start timestamp (-s) and an end timestamp (-e) as parameters. | `act.sh sep list -a 29 -s 1610389435 -e 1620389435` |
+| updateConfig | Insert or Update SEPs. Provide an application id (-a) and a json string or a @file (-d) as parameter. | `act.sh sep updateConfig -a 29 -d @examples/sep.json` |
 
 
 ## server

@@ -620,12 +620,26 @@ scope:
 sep:
   title: Service Endpoints
   description: List service endpoints
-  list:
-    title: List all SEPs.
+  config:
+    title: List all SEP configurations.
     description: Provide an application id (-a).
     example: -a 29
     endpoint: /controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep
-  update:
+  list:
+    title: List all SEPs
+    description: Provide an application id (-a), a start timestamp (-s) and an end timestamp (-e) as parameters.
+    example: -a 29 -s 1610389435 -e 1620389435
+    method: POST
+    endpoint: /controller/restui/serviceEndpoint/list
+    payload: {\"requestFilter\":{\"queryParams\":{\"applicationId\":{{a:application}},\"mode\":\"FILTER_EXCLUDED\"},\"searchText\":\"\",\"filters\":{\"type\":[],\"sepName\":[]}},\"columnSorts\":[{\"column\":\"NAME\",\"direction\":\"ASC\"}],\"timeRangeStart\":{{s:start}},\"timeRangeEnd\":{{e:end}}}
+  delete:
+    title: Delete SEPs
+    description: Provide an id or an list of ids of service end points (-s) as parameter.
+    example: -s 11705717,11705424
+    method: POST
+    endpoint: /controller/restui/serviceEndpoint/delete
+    payload: [{{s:service_endpoints}}]
+  updateConfig:
     title: Insert or Update SEPs.
     description: Provide an application id (-a) and a json string or a @file (-d) as parameter.
     example: -a 29 -d @examples/sep.json

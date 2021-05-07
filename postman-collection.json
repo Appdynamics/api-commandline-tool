@@ -2549,7 +2549,7 @@
             "description": "Provide an application id (-a) as parameter"
 					}
 				}]},{"name": "sep","item": [{
-					"name": "List all SEPs.",
+					"name": "List all SEP configurations.",
 					"request": {
 						"method": "",
 						"header": [
@@ -2577,6 +2577,66 @@
               "query": []
 						},
             "description": "Provide an application id (-a)."
+					}
+				},{
+					"name": "Delete SEPs",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{service_endpoints}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/serviceEndpoint/delete",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","serviceEndpoint","delete"],
+              "query": []
+						},
+            "description": "Provide an id or an list of ids of service end points (-s) as parameter."
+					}
+				},{
+					"name": "List all SEPs",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"requestFilter\":{\"queryParams\":{\"applicationId\":{{application}},\"mode\":\"FILTER_EXCLUDED\"},\"searchText\":\"\",\"filters\":{\"type\":[],\"sepName\":[]}},\"columnSorts\":[{\"column\":\"NAME\",\"direction\":\"ASC\"}],\"timeRangeStart\":{{start}},\"timeRangeEnd\":{{end}}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/serviceEndpoint/list",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","serviceEndpoint","list"],
+              "query": []
+						},
+            "description": "Provide an application id (-a), a start timestamp (-s) and an end timestamp (-e) as parameters."
 					}
 				},{
 					"name": "Insert or Update SEPs.",

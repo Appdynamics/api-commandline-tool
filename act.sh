@@ -1,6 +1,6 @@
 #!/bin/bash
-ACT_VERSION="v20.3.0"
-ACT_LAST_COMMIT="2d76e711095ed5c5b6cd7affa9e55de9a91330d0"
+ACT_VERSION="v21.1.0"
+ACT_LAST_COMMIT="46684e3055da89ddf8fd1ff5847f55301445c786"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -320,10 +320,14 @@ rde scope_list "List all scopes." "Provide an application id (-a) as parameter" 
 doc sep << EOF
 List service endpoints
 EOF
-sep_list() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
-rde sep_list "List all SEPs." "Provide an application id (-a)." "-a 29"
-sep_update() { apiCall -X POST -d '{{d:sep_json}}' '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
-rde sep_update "Insert or Update SEPs." "Provide an application id (-a) and a json string or a @file (-d) as parameter." "-a 29 -d @examples/sep.json"
+sep_config() { apiCall '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_config "List all SEP configurations." "Provide an application id (-a)." "-a 29"
+sep_delete() { apiCall -X POST -d '[{{s:service_endpoints}}]' '/controller/restui/serviceEndpoint/delete' "$@" ; }
+rde sep_delete "Delete SEPs" "Provide an id or an list of ids of service end points (-s) as parameter." "-s 11705717,11705424"
+sep_list() { apiCall -X POST -d '{"requestFilter":{"queryParams":{"applicationId":{{a:application}},"mode":"FILTER_EXCLUDED"},"searchText":"","filters":{"type":[],"sepName":[]}},"columnSorts":[{"column":"NAME","direction":"ASC"}],"timeRangeStart":{{s:start}},"timeRangeEnd":{{e:end}}}' '/controller/restui/serviceEndpoint/list' "$@" ; }
+rde sep_list "List all SEPs" "Provide an application id (-a), a start timestamp (-s) and an end timestamp (-e) as parameters." "-a 29 -s 1610389435 -e 1620389435"
+sep_updateConfig() { apiCall -X POST -d '{{d:sep_json}}' '/controller/api/accounts/{{i:accountid}}/applications/{{a:application}}/sep' "$@" ; }
+rde sep_updateConfig "Insert or Update SEPs." "Provide an application id (-a) and a json string or a @file (-d) as parameter." "-a 29 -d @examples/sep.json"
 doc server << EOF
 List servers, their properties and metrics
 EOF
