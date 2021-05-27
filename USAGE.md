@@ -319,6 +319,18 @@ Configure and retrieve health rules and their violates.
 | copy | Copy healthrules from one application to another. Provide the source application id ("-s") and the target application ("-t")."<br>"/If you provide ("-n") only the named health rule will be copied. |  |
 
 
+## informationPoint
+
+
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| create | Create an information point. Provide an json file (with @ as prefix) containing the information point config (-d) as parameter. | `act.sh informationPoint create -d @examples/information_point.json` |
+| delete | Delete information points. Provide an id or an list of ids of information points (-i) as parameter. | `act.sh informationPoint delete -i 1326,1327` |
+| list | List information points. Provide an application id (-a) and a time range string (-t) as parameters. | `act.sh informationPoint list -a 6743 -t last_1_hour.BEFORE_NOW.-1.-1.60` |
+| update | Update an information point. Provide an json file (with @ as prefix) containing the information point update config (-d) as parameter. | `act.sh informationPoint update -d @examples/information_point_update.json` |
+
+
 ## licenserule
 
 

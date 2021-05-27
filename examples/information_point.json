@@ -1,0 +1,45 @@
+{
+    "agentType": "APP_AGENT",
+    "methodDefinition": {
+        "matchType": "MATCHES_CLASS",
+        "className": "MyTest",
+        "methodName": "testMethod",
+        "methodParameterTypes": [],
+        "matchConditions": [{
+            "methodDataGathererConfig": {
+                "gathererType": "POSITION_GATHERER_TYPE",
+                "position": 0,
+                "objectDataTransformer": {
+                    "useToString": true,
+                    "transformerType": "TO_STRING_OBJECT_DATA_TRANSFORMER_TYPE"
+                }
+            },
+            "match": {
+                "extendedMatchType": "STARTSWITH",
+                "extendedMatchPattern": "test",
+                "inList": null,
+                "inverse": null,
+                "caseInsensitive": null,
+                "matchPattern": "test",
+                "matchType": null,
+                "regexGroups": null
+            }
+        }]
+    },
+    "metricDefinitions": [{
+        "name": "test",
+        "methodDataGathererConfig": {
+            "gathererType": "POSITION_GATHERER_TYPE",
+            "returnValue": false,
+            "position": 0,
+            "objectDataTransformer": {
+                "transformerType": "TO_STRING_OBJECT_DATA_TRANSFORMER_TYPE",
+                "useToString": true
+            }
+        },
+        "metricTimeRollupType": "AVERAGE"
+    }],
+    "jsonDefinition": "",
+    "name": "mytest",
+    "applicationId": 6743
+}

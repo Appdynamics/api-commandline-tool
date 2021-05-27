@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v21.4.0"
-ACT_LAST_COMMIT="2f91fa3da1708fc1164c68a4a353de156f040d72"
+ACT_LAST_COMMIT="bf2f495b83d0b30ca3c27ac97fd27189698e2ca0"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -260,6 +260,16 @@ healthrule_list() { apiCall '/controller/alerting/rest/v1/applications/{{a:appli
 rde healthrule_list "List all healthrules." "Provide an application (-a) as parameter" "-a 29"
 healthrule_violations() { apiCall '/controller/rest/applications/{{a:application}}/problems/healthrule-violations?time-range-type={{t:time_range_type}}&duration-in-mins={{d:duration_in_minutes?}}&start-time={{b:start_time?}}&end-time={{e:end_time?}}' "$@" ; }
 rde healthrule_violations "Get all healthrule violations." "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)" "-a 29 -t BEFORE_NOW -d 120"
+doc informationPoint << EOF
+EOF
+informationPoint_create() { apiCall -X POST -d '{{d:infopoint_config}}' '/controller/restui/informationPointUiService/createInfoPointGathererConfig' "$@" ; }
+rde informationPoint_create "Create an information point." "Provide an json file (with @ as prefix) containing the information point config (-d) as parameter." "-d @examples/information_point.json"
+informationPoint_delete() { apiCall -X POST -d '[{{i:information_points}}]' '/controller/restui/informationPointUiService/deleteInformationPoints' "$@" ; }
+rde informationPoint_delete "Delete information points." "Provide an id or an list of ids of information points (-i) as parameter." "-i 1326,1327"
+informationPoint_list() { apiCall '/controller/restui/informationPointUiService/getAllInfoPointsListViewData/{{a:application}}?time-range={{t:timerange}}' "$@" ; }
+rde informationPoint_list "List information points." "Provide an application id (-a) and a time range string (-t) as parameters." "-a 6743 -t last_1_hour.BEFORE_NOW.-1.-1.60"
+informationPoint_update() { apiCall -X POST -d '{{d:infopoint_config}}' '/controller/restui/informationPointUiService/updateInfoPointGathererConfig' "$@" ; }
+rde informationPoint_update "Update an information point." "Provide an json file (with @ as prefix) containing the information point update config (-d) as parameter." "-d @examples/information_point_update.json"
 doc licenserule << EOF
 EOF
 licenserule_create() { apiCall -X POST '/controller/mds/v1/license/rules' "$@" ; }

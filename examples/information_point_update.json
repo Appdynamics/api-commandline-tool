@@ -1,0 +1,94 @@
+{
+    "id": 1326,
+    "version": 4,
+    "name": "mytest2",
+    "nameUnique": true,
+    "applicationId": 6743,
+    "methodDefinition": {
+        "id": 4037,
+        "version": 0,
+        "matchType": "MATCHES_CLASS",
+        "className": "MyTest",
+        "methodName": "testMethod",
+        "methodParameterTypes": [],
+        "matchConditions": [{
+            "id": 358,
+            "version": 0,
+            "methodDataGathererConfig": {
+                "id": 9418,
+                "version": 0,
+                "gathererType": "POSITION_GATHERER_TYPE",
+                "name": null,
+                "hashValue": 0,
+                "hashValueDetermined": false,
+                "returnValue": false,
+                "position": 0,
+                "objectDataTransformer": {
+                    "transformerType": "TO_STRING_OBJECT_DATA_TRANSFORMER_TYPE",
+                    "useToString": true,
+                    "objectStateGetterMethods": null,
+                    "fieldName": null,
+                    "userDefinedName": null,
+                    "regex": null,
+                    "objectDataFilter": null,
+                    "hashValue": 0,
+                    "hashValueDetermined": false
+                },
+                "analyticsTypeConfig": null
+            },
+            "match": {
+                "matchType": "STARTSWITH",
+                "matchPattern": "test",
+                "inverse": false,
+                "inList": null,
+                "extendedMatchType": "STARTSWITH",
+                "extendedMatchPattern": "test",
+                "regexGroups": null,
+                "caseInsensitive": false
+            },
+            "hashValue": 0,
+            "hashValueDetermined": false
+        }],
+        "moduleName": null,
+        "fileName": null,
+        "startLineNo": 0,
+        "endLineNo": 0,
+        "matchNoArgsOnly": false,
+        "gathererType": "CLASS_METHOD",
+        "hashValue": 0,
+        "hashValueDetermined": false,
+        "ruleContextID": 579900972
+    },
+    "metricDefinitions": [{
+        "id": 205,
+        "version": 1,
+        "name": "test",
+        "nameUnique": true,
+        "methodDataGathererConfig": {
+            "id": 9419,
+            "version": 0,
+            "gathererType": "POSITION_GATHERER_TYPE",
+            "name": null,
+            "hashValue": 0,
+            "hashValueDetermined": false,
+            "returnValue": false,
+            "position": 0,
+            "objectDataTransformer": {
+                "transformerType": "TO_STRING_OBJECT_DATA_TRANSFORMER_TYPE",
+                "useToString": true,
+                "objectStateGetterMethods": null,
+                "fieldName": null,
+                "userDefinedName": null,
+                "regex": null,
+                "objectDataFilter": null,
+                "hashValue": 0,
+                "hashValueDetermined": false
+            },
+            "analyticsTypeConfig": null
+        },
+        "metricId": 140686672,
+        "metricTimeRollupType": "AVERAGE"
+    }],
+    "jsonDefinition": null,
+    "agentType": "APP_AGENT"
+}

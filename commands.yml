@@ -775,3 +775,33 @@ user:
     example: -n myadmin -d Administrator -r \"Account Administrator,Administrator\" -p ******** -m admin@localhost
     method: POST
     endpoint: /controller/rest/users?user-id={{i:user_id}}&user-name={{n:user_name}}&user-display-name={{d:user_display_name}}&user-password={{p:user_password?}}&user-email={{m:user_mail}}&user-roles={{r:user_roles?}}
+informationPoint:
+  title: Information Points
+  descripion: Retrieve, create and modify information points.
+  list:
+    title: List information points.
+    description: Provide an application id (-a) and a time range string (-t) as parameters.
+    example: -a 6743 -t last_1_hour.BEFORE_NOW.-1.-1.60
+    method: GET
+    endpoint: /controller/restui/informationPointUiService/getAllInfoPointsListViewData/{{a:application}}?time-range={{t:timerange}}
+  create:
+    title: Create an information point.
+    description: Provide an json file (with @ as prefix) containing the information point config (-d) as parameter.
+    example: -d @examples/information_point.json
+    method: POST
+    endpoint: /controller/restui/informationPointUiService/createInfoPointGathererConfig
+    payload: {{d:infopoint_config}}
+  update:
+    title: Update an information point.
+    description: Provide an json file (with @ as prefix) containing the information point update config (-d) as parameter.
+    example: -d @examples/information_point_update.json
+    method: POST
+    endpoint: /controller/restui/informationPointUiService/updateInfoPointGathererConfig
+    payload: {{d:infopoint_config}}
+  delete:
+    title: Delete information points.
+    description: Provide an id or an list of ids of information points (-i) as parameter.
+    example: -i 1326,1327
+    method: POST
+    endpoint: /controller/restui/informationPointUiService/deleteInformationPoints
+    payload: [{{i:information_points}}]

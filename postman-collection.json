@@ -1978,6 +1978,126 @@
 						},
             "description": "Provide an application (-a) and a time range type (-t) as parameters, as well as a duration in minutes (-d) or a start-time (-b) and an end time (-f)"
 					}
+				}]},{"name": "informationPoint","item": [{
+					"name": "Create an information point.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{infopoint_config}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/informationPointUiService/createInfoPointGathererConfig",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","informationPointUiService","createInfoPointGathererConfig"],
+              "query": []
+						},
+            "description": "Provide an json file (with @ as prefix) containing the information point config (-d) as parameter."
+					}
+				},{
+					"name": "Delete information points.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "[{{information_points}}]"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/informationPointUiService/deleteInformationPoints",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","informationPointUiService","deleteInformationPoints"],
+              "query": []
+						},
+            "description": "Provide an id or an list of ids of information points (-i) as parameter."
+					}
+				},{
+					"name": "List information points.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/informationPointUiService/getAllInfoPointsListViewData/{{a:application}}?time-range={{t:timerange}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","informationPointUiService","getAllInfoPointsListViewData","{{application}}"],
+              "query": [{"key": "time-range","value": "{{timerange}}"}]
+						},
+            "description": "Provide an application id (-a) and a time range string (-t) as parameters."
+					}
+				},{
+					"name": "Update an information point.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{infopoint_config}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/informationPointUiService/updateInfoPointGathererConfig",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","informationPointUiService","updateInfoPointGathererConfig"],
+              "query": []
+						},
+            "description": "Provide an json file (with @ as prefix) containing the information point update config (-d) as parameter."
+					}
 				}]},{"name": "licenserule","item": [{
 					"name": "Create a license rule.",
 					"request": {
