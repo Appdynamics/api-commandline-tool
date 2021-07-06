@@ -448,6 +448,126 @@
 						},
             "description": "Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter."
 					}
+				}]},{"name": "alertingtemplate","item": [{
+					"name": "Delete an alerting template",
+					"request": {
+						"method": "DELETE",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/templates/{{a:alerting_template_id}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","templates","{{alerting_template_id}}"],
+              "query": []
+						},
+            "description": "Provide the id of the alerting template (-a) as parameter."
+					}
+				},{
+					"name": "Export an alerting template",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/templates/{{a:alerting_template_id}}/export",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","templates","{{alerting_template_id}}","export"],
+              "query": []
+						},
+            "description": "Provide the id of the alerting template (-a) as parameter."
+					}
+				},{
+					"name": "Import an alerting template",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{alerting_template}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/templates/import",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","templates","import"],
+              "query": []
+						},
+            "description": "Provide a json string or a file (with @ as prefix) as parameter (-d)."
+					}
+				},{
+					"name": "List all alerting templates",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/alerting/rest/v1/templates/details",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","alerting","rest","v1","templates","details"],
+              "query": []
+						},
+            "description": "This command requires no further arguments."
+					}
 				}]},{"name": "analyticsmetric","item": [{
 					"name": "Create analytics metric",
 					"request": {

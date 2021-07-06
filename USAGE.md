@@ -87,6 +87,18 @@ List, Reset, Disable AppDynamics Agents
 | toggleMachineAgent | Enable or Disable an machine agent by id Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter. | `act.sh agents toggleMachineAgent -i 15 -m false` |
 
 
+## alertingtemplate
+
+These commands allow you to list, import and export action templates.
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| delete | Delete an alerting template Provide the id of the alerting template (-a) as parameter. | `act.sh alertingtemplate delete -i 68` |
+| export | Export an alerting template Provide the id of the alerting template (-a) as parameter. | `act.sh alertingtemplate export -i 68` |
+| import | Import an alerting template Provide a json string or a file (with @ as prefix) as parameter (-d). | `act.sh alertingtemplate import -d examples/alertingTemplate.json` |
+| list | List all alerting templates This command requires no further arguments. | `act.sh alertingtemplate list ` |
+
+
 ## analyticsmetric
 
 Manage custom analytics metrics

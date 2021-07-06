@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v21.4.0"
-ACT_LAST_COMMIT="bf2f495b83d0b30ca3c27ac97fd27189698e2ca0"
+ACT_LAST_COMMIT="4c2d9a48c1272ccab4fc3b39e3a7d11027e146dc"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -107,6 +107,17 @@ agents_list() { apiCall -X POST -d '{"requestFilter":{"queryParams":{"applicatio
 rde agents_list "List all agents of a specific type" "Provide a type as parameter (-t). Possible types are appserver, machine, cluster." ""
 agents_toggleMachineAgent() { apiCall -X POST -d '[{{i:id}}]' '/controller/restui/agent/setting/toggleMachineAgentEnable?enabledFlag={{m:enabledFlag}}&entityType=MACHINE_INSTANCE' "$@" ; }
 rde agents_toggleMachineAgent "Enable or Disable an machine agent by id" "Provide an agent id (-i) and the enabled (-m) flag (true/false) as parameter." "-i 15 -m false"
+doc alertingtemplate << EOF
+These commands allow you to list, import and export action templates.
+EOF
+alertingtemplate_delete() { apiCall -X DELETE '/controller/alerting/rest/v1/templates/{{a:alerting_template_id}}' "$@" ; }
+rde alertingtemplate_delete "Delete an alerting template" "Provide the id of the alerting template (-a) as parameter." "-i 68"
+alertingtemplate_export() { apiCall -X POST '/controller/alerting/rest/v1/templates/{{a:alerting_template_id}}/export' "$@" ; }
+rde alertingtemplate_export "Export an alerting template" "Provide the id of the alerting template (-a) as parameter." "-i 68"
+alertingtemplate_import() { apiCall -X POST -d '{{d:alerting_template}}' '/controller/alerting/rest/v1/templates/import' "$@" ; }
+rde alertingtemplate_import "Import an alerting template" "Provide a json string or a file (with @ as prefix) as parameter (-d)." "-d examples/alertingTemplate.json"
+alertingtemplate_list() { apiCall '/controller/alerting/rest/v1/templates/details' "$@" ; }
+rde alertingtemplate_list "List all alerting templates" "This command requires no further arguments." ""
 doc analyticsmetric << EOF
 Manage custom analytics metrics
 EOF

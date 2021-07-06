@@ -1,0 +1,11 @@
+{
+    "healthRuleTemplateMemberConfig": {
+        "matchType": "ALL",
+        "ids": [
+            0
+        ]
+    },
+    "applicationId": 7948,
+    "description": "Example Alerting Template",
+    "name": "Example"
+}

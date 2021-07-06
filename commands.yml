@@ -134,6 +134,34 @@ actiontemplate:
     example:
     method: GET
     endpoint: /controller/restui/httpaction/getHttpRequestActionPlanList
+alertingtemplate:
+  title: Alerting Templates
+  description: These commands allow you to list, import and export action templates.
+  list:
+    title: List all alerting templates
+    description: This command requires no further arguments.
+    example:
+    method: GET
+    endpoint: /controller/alerting/rest/v1/templates/details
+  import:
+    title: Import an alerting template
+    description: Provide a json string or a file (with @ as prefix) as parameter (-d).
+    example: -d examples/alertingTemplate.json
+    method: POST
+    endpoint: /controller/alerting/rest/v1/templates/import
+    payload: {{d:alerting_template}}
+  export:
+    title: Export an alerting template
+    description: Provide the id of the alerting template (-a) as parameter.
+    example: -i 68
+    method: POST
+    endpoint: /controller/alerting/rest/v1/templates/{{a:alerting_template_id}}/export
+  delete:
+    title: Delete an alerting template
+    description: Provide the id of the alerting template (-a) as parameter.
+    example: -i 68
+    method: DELETE
+    endpoint: /controller/alerting/rest/v1/templates/{{a:alerting_template_id}}
 adql:
   title: Run ADQL Queries
   description: These commands allow you to run ADQL queries agains the controller (not the event service!)
