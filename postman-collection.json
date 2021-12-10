@@ -1219,11 +1219,11 @@
 							"raw": "{{business_transaction_name}}"
 						},
 						"url": {
-							"raw": "{{controller_host}}/controller/restui/bt/renameBT?id={{b:business_transaction}}",
+							"raw": "{{controller_host}}/controller/restui/v1/bt/renameBT?id={{b:business_transaction}}",
               "host": [
 								"{{controller_host}}"
 							],
-							"path": ["controller","restui","bt","renameBT"],
+							"path": ["controller","restui","v1","bt","renameBT"],
               "query": [{"key": "id","value": "{{business_transaction}}"}]
 						},
             "description": "Provide the bt id (-b) and the new name (-n) as parameters"

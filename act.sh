@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v21.4.0"
-ACT_LAST_COMMIT="4c2d9a48c1272ccab4fc3b39e3a7d11027e146dc"
+ACT_LAST_COMMIT="9b200d473e5c26fa65f6aa112a34c648a3dc0645"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -184,7 +184,7 @@ bt_get() { apiCall '/controller/rest/applications/{{a:application}}/business-tra
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
 bt_list() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
 rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
-bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
+bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/v1/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
 rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc configuration << EOF
 The configuration API enables you read and modify selected Controller configuration settings programmatically.

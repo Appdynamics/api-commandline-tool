@@ -292,7 +292,7 @@ bt:
     description: Provide the bt id (-b) and the new name (-n) as parameters
     example: -b 13 -n Checkout
     method: POST
-    endpoint: /controller/restui/bt/renameBT?id={{b:business_transaction}}
+    endpoint: /controller/restui/v1/bt/renameBT?id={{b:business_transaction}}
     payload: {{n:business_transaction_name}}
   creategroup:
     title: Create a BT group.
