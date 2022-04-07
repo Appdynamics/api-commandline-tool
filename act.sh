@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v21.4.0"
-ACT_LAST_COMMIT="9b200d473e5c26fa65f6aa112a34c648a3dc0645"
+ACT_LAST_COMMIT="efc9c1266341f1ef62e684b41c3021693b73146a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -681,7 +681,7 @@ EOF
 CONTROLLER_LOGIN_STATUS=0
 controller_login() {
   debug "Login at ${CONFIG_CONTROLLER_HOST} with ${CONFIG_CONTROLLER_CREDENTIALS}"
-  LOGIN_RESPONSE=$(httpClient -sI -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login")
+  LOGIN_RESPONSE=$(httpClient -v -c "${CONFIG_CONTROLLER_COOKIE_LOCATION}" --user "${CONFIG_CONTROLLER_CREDENTIALS}" "${CONFIG_CONTROLLER_HOST}/controller/auth?action=login" 2>&1)
   debug "RESPONSE: ${LOGIN_RESPONSE}"
   # The section option is for supporting HTTP2 (#12)
   if [[ "${LOGIN_RESPONSE/200 OK}" != "${LOGIN_RESPONSE}" ]] || [[ "${LOGIN_RESPONSE/HTTP\/2 200}" != "${LOGIN_RESPONSE}" ]]; then
