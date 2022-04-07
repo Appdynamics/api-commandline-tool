@@ -1,6 +1,6 @@
 #!/bin/bash
-ACT_VERSION="v21.4.0"
-ACT_LAST_COMMIT="efc9c1266341f1ef62e684b41c3021693b73146a"
+ACT_VERSION="v22.4.0"
+ACT_LAST_COMMIT="b18e9f68d51eae728697825a6b460470fa687ec1"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
