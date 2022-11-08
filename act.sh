@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v22.4.0"
-ACT_LAST_COMMIT="b18e9f68d51eae728697825a6b460470fa687ec1"
+ACT_LAST_COMMIT="401363b3bf068013122e8a9975b1af70be7dfbec"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -152,6 +152,8 @@ application_get() { apiCall '/controller/rest/applications/{{a:application}}' "$
 rde application_get "Get an application." "Provide an application id or name as parameter (-a)." "-a 15"
 application_list() { apiCall '/controller/rest/applications' "$@" ; }
 rde application_list "List all applications." "This command requires no further arguments." ""
+application_listdetails() { apiCall -X POST -d '{"requestFilter":[{{i:ids}}],"timeRangeStart":{{s:start}},"timeRangeEnd":{{e:end}},"searchFilters":null,"columnSorts":null,"resultColumns":["APP_OVERALL_HEALTH","CALLS","CALLS_PER_MINUTE","AVERAGE_RESPONSE_TIME","ERROR_PERCENT","ERRORS","ERRORS_PER_MINUTE","NODE_HEALTH","BT_HEALTH"],"offset":0,"limit":-1} ' '/controller/restui/v1/app/list/ids' "$@" ; }
+rde application_listdetails "List application details" "List application details including health. Provide application ids as parameter (-i), a start and end timestamp (-s and -e)." "-i 9326,8914 -s 1610389435 -e 1620389435"
 doc audit << EOF
 The Controller audit history is a record of the configuration and user activities in the Controller configuration.
 EOF

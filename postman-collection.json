@@ -898,6 +898,36 @@
 						},
             "description": "This command requires no further arguments."
 					}
+				},{
+					"name": "List application details",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"requestFilter\":[{{ids}}],\"timeRangeStart\":{{start}},\"timeRangeEnd\":{{end}},\"searchFilters\":null,\"columnSorts\":null,\"resultColumns\":[\"APP_OVERALL_HEALTH\",\"CALLS\",\"CALLS_PER_MINUTE\",\"AVERAGE_RESPONSE_TIME\",\"ERROR_PERCENT\",\"ERRORS\",\"ERRORS_PER_MINUTE\",\"NODE_HEALTH\",\"BT_HEALTH\"],\"offset\":0,\"limit\":-1} "
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/v1/app/list/ids",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","v1","app","list","ids"],
+              "query": []
+						},
+            "description": "List application details including health. Provide application ids as parameter (-i), a start and end timestamp (-s and -e)."
+					}
 				}]},{"name": "audit","item": [{
 					"name": "Get audit history.",
 					"request": {
