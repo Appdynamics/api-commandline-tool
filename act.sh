@@ -93,7 +93,7 @@ doc adql << EOF
 These commands allow you to run ADQL queries agains the controller (not the event service!)
 EOF
 adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
-rde adql_query "Run an ADQL query" "" ""
+rde adql_query "Run an ADQL query:" "Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters.  Remember to escape double quotes in the query." "-q 'SELECT eventTimestamp FROM transactions LIMIT 1' -s 2022-06-05T00:00:00.000Z -e 2022-06-16T06:00:00.000Z"
 doc agents << EOF
 List, Reset, Disable AppDynamics Agents
 EOF
