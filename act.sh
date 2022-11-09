@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v22.4.0"
-ACT_LAST_COMMIT="401363b3bf068013122e8a9975b1af70be7dfbec"
+ACT_LAST_COMMIT="4b793e41e6df7ef1911b29e871c9046b99651441"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -93,7 +93,7 @@ doc adql << EOF
 These commands allow you to run ADQL queries agains the controller (not the event service!)
 EOF
 adql_query() { apiCall -X POST -d '{"requests":[{"query":"{{q:query}}","label":"DataQuery","customResponseRequest":true,"responseConverter":"UIGRID","responseType":"ORDERED","start":"{{s:start}}","end":"{{e:end}}","chunk":false,"mode":"page","scrollId":"","size":"50000","offset":"0","limit":"1000000"}],"start":"","end":"","chunk":false,"mode":"none","scrollId":"","size":"","offset":"","limit":"1000000","chunkDelayMillis":"","chunkBreakDelayMillis":"","chunkBreakBytes":"","others":"false","emptyOnError":"false","token":"","dashboardId":0,"warRoomToken":"","warRoom":false}' '/controller/restui/analytics/adql/query' "$@" ; }
-rde adql_query "Run an ADQL query:" "Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters.  Remember to escape double quotes in the query." "-q 'SELECT eventTimestamp FROM transactions LIMIT 1' -s 2022-06-05T00:00:00.000Z -e 2022-06-16T06:00:00.000Z"
+rde adql_query "Run an ADQL query" "Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters. Remember to escape double quotes in the query." "-q 'SELECT eventTimestamp FROM transactions LIMIT 1' -s 2022-06-05T00:00:00.000Z -e 2022-06-16T06:00:00.000Z"
 doc agents << EOF
 List, Reset, Disable AppDynamics Agents
 EOF
@@ -313,6 +313,13 @@ node_markhistorical() { apiCall -X POST '/controller/rest/mark-nodes-historical?
 rde node_markhistorical "Mark nodes as historical." "Provide a comma separated list of node ids." "-n 45,46"
 node_move() { apiCall -X POST '/controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}' "$@" ; }
 rde node_move "Move node." "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier." "-n 1782418 -t 187811"
+doc otel << EOF
+Configure OpenTelemetry collector for AppDynamics
+EOF
+otel_getApiKey() { apiCall '/controller/restui/otel/getOtelApiKey' "$@" ; }
+rde otel_getApiKey "Get OpenTelemetry API Key" "No parameter required." ""
+otel_isEnabled() { apiCall '/controller/restui/otel/isOtelEnabled' "$@" ; }
+rde otel_isEnabled "Check if OpenTelemetry enabled." "No parameter required." ""
 doc policy << EOF
 Import and export policies
 EOF

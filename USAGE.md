@@ -71,7 +71,7 @@ These commands allow you to run ADQL queries agains the controller (not the even
 
 | Command | Description | Example |
 | ------- | ----------- | ------- |
-| query | Run an ADQL query | `act.sh adql query ` |
+| query | Run an ADQL query Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters. Remember to escape double quotes in the query. | `act.sh adql query -q 'SELECT eventTimestamp FROM transactions LIMIT 1' -s 2022-06-05T00:00:00.000Z -e 2022-06-16T06:00:00.000Z` |
 
 
 ## agents
@@ -140,6 +140,7 @@ The applications API lets you retrieve information about the monitored environme
 | export | Export an application. Provide an application id as parameter (-a) | `act.sh application export -a 29` |
 | get | Get an application. Provide an application id or name as parameter (-a). | `act.sh application get -a 15` |
 | list | List all applications. This command requires no further arguments. | `act.sh application list ` |
+| listdetails | List application details List application details including health. Provide application ids as parameter (-i), a start and end timestamp (-s and -e). | `act.sh application listdetails -i 9326,8914 -s 1610389435 -e 1620389435` |
 
 
 ## audit
@@ -392,6 +393,16 @@ Retrieve nodes within a business application
 | list | List all nodes. Provide the application id as parameter (-a). | `act.sh node list -a 29` |
 | markhistorical | Mark nodes as historical. Provide a comma separated list of node ids. | `act.sh node markhistorical -n 45,46` |
 | move | Move node. Provide a node id (-n) and a tier id (-t) to move the given node to the given tier. | `act.sh node move -n 1782418 -t 187811` |
+
+
+## otel
+
+Configure OpenTelemetry collector for AppDynamics
+
+| Command | Description | Example |
+| ------- | ----------- | ------- |
+| getApiKey | Get OpenTelemetry API Key No parameter required. | `act.sh otel getApiKey ` |
+| isEnabled | Check if OpenTelemetry enabled. No parameter required. | `act.sh otel isEnabled ` |
 
 
 ## policy

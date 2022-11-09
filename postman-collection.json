@@ -296,7 +296,7 @@
 							"path": ["controller","restui","analytics","adql","query"],
               "query": []
 						},
-            "description": ""
+            "description": "Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters. Remember to escape double quotes in the query."
 					}
 				}]},{"name": "agents","item": [{
 					"name": "Disable an app agent by id",
@@ -2547,6 +2547,66 @@
               "query": []
 						},
             "description": "Provide a node id (-n) and a tier id (-t) to move the given node to the given tier."
+					}
+				}]},{"name": "otel","item": [{
+					"name": "Get OpenTelemetry API Key",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/otel/getOtelApiKey",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","otel","getOtelApiKey"],
+              "query": []
+						},
+            "description": "No parameter required."
+					}
+				},{
+					"name": "Check if OpenTelemetry enabled.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/otel/isOtelEnabled",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","otel","isOtelEnabled"],
+              "query": []
+						},
+            "description": "No parameter required."
 					}
 				}]},{"name": "policy","item": [{
 					"name": "List all policies.",

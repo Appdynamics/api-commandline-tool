@@ -174,8 +174,8 @@ adql:
   description: These commands allow you to run ADQL queries agains the controller (not the event service!)
   query:
     title: Run an ADQL query
-    description:
-    example:
+    description: Provide an adql query (-q), a start time (-s) and an end time (-e) as parameters. Remember to escape double quotes in the query.
+    example: -q 'SELECT eventTimestamp FROM transactions LIMIT 1' -s 2022-06-05T00:00:00.000Z -e 2022-06-16T06:00:00.000Z
     method: POST
     endpoint: /controller/restui/analytics/adql/query
     payload: {\"requests\":[{\"query\":\"{{q:query}}\",\"label\":\"DataQuery\",\"customResponseRequest\":true,\"responseConverter\":\"UIGRID\",\"responseType\":\"ORDERED\",\"start\":\"{{s:start}}\",\"end\":\"{{e:end}}\",\"chunk\":false,\"mode\":\"page\",\"scrollId\":\"\",\"size\":\"50000\",\"offset\":\"0\",\"limit\":\"1000000\"}],\"start\":\"\",\"end\":\"\",\"chunk\":false,\"mode\":\"none\",\"scrollId\":\"\",\"size\":\"\",\"offset\":\"\",\"limit\":\"1000000\",\"chunkDelayMillis\":\"\",\"chunkBreakDelayMillis\":\"\",\"chunkBreakBytes\":\"\",\"others\":\"false\",\"emptyOnError\":\"false\",\"token\":\"\",\"dashboardId\":0,\"warRoomToken\":\"\",\"warRoom\":false}
@@ -585,6 +585,21 @@ node:
     example: -n 1782418 -t 187811
     method: POST
     endpoint: /controller/restui/nodeUiService/moveNode/{{n:node}}/{{t:tier}}
+otel:
+  title: OpenTelemetry
+  description: Configure OpenTelemetry collector for AppDynamics
+  isEnabled:
+    title: Check if OpenTelemetry enabled.
+    description: No parameter required.
+    example:
+    method: GET
+    endpoint: /controller/restui/otel/isOtelEnabled
+  getApiKey:
+    title: Get OpenTelemetry API Key
+    description: No parameter required.
+    example:
+    method: GET
+    endpoint: /controller/restui/otel/getOtelApiKey
 policy:
   title: Policies API
   description: Import and export policies
