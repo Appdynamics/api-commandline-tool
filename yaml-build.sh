@@ -1,5 +1,5 @@
 #!/bin/bash
-LATEST_RELEASE=`git tag | tail -n 1`
+LATEST_RELEASE=`git tag --sort=creatordate | tail -n 1`
 LATEST_COMMIT=`git rev-parse HEAD`
 
 function from_yaml {
