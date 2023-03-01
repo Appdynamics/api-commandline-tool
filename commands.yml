@@ -616,6 +616,19 @@ policy:
     method: POST
     endpoint: /controller/policies/{{a:application}}
     form: file={{d:policy}}
+  get:
+    title: Get a policy.
+    description: Provide a policy id (-p) as parameter.
+    example: -p 9886
+    method: GET
+    endpoint: /controller/restui/event_reactor/getAllEventReactorsForApplication/{{p:policy}}
+  update:
+    title: Update an existing policy.
+    description: Provide a policy file or json (-d) as parameter.
+    example: -d @examples/policy.json
+    method: POST
+    endpoint: /controller/restui/event_reactor/update
+    payload: {{d:policy}}
 sam:
   title: Service Availability Monitoring
   description: Manage service monitoring configurations

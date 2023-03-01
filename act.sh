@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v22.11.0"
-ACT_LAST_COMMIT="3fb80e139d66581b5b77966bf726355849bc96dd"
+ACT_LAST_COMMIT="5fd8505fb577446ff525909c6d6c371880d4b244"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -325,8 +325,12 @@ Import and export policies
 EOF
 policy_export() { apiCall '/controller/policies/{{a:application}}' "$@" ; }
 rde policy_export "List all policies." "Provide an application (-a) as parameter." "-a 29"
+policy_get() { apiCall '/controller/restui/event_reactor/getAllEventReactorsForApplication/{{p:policy}}' "$@" ; }
+rde policy_get "Get a policy." "Provide a policy id (-p) as parameter." "-p 9886"
 policy_import() { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
 rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
+policy_update() { apiCall -X POST  -d '{{d:policy}}' '/controller/restui/event_reactor/update' "$@" ; }
+rde policy_update "Update an existing policy." "Provide a policy file or json (-d) as parameter." "-d @examples/policy.json"
 doc sam << EOF
 Manage service monitoring configurations
 EOF

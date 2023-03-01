@@ -412,7 +412,9 @@ Import and export policies
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | export | List all policies. Provide an application (-a) as parameter. | `act.sh policy export -a 29` |
+| get | Get a policy. Provide a policy id (-p) as parameter. | `act.sh policy get -p 9886` |
 | import | Import a policy. Provide an application (-a) and a policy file or json (-d) as parameter. | `act.sh policy import -a 29 -d @examples/policy.json` |
+| update | Update an existing policy. Provide a policy file or json (-d) as parameter. | `act.sh policy update -d @examples/policy.json` |
 
 
 ## sam

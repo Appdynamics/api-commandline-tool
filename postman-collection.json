@@ -2639,6 +2639,36 @@
             "description": "Provide an application (-a) as parameter."
 					}
 				},{
+					"name": "Get a policy.",
+					"request": {
+						"method": "GET",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/event_reactor/getAllEventReactorsForApplication/{{p:policy}}",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","event_reactor","getAllEventReactorsForApplication","{{policy}}"],
+              "query": []
+						},
+            "description": "Provide a policy id (-p) as parameter."
+					}
+				},{
 					"name": "Import a policy.",
 					"request": {
 						"method": "POST",
@@ -2667,6 +2697,36 @@
               "query": []
 						},
             "description": "Provide an application (-a) and a policy file or json (-d) as parameter."
+					}
+				},{
+					"name": "Update an existing policy.",
+					"request": {
+						"method": "POST ",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{{policy}}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/event_reactor/update",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","event_reactor","update"],
+              "query": []
+						},
+            "description": "Provide a policy file or json (-d) as parameter."
 					}
 				}]},{"name": "sam","item": [{
 					"name": "Create a monitor.",
