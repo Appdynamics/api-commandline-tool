@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v22.11.0"
-ACT_LAST_COMMIT="5fd8505fb577446ff525909c6d6c371880d4b244"
+ACT_LAST_COMMIT="103026d3b4e9e8ceaa6cf3aa667df94d3888453a"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -186,6 +186,8 @@ bt_get() { apiCall '/controller/rest/applications/{{a:application}}/business-tra
 rde bt_get "Get a BT." "Provide as parameters bt id (-b) and application id (-a)." "-a 29 -b 13"
 bt_list() { apiCall '/controller/rest/applications/{{a:application}}/business-transactions' "$@" ; }
 rde bt_list "List all BTs." "Provide the application id as parameter (-a)" "-a 29"
+bt_overflowtraffic() { apiCall -X POST -d '{"componentId":{{c:component_id}},"timeRangeSpecifier":{"type":"BEFORE_NOW","durationInMinutes":{{d:duration_in_minutes}}},"endEventId":0,"currentFetchedEventCount":0}' '/controller/restui/overflowtraffic/event' "$@" ; }
+rde bt_overflowtraffic "Get the overflow traffic for a given component." "Provide a component id (-c) and a duration in minutes for a time range (-d) as parameters." ""
 bt_rename() { apiCall -X POST -d '{{n:business_transaction_name}}' '/controller/restui/v1/bt/renameBT?id={{b:business_transaction}}' "$@" ; }
 rde bt_rename "Rename a BT." "Provide the bt id (-b) and the new name (-n) as parameters" "-b 13 -n Checkout"
 doc configuration << EOF
@@ -329,7 +331,7 @@ policy_get() { apiCall '/controller/restui/event_reactor/getAllEventReactorsForA
 rde policy_get "Get a policy." "Provide a policy id (-p) as parameter." "-p 9886"
 policy_import() { apiCall -X POST -F 'file={{d:policy}}' '/controller/policies/{{a:application}}' "$@" ; }
 rde policy_import "Import a policy." "Provide an application (-a) and a policy file or json (-d) as parameter." "-a 29 -d @examples/policy.json"
-policy_update() { apiCall -X POST  -d '{{d:policy}}' '/controller/restui/event_reactor/update' "$@" ; }
+policy_update() { apiCall -X POST -d '{{d:policy}}' '/controller/restui/event_reactor/update' "$@" ; }
 rde policy_update "Update an existing policy." "Provide a policy file or json (-d) as parameter." "-d @examples/policy.json"
 doc sam << EOF
 Manage service monitoring configurations

@@ -308,6 +308,13 @@ bt:
     method: POST
     endpoint: /controller/restui/bt/createBusinessTransactionGroup?applicationId={{a:application}}&groupName={{n:business_transaction_group_name}}
     payload: [{{b:business_transactions}}]
+  overflowtraffic:
+    title: Get the overflow traffic for a given component.
+    description: Provide a component id (-c) and a duration in minutes for a time range (-d) as parameters.
+    example:
+    method: POST
+    endpoint: /controller/restui/overflowtraffic/event
+    payload: {\"componentId\":{{c:component_id}},\"timeRangeSpecifier\":{\"type\":\"BEFORE_NOW\",\"durationInMinutes\":{{d:duration_in_minutes}}},\"endEventId\":0,\"currentFetchedEventCount\":0}
 configuration:
   title: Configuration API
   description: The configuration API enables you read and modify selected Controller configuration settings programmatically.

@@ -183,6 +183,7 @@ Retrieve information about business transactions within a given business applica
 | delete | Delete a BT. Provide the bt id as parameter (-b) | `act.sh bt delete -b 13` |
 | get | Get a BT. Provide as parameters bt id (-b) and application id (-a). | `act.sh bt get -a 29 -b 13` |
 | list | List all BTs. Provide the application id as parameter (-a) | `act.sh bt list -a 29` |
+| overflowtraffic | Get the overflow traffic for a given component. Provide a component id (-c) and a duration in minutes for a time range (-d) as parameters. | `act.sh bt overflowtraffic ` |
 | rename | Rename a BT. Provide the bt id (-b) and the new name (-n) as parameters | `act.sh bt rename -b 13 -n Checkout` |
 
 

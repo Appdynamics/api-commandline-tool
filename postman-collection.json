@@ -1229,6 +1229,36 @@
             "description": "Provide the application id as parameter (-a)"
 					}
 				},{
+					"name": "Get the overflow traffic for a given component.",
+					"request": {
+						"method": "POST",
+						"header": [
+              {
+								"key": "Content-Type",
+								"value": "application/json;charset=UTF-8",
+								"type": "text"
+							},
+              {
+								"key": "X-CSRF-TOKEN",
+								"value": "{{X-CSRF-TOKEN}}",
+								"type": "text"
+							}
+            ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"componentId\":{{component_id}},\"timeRangeSpecifier\":{\"type\":\"BEFORE_NOW\",\"durationInMinutes\":{{duration_in_minutes}}},\"endEventId\":0,\"currentFetchedEventCount\":0}"
+						},
+						"url": {
+							"raw": "{{controller_host}}/controller/restui/overflowtraffic/event",
+              "host": [
+								"{{controller_host}}"
+							],
+							"path": ["controller","restui","overflowtraffic","event"],
+              "query": []
+						},
+            "description": "Provide a component id (-c) and a duration in minutes for a time range (-d) as parameters."
+					}
+				},{
 					"name": "Rename a BT.",
 					"request": {
 						"method": "POST",
@@ -2701,7 +2731,7 @@
 				},{
 					"name": "Update an existing policy.",
 					"request": {
-						"method": "POST ",
+						"method": "POST",
 						"header": [
               {
 								"key": "Content-Type",
