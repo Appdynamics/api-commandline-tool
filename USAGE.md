@@ -106,6 +106,7 @@ Manage custom analytics metrics
 | Command | Description | Example |
 | ------- | ----------- | ------- |
 | create | Create analytics metric Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional. | `act.sh analyticsmetric create -q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'` |
+| list | List all analytics metrics | `act.sh analyticsmetric list ` |
 
 
 ## analyticsschema

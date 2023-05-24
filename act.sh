@@ -1,6 +1,6 @@
 #!/bin/bash
 ACT_VERSION="v22.11.0"
-ACT_LAST_COMMIT="103026d3b4e9e8ceaa6cf3aa667df94d3888453a"
+ACT_LAST_COMMIT="739b80a0fcafeb3692d154d578257146850db9f7"
 USER_CONFIG="$HOME/.appdynamics/act/config.sh"
 GLOBAL_CONFIG="/etc/appdynamics/act/config.sh"
 CONFIG_CONTROLLER_COOKIE_LOCATION="/tmp/appdynamics-controller-cookie.txt"
@@ -123,6 +123,8 @@ Manage custom analytics metrics
 EOF
 analyticsmetric_create() { apiCall -X POST -d '{"adqlQueryString":"{{q:query}}","eventType":"{{e:eventType}}","enabled":true,"queryType":"ADQL_QUERY","queryName":"{{n:queryname}}","queryDescription":"{{d:querydescription?}}"}' '/controller/restui/analyticsMetric/create' "$@" ; }
 rde analyticsmetric_create "Create analytics metric" "Provide an adql query (-q) and an event type (-e BROWSER_RECORD, BIZ_TXN) and a name (-n) as parameters. The description (-d) is optional." "-q 'SELECT count(*) FROM browser_records' -e BROWSER_RECORD -n 'My Custom Metric'"
+analyticsmetric_list() { apiCall '/controller/restui/analyticsMetric/getAnalyticsScheduledQueryReports' "$@" ; }
+rde analyticsmetric_list "List all analytics metrics" "" ""
 doc analyticsschema << EOF
 These commands allow you to manage analytics schemas.
 EOF
