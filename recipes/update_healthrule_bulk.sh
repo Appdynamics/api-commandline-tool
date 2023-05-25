@@ -126,9 +126,9 @@ getHRLIST() {
     echo "  No -H param, getting ALL HR"
     HRLIST=$(../act.sh -E ${ENVIRONMENT} healthrule list -a ${APPID} | jq -r '.[] | .id')
   else
-    echo "  -H '${HRSTRING}', getting mathcing HRs"
+    echo "  -H '${HRSTRING}', getting matching HRs"
     # Get list if HR IDs matching HRSTRING
-    HRLIST=$(../act.sh -E ${ENVIRONMENT} healthrule list -a ${APPID} | jq -r --arg PATTERN "${HRSTRING}" '.[] | select(.name | contains($PATTERN)) | .id')
+    HRLIST=$(../act.sh -E ${ENVIRONMENT} healthrule list -a ${APPID} | jq -r --arg PATTERN "${HRSTRING}" '.[] | select(.name | contains($PATTERN)) | "\(.id), \(.name)"')
   fi
   echo "${HRLIST}"
   echo "----------------------------------------------------------------------------"
@@ -141,8 +141,12 @@ updateHRData() {
   # Reset our vars and carry on
   resetVars
 
+  OLDIFS=$IFS
+  IFS=$'\r\n'
+
   #  Iterate through HR list
-  for HRID in $HRLIST; do
+  for HRITEM in $HRLIST; do
+    HRID=$(echo ${HRITEM} | cut -d "," -f1)
     echo "Updating ${HRID}..."
     # Set our URI for getting/updating current HR
     HEATHRULEURI="/controller/alerting/rest/v1/applications/${APPID}/health-rules/${HRID}"
@@ -150,16 +154,16 @@ updateHRData() {
     HROUTPUT=$(../act.sh -E ${ENVIRONMENT} controller call -X GET ${HEATHRULEURI})
 
     # Do we see the PATTERNIN in our HR?
-    HROUTPUTCHECK=$(echo ${HROUTPUT} | grep "${PATTERNIN}")
+    HROUTPUTCHECK=$(echo ${HROUTPUT} | grep -E "${PATTERNIN}")
     if [[ -z ${HROUTPUTCHECK} ]]; then
       echo "         No pattern match found in health rule, skipping any changes..."
       continue
     else
       # Update the HR json
-      HROUTPUTUPDATED=$(echo "${HROUTPUT}" | sed "s|${PATTERNIN}|${PATTERNOUT}|g")
+      HROUTPUTUPDATED=$(echo "${HROUTPUT}" | sed -r "s|${PATTERNIN}|${PATTERNOUT}|g")
       # PUT our HR json back
       HRPUTRESPONSE=$(../act.sh -E ${ENVIRONMENT} controller call -X PUT -d "${HROUTPUTUPDATED}" ${HEATHRULEURI})
-      HRPUTRESPONSECHECK=$(echo ${HRPUTRESPONSE} | grep "\"id\":${HRID},")
+      HRPUTRESPONSECHECK=$(echo ${HRPUTRESPONSE} | grep -E "\"id\":${HRID},")
       if [[ ${HRPUTRESPONSECHECK} ]]; then
         echo "         Updated"
       else
@@ -167,6 +171,8 @@ updateHRData() {
       fi
     fi
   done
+
+  IFS=$OLDIFS
 
   echo "----------------------------------------------------------------------------"
   echo "Completed HR updates"
