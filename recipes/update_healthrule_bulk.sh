@@ -126,7 +126,7 @@ getHRLIST() {
     echo "  No -H param, getting ALL HR"
     HRLIST=$(../act.sh -E ${ENVIRONMENT} healthrule list -a ${APPID} | jq -r '.[] | .id')
   else
-    echo "  -H '${HRSTRING}', getting mathcing HRs"
+    echo "  -H '${HRSTRING}', getting matching HRs"
     # Get list if HR IDs matching HRSTRING
     HRLIST=$(../act.sh -E ${ENVIRONMENT} healthrule list -a ${APPID} | jq -r --arg PATTERN "${HRSTRING}" '.[] | select(.name | contains($PATTERN)) | .id')
   fi
