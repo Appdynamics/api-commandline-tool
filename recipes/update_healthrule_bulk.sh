@@ -154,16 +154,16 @@ updateHRData() {
     HROUTPUT=$(../act.sh -E ${ENVIRONMENT} controller call -X GET ${HEATHRULEURI})
 
     # Do we see the PATTERNIN in our HR?
-    HROUTPUTCHECK=$(echo ${HROUTPUT} | grep "${PATTERNIN}")
+    HROUTPUTCHECK=$(echo ${HROUTPUT} | grep -E "${PATTERNIN}")
     if [[ -z ${HROUTPUTCHECK} ]]; then
       echo "         No pattern match found in health rule, skipping any changes..."
       continue
     else
       # Update the HR json
-      HROUTPUTUPDATED=$(echo "${HROUTPUT}" | sed "s|${PATTERNIN}|${PATTERNOUT}|g")
+      HROUTPUTUPDATED=$(echo "${HROUTPUT}" | sed -r "s|${PATTERNIN}|${PATTERNOUT}|g")
       # PUT our HR json back
       HRPUTRESPONSE=$(../act.sh -E ${ENVIRONMENT} controller call -X PUT -d "${HROUTPUTUPDATED}" ${HEATHRULEURI})
-      HRPUTRESPONSECHECK=$(echo ${HRPUTRESPONSE} | grep "\"id\":${HRID},")
+      HRPUTRESPONSECHECK=$(echo ${HRPUTRESPONSE} | grep -E "\"id\":${HRID},")
       if [[ ${HRPUTRESPONSECHECK} ]]; then
         echo "         Updated"
       else
